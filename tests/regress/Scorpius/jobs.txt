@@ -1,0 +1,10 @@
+# Render regression cases for Scorpius (scripts/render_regress.py). One per line:
+#   <name> signal=<sine|noise|burst|mix> [seconds=0.5] [fs=48000] [block=512] [threshold=-80] [param:Name=text ...]
+# Make the goldens once the DSP is right:  python scripts/render_regress.py --build build --update
+# and commit tests/regress/Scorpius/golden/*.f32 with that change. Rewrite them only with an intended DSP change.
+default_sine   signal=sine
+default_noise  signal=noise
+default_mix    signal=mix   seconds=1.0
+default_burst  signal=burst
+rate_44100     signal=mix   fs=44100
+block_64       signal=mix   block=64

@@ -1,0 +1,420 @@
+#include "Widgets.h"
+#include "OrreryUiData.h"
+
+using namespace juce;
+
+namespace orrery
+{
+Font theme::font (float emPx)
+{
+    static const auto face = Typeface::createSystemTypefaceFor (OrreryUiData::InstrumentSansRegular_ttf,
+                                                                OrreryUiData::InstrumentSansRegular_ttfSize);
+    return Font (FontOptions (face).withPointHeight (emPx));
+}
+
+void theme::textAt (Graphics& g, const String& s, float x, float baseline, Justification j)
+{
+    GlyphArrangement ga;
+    ga.addLineOfText (g.getCurrentFont(), s, 0.0f, 0.0f);
+    const float w = ga.getBoundingBox (0, -1, false).getRight();
+    const float dx = j.testFlags (Justification::right) ? x - w : j.testFlags (Justification::horizontallyCentred) ? x - w * 0.5f : x;
+    ga.draw (g, AffineTransform::translation (dx, baseline));
+}
+
+static void powerIcon (Graphics& g, Point<float> c, float r, Colour col, float stroke)
+{
+    Path p;
+    p.addCentredArc (c.x, c.y, r, r, 0.0f, 0.70f, MathConstants<float>::twoPi - 0.70f, true);
+    p.startNewSubPath (c.x, c.y - r - 1.0f);
+    p.lineTo (c.x, c.y - r * 0.15f);
+    g.setColour (col);
+    g.strokePath (p, PathStrokeType (stroke, PathStrokeType::curved, PathStrokeType::rounded));
+}
+
+void PowerButton::paint (Graphics& g)
+{
+    const auto b = getLocalBounds().toFloat().withHeight (boxHeight);
+    if (offHoverFill && isMouseButtonDown() && isMouseOver())
+    {
+        // Orion's pressed look, on or off: a dark mint box without its outline and a dimmed icon (measured)
+        g.setColour (theme::mint.withAlpha (0.2f));
+        g.fillRoundedRectangle (b.reduced (0.5f), 2.5f);
+        powerIcon (g, b.getCentre().translated (0.0f, 0.5f), 6.2f, theme::mint.withAlpha (0.85f), 1.0f);
+        return;
+    }
+    if (active)
+    {
+        g.setColour (theme::mint.brighter (isMouseOver() && ! offHoverFill ? 0.06f : 0.0f));
+        g.fillRoundedRectangle (b, 2.5f);
+        powerIcon (g, b.getCentre().translated (0.0f, 0.5f), 6.2f, theme::well, 1.0f);
+    }
+    else
+    {
+        if (offHoverFill && isMouseOver())
+        {
+            g.setColour (theme::mint.withAlpha (0.2f));
+            g.fillRoundedRectangle (b.reduced (0.5f), 2.5f);
+        }
+        g.setColour (theme::mint);
+        g.drawRoundedRectangle (b.reduced (0.5f), 2.5f, 1.0f);
+        powerIcon (g, b.getCentre().translated (0.0f, 0.5f), 6.2f, theme::mint, 1.0f);
+    }
+}
+
+void LinkButton::paint (Graphics& g)
+{
+    const auto b = getLocalBounds().toFloat().withHeight (24.5f).reduced (0.5f);
+    g.setColour (active ? theme::gold : theme::boxFill);
+    g.fillRoundedRectangle (b, 4.0f);
+    g.setColour (isMouseOver() || active ? theme::gold : theme::lineLight);
+    g.drawRoundedRectangle (b, 4.0f, 1.0f);
+    g.setFont (theme::font (12.0f));
+    g.setColour (active ? theme::well : theme::text);
+    g.drawText ("I/O LINK", Rectangle<float> (0.0f, 0.0f, (float) getWidth(), 24.5f).translated (0.5f, -0.5f), Justification::centred, false);
+}
+
+void IconButton::paint (Graphics& g)
+{
+    const auto b = getLocalBounds().toFloat().withHeight (24.5f);
+    // under the mouse the box lightens
+    g.setColour (isMouseOver() || isMouseButtonDown() ? theme::raisedTop : theme::boxFill);
+    g.fillRoundedRectangle (b.reduced (0.5f), 4.0f);
+    g.setColour (isMouseOver() ? theme::gold : theme::lineLight);
+    g.drawRoundedRectangle (b.reduced (0.5f), 4.0f, 1.0f);
+    const auto c = b.getCentre();
+    Path p;
+    if (icon == Icon::save)
+    {
+        // floppy disk
+        const auto r = Rectangle<float> (15.0f, 15.5f).withCentre (c);
+        p.startNewSubPath (r.getX() + 1.5f, r.getY());
+        p.lineTo (r.getRight() - 3.0f, r.getY());
+        p.lineTo (r.getRight(), r.getY() + 3.0f);
+        p.lineTo (r.getRight(), r.getBottom() - 1.5f);
+        p.quadraticTo (r.getRight(), r.getBottom(), r.getRight() - 1.5f, r.getBottom());
+        p.lineTo (r.getX() + 1.5f, r.getBottom());
+        p.quadraticTo (r.getX(), r.getBottom(), r.getX(), r.getBottom() - 1.5f);
+        p.lineTo (r.getX(), r.getY() + 1.5f);
+        p.quadraticTo (r.getX(), r.getY(), r.getX() + 1.5f, r.getY());
+        p.closeSubPath();
+        p.addRectangle (r.getX() + 3.5f, r.getY(), r.getWidth() - 8.0f, 4.5f);
+        p.addRectangle (r.getX() + 3.0f, r.getY() + 8.5f, r.getWidth() - 6.0f, r.getHeight() - 8.5f);
+        g.strokePath (p, PathStrokeType (1.1f));
+        return;
+    }
+    const float d = icon == Icon::left ? -1.0f : 1.0f;
+    p.startNewSubPath (c.x - 6.5f * d, c.y);
+    p.lineTo (c.x + 6.5f * d, c.y);
+    p.startNewSubPath (c.x + 1.0f * d, c.y - 5.5f);
+    p.lineTo (c.x + 6.5f * d, c.y);
+    p.lineTo (c.x + 1.0f * d, c.y + 5.5f);
+    g.strokePath (p, PathStrokeType (1.1f, PathStrokeType::mitered, PathStrokeType::rounded));
+}
+
+static void triangle (Graphics& g, Rectangle<float> r, Colour c)
+{
+    Path t;
+    t.addTriangle (r.getX(), r.getY(), r.getRight(), r.getY(), r.getCentreX(), r.getBottom());
+    g.setColour (c);
+    g.fillPath (t);
+}
+
+void DropBox::paint (Graphics& g)
+{
+    const auto b = getLocalBounds().toFloat().withHeight (24.5f);
+    g.setColour (theme::boxFill);
+    g.fillRect (b);
+    g.setColour (open || isMouseOver() ? theme::gold : theme::boxLine);     // the frame turns white under the mouse (measured)
+    g.drawRect (b, 1.0f);
+    g.setColour (theme::text);
+    g.setFont (theme::font (12.0f));
+    theme::textAt (g, text, 6.5f, 16.5f);
+    triangle (g, { b.getRight() - 20.0f, 10.0f, 10.0f, 4.5f }, theme::text);
+}
+
+void SegmentToggle::paint (Graphics& g)
+{
+    const auto b = getLocalBounds().toFloat().withHeight (24.5f).reduced (0.5f);
+    const float half = b.getWidth() * 0.5f + 0.25f;
+    g.setColour (theme::boxFill);
+    g.fillRoundedRectangle (b, 4.0f);
+    {
+        Graphics::ScopedSaveState s (g);
+        Path clip;
+        clip.addRoundedRectangle (b, 4.0f);
+        g.reduceClipRegion (clip);
+        g.setColour (theme::gold);
+        g.fillRect (external ? b.withTrimmedLeft (half) : b.withWidth (half));
+    }
+    g.setColour (theme::lineLight);
+    g.drawRoundedRectangle (b, 4.0f, 1.0f);
+    g.setFont (theme::font (12.0f));
+    g.setColour (external ? theme::text : theme::well);
+    g.drawText ("INT", Rectangle<float> (0.0f, 0.0f, half, 24.5f).translated (0.5f, -0.5f), Justification::centred, false);
+    g.setColour (external ? theme::well : theme::text);
+    g.drawText ("EXT", Rectangle<float> (half, 0.0f, b.getWidth() - half, 24.5f).translated (0.5f, -0.5f), Justification::centred, false);
+}
+
+void GearButton::paint (Graphics& g)
+{
+    const auto c = getLocalBounds().toFloat().getCentre();
+    Path gear;
+    const int teeth = 8;
+    for (int i = 0; i < teeth * 2; ++i)
+    {
+        const float a0 = MathConstants<float>::twoPi * (float) i / (float) (teeth * 2);
+        const float a1 = MathConstants<float>::twoPi * (float) (i + 1) / (float) (teeth * 2);
+        const float r = (i % 2 == 0) ? 7.6f : 6.0f;
+        const auto p0 = c.getPointOnCircumference (r, a0 + 0.06f), p1 = c.getPointOnCircumference (r, a1 - 0.06f);
+        if (i == 0) gear.startNewSubPath (p0); else gear.lineTo (p0);
+        gear.lineTo (p1);
+    }
+    gear.closeSubPath();
+    g.setColour (isMouseOver() ? theme::letteringDim : theme::boxLine);      // brighter under the mouse
+    g.strokePath (gear, PathStrokeType (1.3f, PathStrokeType::curved));
+    g.drawEllipse (Rectangle<float> (6.2f, 6.2f).withCentre (c), 1.3f);
+}
+
+void Logo::paint (Graphics& g)
+{
+    if (isMouseOver()) { g.setColour (theme::text.withAlpha (0.06f)); g.fillRoundedRectangle (getLocalBounds().toFloat(), 2.0f); }
+    // the Orrery Suite mark: the orbit in violet: a sun with its
+    // orbit, the orbit lit along its lower arc as a crescent, a planet nearer in (at this size the inner orbit is left out)
+    const auto c = getLocalBounds().toFloat().getCentre();
+    const float ro = 7.2f;
+    g.setColour (theme::violetLight);
+    g.drawEllipse (Rectangle<float> (2 * ro, 2 * ro).withCentre (c), 1.0f);                     // the orbit
+    Path crescent;                                                                             // its lit lower arc
+    for (int i = 0; i <= 24; ++i)                                                              // outer edge, left to right
+    {
+        const float a = MathConstants<float>::pi * (0.7f + 0.6f * (float) i / 24.0f);
+        const Point<float> p (c.x - (ro + 0.5f) * std::sin (a), c.y - (ro + 0.5f) * std::cos (a));
+        if (i == 0) crescent.startNewSubPath (p); else crescent.lineTo (p);
+    }
+    for (int i = 24; i >= 0; --i)                                                              // inner edge back, higher up
+    {
+        const float a = MathConstants<float>::pi * (0.7f + 0.6f * (float) i / 24.0f);
+        crescent.lineTo (c.x - (ro + 0.5f) * std::sin (a), c.y - 1.2f - (ro - 1.6f) * std::cos (a));
+    }
+    crescent.closeSubPath();
+    g.setColour (theme::pearl);
+    g.fillPath (crescent);
+    g.fillEllipse (Rectangle<float> (5.2f, 5.2f).withCentre (c + Point<float> (0.0f, -0.6f)));   // the sun (the particle)
+    g.fillEllipse (Rectangle<float> (2.4f, 2.4f).withCentre (c + Point<float> (3.4f, -3.6f)));   // a planet nearer in
+}
+
+InfoDialog::InfoDialog (String t, std::vector<std::pair<String, String>> r)
+    : Dialog (std::move (t), { 154.0f, 46.0f, 580.0f, 288.0f }, true), rows (std::move (r)) {}
+
+void InfoDialog::paint (Graphics& g)
+{
+    Dialog::paint (g);
+    constexpr float lineH = 16.5f, rowGap = 23.0f;
+    float y = box.getY() + 58.0f;
+    for (auto& [label, value] : rows)
+    {
+        if (label.isEmpty() && value.isEmpty()) { y += 9.0f; continue; }
+        g.setFont (theme::font (11.5f));
+        g.setColour (theme::letteringDim);
+        theme::textAt (g, label, box.getX() + 24.0f, y);
+        g.setColour (theme::text);
+        GlyphArrangement ga;
+        ga.addJustifiedText (theme::font (11.5f), value, box.getX() + 124.0f, y, box.getWidth() - 152.0f, Justification::left,
+                             lineH - theme::font (11.5f).getHeight());
+        ga.draw (g);
+        const int lines = jmax (1, (int) std::round ((ga.getBoundingBox (0, -1, true).getBottom() - y + 9.0f) / lineH));
+        y += lineH * (float) (lines - 1) + rowGap;
+    }
+}
+
+void DropList::setItems (std::vector<Item> i, float rowHeight, bool captionsStyle)
+{
+    items = std::move (i);
+    rowH = rowHeight;
+    presetStyle = captionsStyle;
+    hover = -1;
+}
+
+int DropList::rowAt (int y) const
+{
+    const int r = (int) std::floor ((float) y / rowH);
+    return (r >= 0 && r < (int) items.size() && ! items[(size_t) r].caption) ? r : -1;
+}
+
+void DropList::mouseUp (const MouseEvent& e)
+{
+    const int r = rowAt (e.y);
+    // called through a copy: the callback usually closes (deletes) this list, which would free it, and what it
+    // captured, while it is still running
+    if (r >= 0 && onPick) { auto pick = onPick; pick (r); }
+}
+
+void DropList::paint (Graphics& g)
+{
+    const auto b = getLocalBounds().toFloat();
+    g.setColour (theme::card);
+    g.fillRect (b);
+    for (int i = 0; i < (int) items.size(); ++i)
+    {
+        const auto& it = items[(size_t) i];
+        const auto row = Rectangle<float> (0.0f, (float) i * rowH, b.getWidth(), rowH);
+        if (presetStyle && ! it.caption && i == hover) { g.setColour (theme::raised); g.fillRect (row); }
+        if (presetStyle && it.caption) { g.setColour (theme::raised); g.fillRect (row.withTrimmedTop (rowH * 0.45f)); }
+        if (it.caption)
+        {
+            g.setColour (theme::menuCaption);
+            auto f = theme::font (9.5f);
+            f.setExtraKerningFactor (0.32f);
+            g.setFont (f);
+            theme::textAt (g, it.text.toUpperCase(), 6.0f, row.getY() + rowH * 0.62f + 3.0f);
+        }
+        else
+        {
+            g.setColour (presetStyle ? theme::letteringDim : (i == hover ? theme::text : theme::text.withAlpha (0.92f)));
+            g.setFont (theme::font (12.0f));
+            theme::textAt (g, it.text, 6.0f, row.getY() + rowH * 0.5f + 4.2f);
+        }
+    }
+    g.setColour (theme::text);
+    g.drawRect (b, 1.0f);
+}
+
+Dialog::Dialog (String t, Rectangle<float> r, bool dimTopBar) : box (r), title (std::move (t)), dimTop (dimTopBar)
+{
+    noFocus (*this);
+}
+
+void Dialog::paint (Graphics& g)
+{
+    const auto all = getLocalBounds().toFloat();
+    g.setColour (Colours::black.withAlpha (0.62f));
+    g.fillRect (dimTop ? all : all.withTrimmedTop (30.5f));
+    g.setColour (theme::card);
+    g.fillRect (box);
+    g.setColour (theme::well);
+    g.fillRect (box.withHeight (31.5f));
+    g.setColour (theme::text);
+    g.setFont (theme::font (17.5f));
+    theme::textAt (g, title, box.getX() + 11.0f, box.getY() + 22.5f);
+    const auto x = closeArea().reduced (5.5f, 3.5f);
+    g.setColour (theme::letteringFaint);
+    g.drawLine ({ x.getTopLeft(), x.getBottomRight() }, 1.0f);
+    g.drawLine ({ x.getBottomLeft(), x.getTopRight() }, 1.0f);
+}
+
+void Dialog::mouseDown (const MouseEvent& e)
+{
+    const auto p = e.position;
+    if (closeArea().contains (p) || ! box.contains (p))
+        if (onClose) onClose();
+}
+
+//==============================================================================
+Rectangle<float> CompareToggle::circle() const
+{
+    return Rectangle<float> (22.0f, 22.0f).withCentre (getLocalBounds().toFloat().withHeight (24.5f).getCentre());
+}
+
+void CompareToggle::paint (Graphics& g)
+{
+    const auto b = getLocalBounds().toFloat().withHeight (24.5f).reduced (0.5f);
+    const float half = b.getWidth() * 0.5f;
+    const int inactive = 1 - slot;
+    g.setColour (theme::boxFill);
+    g.fillRoundedRectangle (b, 4.0f);
+    {
+        Graphics::ScopedSaveState s (g);
+        Path clip;
+        clip.addRoundedRectangle (b, 4.0f);
+        g.reduceClipRegion (clip);
+        if (hover == inactive || pressedPart == inactive)
+        {
+            g.setColour (theme::raisedTop);
+            g.fillRect (inactive == 0 ? b.withWidth (half) : b.withTrimmedLeft (half));
+        }
+        // the active half is gold, or dark while held down
+        g.setColour (pressedPart == slot ? theme::raisedTop : theme::gold);
+        g.fillRect (slot == 0 ? b.withWidth (half) : b.withTrimmedLeft (half));
+    }
+    g.setColour (theme::lineLight);
+    g.drawRoundedRectangle (b, 4.0f, 1.0f);
+    g.setFont (theme::font (12.0f));
+    const Colour grey (theme::letteringDim);
+    // the active letter: dark on gold, dim under the mouse, light while held down
+    g.setColour (slot == 0 ? (pressedPart == 0 ? theme::text : hover == 0 ? grey : theme::boxFill) : theme::text);
+    g.drawText ("A", Rectangle<float> (0.0f, 0.0f, 26.0f, 24.5f).translated (0.5f, -0.5f), Justification::centred, false);
+    g.setColour (slot == 1 ? (pressedPart == 1 ? theme::text : hover == 1 ? grey : theme::boxFill) : theme::text);
+    g.drawText ("B", Rectangle<float> (b.getRight() - 26.0f, 0.0f, 26.0f, 24.5f).translated (0.0f, -0.5f), Justification::centred, false);
+
+    // the copy button: a black circle across the middle, ringed, with an arrow towards the other setting
+    const auto c = circle();
+    g.setColour (pressedPart == 2 ? theme::raisedTop : theme::well);
+    g.fillEllipse (c);
+    g.setColour (theme::text);
+    g.drawEllipse (c.reduced (0.5f), 1.0f);
+    // the arrow: grey under the mouse, white again while held down
+    g.setColour (hover == 2 && pressedPart != 2 ? theme::letteringDim : theme::text);
+    const float d = slot == 0 ? 1.0f : -1.0f;
+    const auto m = c.getCentre();
+    Path p;
+    p.startNewSubPath (m.x - 6.0f * d, m.y);
+    p.lineTo (m.x + 6.0f * d, m.y);
+    p.startNewSubPath (m.x + 1.0f * d, m.y - 5.0f);
+    p.lineTo (m.x + 6.0f * d, m.y);
+    p.lineTo (m.x + 1.0f * d, m.y + 5.0f);
+    g.strokePath (p, PathStrokeType (1.1f, PathStrokeType::mitered, PathStrokeType::rounded));
+}
+
+int CompareToggle::partAt (Point<float> p) const
+{
+    if (circle().contains (p)) return 2;
+    return p.x < (float) getWidth() * 0.5f ? 0 : 1;
+}
+
+// acts on release over the part that was pressed (measured: a press dragged off does nothing)
+void CompareToggle::mouseDown (const MouseEvent& e) { pressedPart = partAt (e.position); repaint(); }
+
+void CompareToggle::mouseUp (const MouseEvent& e)
+{
+    const int part = getLocalBounds().contains (e.getPosition()) ? partAt (e.position) : -1;
+    const int was = pressedPart;
+    pressedPart = -1;
+    repaint();
+    if (part != was) return;
+    if (part == 2) { if (onCopy) onCopy(); return; }
+    if (part >= 0 && part != slot && onSelect) onSelect (part);
+}
+
+//==============================================================================
+void Toast::show (const String& t)
+{
+    text = t;
+    shownAt = Time::getMillisecondCounterHiRes();
+    setAlpha (1.0f);
+    setVisible (true);
+    toFront (false);
+    repaint();
+    startTimerHz (60);
+}
+
+void Toast::timerCallback()
+{
+    const double t = Time::getMillisecondCounterHiRes() - shownAt - holdMs;
+    if (t >= fadeMs) { stopTimer(); setVisible (false); setAlpha (1.0f); return; }
+    setAlpha (t <= 0.0 ? 1.0f : (float) (1.0 - t / fadeMs));
+}
+
+void Toast::paint (Graphics& g)
+{
+    // (measured at 200 %: the box 200 x 60.5 with a 1 px edge #252523, filled #050607; the text as the labels, its
+    // baseline 34.25 below the box's top)
+    const auto b = getLocalBounds().toFloat();
+    g.setColour (theme::raisedTop);
+    g.fillRect (b);
+    g.setColour (theme::topBar);
+    g.fillRect (b.reduced (1.0f));
+    g.setColour (theme::text);
+    g.setFont (theme::font (12.0f));
+    theme::textAt (g, text, b.getCentreX() - 1.0f, 34.25f, Justification::horizontallyCentred);
+}
+}

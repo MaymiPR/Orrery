@@ -1,0 +1,10 @@
+Orrery Suite
+============
+
+Orrery Suite is an open-source project (AGPL-3.0): https://github.com/MaymiPR/Orrery
+
+It is an independent project. It is not affiliated with, endorsed by or sponsored by Cradle.
+Product names belong to their owners and only describe what each plug-in is modelled on. None of their code, artwork,
+preset files, fonts or other files is included: each plug-in was built from measurements of how the original sounds
+and behaves, and its editor is drawn by Orrery Suite. Wraith's reverb plays room and plate responses measured from the
+original's output.

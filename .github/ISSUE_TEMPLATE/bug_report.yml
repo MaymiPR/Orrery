@@ -1,0 +1,63 @@
+name: Bug report
+description: Something does not work, crashes, or sounds wrong.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting. The details below let us reproduce it.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Load ...
+        2. Set ...
+        3. Play ...
+    validations:
+      required: true
+  - type: input
+    id: plugin
+    attributes:
+      label: Plug-in and version
+      description: The logo menu at the top of the plug-in shows the version.
+      placeholder: "Positron 1.x.y"
+    validations:
+      required: true
+  - type: dropdown
+    id: format
+    attributes:
+      label: Plug-in format
+      options: [VST3, CLAP, AU, Standalone]
+    validations:
+      required: true
+  - type: input
+    id: host
+    attributes:
+      label: DAW and version
+      placeholder: "FL Studio 2026, Ableton Live 12.1, Logic Pro 11, Reaper 7 ..."
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "Windows 11 / macOS 15 (Apple Silicon) / Ubuntu 24.04"
+    validations:
+      required: true
+  - type: textarea
+    id: original
+    attributes:
+      label: Difference from the original (if any)
+      description: If it sounds or behaves differently from the original plug-in with the same settings, describe how. The settings or a preset help a lot.
+  - type: textarea
+    id: files
+    attributes:
+      label: Screenshots, recordings or files
+      description: Drag files here (a preset, a short audio example, a screenshot).

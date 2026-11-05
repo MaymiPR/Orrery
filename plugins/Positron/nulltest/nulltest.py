@@ -1,0 +1,245 @@
+"""Null tests: the same signals and settings through the reference (Cradle The God Particle) and through
+Positron; the residual (reference - ours) in dB re the reference's output. Both renders are latency-compensated by
+each plug-in's reported latency, so a latency mismatch shows up as residual too.
+
+    python nulltest.py                 # every case, our processor via PoRender (fast)
+    python nulltest.py --vst3          # our built VST3 through RefRender (the shipped binary)
+    python nulltest.py --only lim      # cases whose name contains 'lim'
+Writes nulltest/results.json and prints a table; NULLTESTS.md reports it."""
+import argparse, json, os
+import numpy as np
+import tgp
+
+FS = tgp.FS
+PRE = 2 * FS                    # the reference's start-up delay ramp (MEASUREMENTS.md); excluded from the residual
+SECS = 6
+
+
+def sig_noise(db=-18, pink=True, seed=11):
+    return tgp.noise(SECS, db, seed=seed, pink=pink)
+
+
+def sig_sweep(db=-12, f0=20, f1=20000):
+    t = np.arange(int(SECS * FS)) / FS
+    k = np.log(f1 / f0) / SECS
+    return (10 ** (db / 20) * np.sin(2 * np.pi * f0 * (np.exp(k * t) - 1) / k)).astype(np.float32)
+
+
+def sig_drums(db=-6, seed=3):
+    """Synthetic drum loop: kick (decaying 55 Hz), snare (noise burst + 190 Hz) and hats, 120 bpm, peaks ~db."""
+    rng = np.random.default_rng(seed)
+    n = int(SECS * FS); x = np.zeros(n); beat = int(0.5 * FS)
+    t = np.arange(int(0.4 * FS)) / FS
+    kick = np.sin(2 * np.pi * (55 * t + 60 * (1 - np.exp(-t * 30)) / 30)) * np.exp(-t * 8)
+    snare = (rng.standard_normal(len(t)) * 0.6 + np.sin(2 * np.pi * 190 * t)) * np.exp(-t * 18)
+    hat = rng.standard_normal(int(0.05 * FS)) * np.exp(-np.arange(int(0.05 * FS)) / FS * 80) * 0.3
+    for i in range(0, n - len(t), beat):
+        k = i // beat
+        x[i:i + len(t)] += kick if k % 2 == 0 else snare
+        h = i + beat // 2
+        if h + len(hat) < n: x[h:h + len(hat)] += hat
+    x *= 10 ** (db / 20) / np.max(np.abs(x))
+    return x.astype(np.float32)
+
+
+def sig_music(db=-10, seed=5):
+    """A dense synthetic mix: bass line, chords (saw-ish partials), pink noise bed, drums; stereo."""
+    rng = np.random.default_rng(seed)
+    n = int(SECS * FS); t = np.arange(n) / FS
+    notes = np.array([55, 65.4, 73.4, 49])
+    f = notes[(t / 0.75).astype(int) % 4]
+    bass = np.sin(2 * np.pi * np.cumsum(f) / FS) * 0.5
+    chord = sum(np.sin(2 * np.pi * f * k * t) / k for f in (220, 277.2, 329.6) for k in range(1, 8)) * 0.08
+    bed = tgp.noise(SECS, -30, seed=seed, pink=True)
+    d = sig_drums(-3, seed)
+    l = bass + chord + bed + d * 0.8; r = bass + chord * 0.8 + np.roll(bed, 37) + d * 0.8
+    m = max(np.max(np.abs(l)), np.max(np.abs(r)))
+    return (np.stack([l, r]) * 10 ** (db / 20) / m).astype(np.float32)
+
+
+SIGNALS = {
+    'pink -18': lambda: sig_noise(-18), 'pink -6': lambda: sig_noise(-6), 'sweep -12': lambda: sig_sweep(-12),
+    'drums -6': lambda: sig_drums(-6), 'music -10': lambda: sig_music(-10), 'music -2': lambda: sig_music(-2),
+}
+N = tgp.NONE
+CASES = [
+    # name, signal, normalised params, displayed params
+    ('path: all stages bypassed', 'pink -18', N, {}),
+    ('eq: low +6 mid -4 high +3 (eq only)', 'pink -18', tgp.EQ_ONLY, {'EQ Low Gain': 6, 'EQ Mid Gain': -4, 'EQ High Gain': 3}),
+    ('eq: sweep, low -6 high +6 (eq only)', 'sweep -12', tgp.EQ_ONLY, {'EQ Low Gain': -6, 'EQ High Gain': 6}),
+    ('lim: pink -6, gain 5 (limiter only)', 'pink -6', tgp.LIM_ONLY, {}),
+    ('lim: drums -6, gain 12 (limiter only)', 'drums -6', tgp.LIM_ONLY, {'Limiter Input Gain': 12}),
+    ('lim: music -2, gain 5 (limiter only)', 'music -2', tgp.LIM_ONLY, {}),
+    ('char: pink -18, 100 % (character only)', 'pink -18', tgp.CHAR_ONLY, {}),
+    ('char: pink -6, 100 % (character only)', 'pink -6', tgp.CHAR_ONLY, {}),
+    ('char: music -10, 50 %', 'music -10', {**tgp.CHAR_ONLY, 'Character': 0.25}, {}),
+    ('char: music -10, 100 %', 'music -10', tgp.CHAR_ONLY, {}),
+    ('char: music -10, 200 %', 'music -10', {**tgp.CHAR_ONLY, 'Character': 1.0}, {}),
+    ('char: drums -6, 100 %', 'drums -6', tgp.CHAR_ONLY, {}),
+    ('full: music -10, defaults', 'music -10', {}, {}),
+    ('full: music -2, defaults', 'music -2', {}, {}),
+    ('full: drums -6, defaults', 'drums -6', {}, {}),
+    ('full: music -10, 200 %, gain 10, eq +3/-2/+4, in -3 out +2', 'music -10', {'Character': 1.0},
+     {'Limiter Input Gain': 10, 'EQ Low Gain': 3, 'EQ Mid Gain': -2, 'EQ High Gain': 4, 'Input Gain': -3, 'Output Gain': 2}),
+]
+
+
+def residual_db(ref, ours):
+    a, b = ref[:, PRE:], ours[:, PRE:]
+    return 10 * np.log10(np.sum((a - b) ** 2) / max(np.sum(a ** 2), 1e-30))
+
+
+def run(only=None, vst3=False):
+    cases = [c for c in CASES if only is None or only in c[0]]
+    sigs = {k: f() for k, f in SIGNALS.items()}
+    pad = lambda x: np.concatenate([np.zeros((2, PRE) if x.ndim == 2 else PRE, np.float32), x], axis=-1)
+    jobs = [dict(x=pad(sigs[s]), norm=nm, params=pm) for _, s, nm, pm in cases]
+    ref = tgp.render_many(jobs, 'ref', cache=True)
+    ours = tgp.render_many(jobs, 'ours' if vst3 else 'model')
+    res = {}
+    for (name, s, nm, pm), r, o in zip(cases, ref, ours):
+        res[name] = dict(residual_dB=round(float(residual_db(r, o)), 2), ref_rms_dBFS=round(tgp.rms_db(r[:, PRE:]), 2),
+                         ours_rms_dBFS=round(tgp.rms_db(o[:, PRE:]), 2))
+        print(f'{res[name]["residual_dB"]:8.2f} dB   {name}   (rms ref {res[name]["ref_rms_dBFS"]}, ours {res[name]["ours_rms_dBFS"]})')
+    return res
+
+
+def report(before=None):
+    """NULLTESTS.md from results.json (our processor) and results_vst3.json (the built VST3), when present. before: an
+    earlier results.json (results_<version>.json, our processor at that version; results_stress_<version>.json beside it
+    for the stress cases), shown as a column"""
+    here = os.path.dirname(os.path.abspath(__file__))
+    model = json.load(open(os.path.join(here, 'results.json')))
+    old, old_st, tag = {}, {}, ''
+    if before:
+        old = json.load(open(os.path.join(here, before)))
+        tag = before.replace('results_', '').replace('.json', '')
+        stb = os.path.join(here, f'results_stress_{tag}.json')
+        old_st = json.load(open(stb)) if os.path.exists(stb) else {}
+    vst3p = os.path.join(here, 'results_vst3.json')
+    vst3 = json.load(open(vst3p)) if os.path.exists(vst3p) else {}
+    sigdoc = {'pink -18': 'pink noise, -18 dBFS RMS', 'pink -6': 'pink noise, -6 dBFS RMS', 'sweep -12': 'log sine sweep 20 Hz - 20 kHz, -12 dBFS',
+              'drums -6': 'synthetic drum loop (kick, snare, hats), peaks -6 dBFS', 'music -10': 'synthetic mix (bass, chords, noise bed, drums), stereo, peaks -10 dBFS',
+              'music -2': 'the same mix, peaks -2 dBFS'}
+    lines = ['# Null tests', '',
+             'The same signal and settings through the reference (Cradle The God Particle 1.2.4, VST3) and through Positron. The',
+             "residual is reference minus ours, in dB re the reference's output energy. Lower is better: -20 dB means the difference",
+             "is a tenth of the signal's amplitude, -60 dB is inaudible in practice. Both renders are compensated by each plug-in's",
+             'reported latency (they report the same values), at 48 kHz, oversampling 1x, block 512. The first 2 s are skipped:',
+             "the reference's delay settles after loading. Signals are synthetic and generated by `nulltest/nulltest.py`; stages are",
+             "isolated with the reference's own power buttons. A mastered demo track is also tested (below); the track itself is not",
+             'in the repository.', '',
+             'Reproduce: `python nulltest/nulltest.py` (our processor through tools/PoRender) and `python nulltest/nulltest.py --vst3`',
+             '(the built VST3 through tools/RefRender). The reference renders stay local (git-ignored).'
+             + (f' The column {tag} is our processor as released in version {tag}.' if tag else ''), '',
+             '| Case | Signal |' + (f' {tag} (dB) |' if tag else '') + ' Residual, ours (dB) | Residual, VST3 build (dB) |',
+             '|---|---|' + ('---|' if tag else '') + '---|---|']
+    for name, sig, nm, pm in CASES:
+        r = model.get(name, {}); v = vst3.get(name, {})
+        b = f' {old.get(name, {}).get("residual_dB", "")} |' if tag else ''
+        lines.append(f'| {name.split(" (")[0]} | {sigdoc[sig]} |{b} {r.get("residual_dB", "")} | {v.get("residual_dB", "")} |')
+    lines += ['', 'Signal list: ' + '; '.join(f'**{k}**: {v}' for k, v in sigdoc.items()) + '.', '']
+    # the numbers the text quotes, from the result files
+    val = lambda prefix: [v['residual_dB'] for k, v in model.items() if k.startswith(prefix)]
+    rng = lambda vs: ('' if not vs else f'{max(vs):.0f} dB' if round(max(vs)) == round(min(vs)) else f'{max(vs):.0f} to {min(vs):.0f} dB')
+    stp, trp = os.path.join(here, 'results_stress.json'), os.path.join(here, 'results_track.json')
+    st = json.load(open(stp)) if os.path.exists(stp) else {}
+    tr = json.load(open(trp)) if os.path.exists(trp) else {}
+    sv = lambda group, test=lambda c: True: [v for k, v in st.items() if k.startswith('48 kHz') and f'| {group} |' in k and test(k.split(' | ')[2])]
+    amt = sv('amount', lambda c: not c.startswith('amount 0 %') and not c.startswith('amount 200 %'))
+    zero = sv('amount', lambda c: c.startswith('amount 0 %'))
+    trv = lambda k: f'{tr[k]["residual_dB"]:.0f} dB' if k in tr else ''
+    lines += ['## What the numbers say', '',
+              f'None of these is a perfect null. On program material the full chain lands at {rng(val("full:"))}, and the',
+              f'stress tests below ({len(st)} cases over settings, levels, signals, automation, rates and block sizes) have a median of',
+              f'{np.median(list(st.values())):.0f} dB.' if st else '', '',
+              f'- **The path, EQ and crossover are exact for practical purposes** ({rng(val("path:") + val("eq:"))}): the fixed delay, the',
+              "  filters and the character section's FIR crossover (taken from the reference's own impulse responses, at every",
+              '  supported rate) are linear and fully identified.' + (f' At amount 0 % the character section nulls at {zero[0]:.0f} dB.' if zero else ''),
+              f'- **The character section** nulls music at {rng(amt)} from 12.5 to 187.5 %. Its structure is identified',
+              '  (MEASUREMENTS.md 3.9 - 3.17): a sine shaper faded in by the amount, mid-only detectors, a side gain per band,',
+              '  a mid band whose nonlinear stage hears a steep upper edge and whose gain reaches the treble through a',
+              "  steeper path still, and a high band whose detector is a mean square with a slow release. The band laws are fitted on",
+              '  program material. Weakest: loud, dense material',
+              f'  (loud pink noise {model.get("char: pink -6, 100 % (character only)", {}).get("residual_dB", "")} dB, mostly the mid band;'
+              + (f' a mastered track {trv("character only")})' if tr else ')') + '.',
+              '- **The limiter** follows the probe-identified algorithm (MEASUREMENTS.md 4.1) with an inter-sample',
+              f'  interpolator fitted per rate: {rng(val("lim: drums") + val("lim: music"))} on music and drums,',
+              f'  {rng(val("lim: pink"))} under continuous heavy limiting of pink noise'
+              + (f', {trv("limiter only")} on the mastered track at 44.1 kHz' if tr else '') + '. The pink-noise case is at',
+              "  the floor set by the reference's own sensitivity: input noise at -80 dBFS moves its output by -57.5 dB",
+              '  (MEASUREMENTS.md 4.1).',
+              "- **Parameter changes** follow the reference's control-rate smoothing (MEASUREMENTS.md 5.1): gain, EQ, amount,",
+              f'  limiter moves and switching stages on and off null at {rng(sv("automation"))}.',
+              '- **The built VST3 and the offline renderer give the same numbers**, so these hold for the plug-in itself.',
+              '']
+    trp = os.path.join(here, 'results_track.json')
+    if os.path.exists(trp):
+        lines += ['## A mastered track', '',
+                  'A 70 s future-house demo track (16-bit, 44.1 kHz, about -10 dBFS RMS: loud, dense and bright), through the',
+                  'reference and the built VST3 at 44.1 kHz with the stage buttons as a user would press them, including the limiter',
+                  'and the character section switched off and back on while it plays (`python nulltest/track.py`; `--vary` sends',
+                  'irregular host blocks as FL Studio does, with the same results). The worst second is the loudest part.', '',
+                  '| Setting | Residual (dB) | Worst second (dB) |', '|---|---|---|']
+        for name, v in json.load(open(trp)).items():
+            lines.append(f'| {name} | {v["residual_dB"]} | {v["worst_second_dB"]} |')
+        lines.append('')
+    osp = os.path.join(here, 'results_oversampling.json')
+    if os.path.exists(osp):
+        lines += ['## Oversampling', '',
+                  "Default settings with the reference switched to 2x / 4x / 8x through its own settings page (then back to 1x) and",
+                  'ours forced to the same ratio, at 48, 44.1 and 96 kHz (`python nulltest/null_oversampling.py`). The filters are',
+                  "designed per host rate like the reference's (MEASUREMENTS.md 7); with the 48 kHz design at every rate, 44.1 kHz",
+                  'drums null at -14 / -11 / -14 dB (2x / 4x / 8x) and 96 kHz at -19 / -37 / -38.', '',
+                  '| Ratio, signal | Residual, ours (dB) |', '|---|---|']
+        for name, v in json.load(open(osp)).items():
+            lines.append(f'| {name} | {v["residual_dB"]} |')
+        lines.append('')
+    scp = os.path.join(here, 'results_sidechain.json')
+    if os.path.exists(scp):
+        lines += ['## External side-chain', '',
+                  'EXT switched on through each plug-in\'s saved state, program material on the main input and other material on the',
+                  'side-chain bus, through the reference and the built VST3 at 48 kHz (`python nulltest/null_sidechain.py`).', '',
+                  '| Main, side-chain | Residual (dB) |', '|---|---|']
+        for name, v in json.load(open(scp)).items():
+            lines.append(f'| {name} | {v} |')
+        lines.append('')
+    stp = os.path.join(here, 'results_stress.json')
+    if os.path.exists(stp):
+        st = json.load(open(stp))
+        vals = list(st.values())
+        lines += ['## Stress tests', '',
+                  f'`python nulltest/stress.py`: {len(vals)} cases over the settings (amounts and gains between the fitted nodes,',
+                  'EQ extremes, input / output gain, stage combinations), levels and signals (bass-heavy, bright, extreme stereo,',
+                  'quiet / loud passages, a sweep), parameter automation (sweeps, jumps, switches), sample rates and block sizes.',
+                  f'Median {np.median(vals):.1f} dB, worst {max(vals):.1f} dB'
+                  + (f' (version {tag}: median {np.median(list(old_st.values())):.1f}, worst {max(old_st.values()):.1f}).' if old_st else '.'), '',
+                  '| Run | Group | Cases | Median (dB) | Worst (dB), case |', '|---|---|---|---|---|']
+        groups = {}
+        for key, v in st.items():
+            run, group, case = key.split(' | ')
+            groups.setdefault((run, group), []).append((v, case))
+        for (run, group), items in groups.items():
+            worst = max(items)
+            lines.append(f'| {run} | {group} | {len(items)} | {np.median([v for v, _ in items]):.1f} | {worst[0]:.1f}, {worst[1]} |')
+        lines += ['', 'Every case at 48 kHz, block 512:', '', '| Group | Case |' + (f' {tag} (dB) |' if old_st else '') + ' Residual (dB) |',
+                  '|---|---|' + ('---|' if old_st else '') + '---|']
+        for key, v in st.items():
+            run, group, case = key.split(' | ')
+            b = (f' {old_st[key]:.2f} |' if key in old_st else ' |') if old_st else ''
+            if run.startswith('48 kHz'): lines.append(f'| {group} | {case} |{b} {v:.2f} |')
+        lines.append('')
+    return lines
+
+
+if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--only'); ap.add_argument('--vst3', action='store_true'); ap.add_argument('--report', action='store_true')
+    ap.add_argument('--before', help='with --report: an earlier results file, e.g. results_1.1.1.json, as a column')
+    a = ap.parse_args()
+    if a.report:
+        open(os.path.join(tgp.PLUGIN, 'NULLTESTS.md'), 'w', newline='\n').write('\n'.join(report(a.before)))
+        raise SystemExit
+    res = run(a.only, a.vst3)
+    if a.only is None:
+        json.dump(res, open(os.path.join(os.path.dirname(__file__), 'results.json' if not a.vst3 else 'results_vst3.json'), 'w'), indent=1)

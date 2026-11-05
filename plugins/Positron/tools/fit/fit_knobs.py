@@ -1,0 +1,103 @@
+"""Fits a compact lighting model to the reference's metal knobs (200 % screenshots in reference/shots, git-ignored).
+The pointer is removed with a per-pixel median over three knob positions (default, min, max). Model per knob:
+  body(r, a) = grey(a) * radial(r)    grey(a) = Fourier series (8 harmonics), radial = 12-point profile
+  rim (outer 8 % of the radius) = 12-point profile (bevel), plus the pointer line geometry.
+A measuring tool: it prints the numbers and writes reference/knob_fit.json (git-ignored). No shipped file is its
+output any more: shared/ui/KnobModel.h holds hand-written design tokens (body grey, the highlight's strength and
+angle, rim greys and width, pointer geometry), read off these numbers and rounded, and MetalKnob.cpp draws the knob
+in code from them. The summary at the end prints the token-sized numbers (mean grey, first and second harmonic)."""
+import json, sys
+import numpy as np
+from PIL import Image
+
+shots = ['reference/shots/silence.png', 'reference/shots/kmin.png', 'reference/shots/kmax.png']
+ims = np.stack([np.asarray(Image.open(p).convert('RGB')).astype(float) for p in shots])
+med = np.median(ims, axis=0)
+grey = med.mean(2)
+
+# approximate centres / radii (200 % pixels), refined below
+# outer circles (200 % px): found by maximising the bright-inside / dark-outside contrast along the circle (plate knobs:
+# bright-disc fit corrected by the small knob's bias); measured once, used as is
+knobs = {'small': (266.75, 181.5, 40.75), 'large': (585.75, 296.5, 101.75), 'plate': (91.51, 626.22, 50.12)}
+
+
+def refine(cx, cy, r0):
+    # the knob edge = strongest radial drop in brightness, measured on 72 rays
+    best = []
+    for a in np.linspace(0, 2 * np.pi, 72, endpoint=False):
+        rs = np.arange(r0 * 0.8, r0 * 1.2, 0.25)
+        xs = cx + rs * np.cos(a); ys = cy + rs * np.sin(a)
+        v = grey[np.round(ys).astype(int), np.round(xs).astype(int)]
+        d = np.diff(v)
+        k = np.argmin(d)
+        best.append((xs[k], ys[k]))
+    p = np.array(best)
+    A = np.c_[2 * p[:, 0], 2 * p[:, 1], np.ones(len(p))]
+    b = (p ** 2).sum(1)
+    sol = np.linalg.lstsq(A, b, rcond=None)[0]
+    x0, y0 = sol[0], sol[1]
+    r = np.sqrt(sol[2] + x0 ** 2 + y0 ** 2)
+    return x0, y0, r
+
+
+out = {}
+for name, (cx, cy, r0) in knobs.items():
+    R = r0
+    nA, nR = 720, 400
+    a = np.linspace(-np.pi, np.pi, nA, endpoint=False)
+    rr = np.linspace(0, 1.0, nR, endpoint=False) + 0.5 / nR
+    X = cx + R * rr[None, :] * np.sin(a)[:, None]      # angle 0 = up, clockwise
+    Y = cy - R * rr[None, :] * np.cos(a)[:, None]
+    def samp(img):
+        x0 = np.floor(X).astype(int); y0 = np.floor(Y).astype(int); fx = X - x0; fy = Y - y0
+        return (img[y0, x0] * (1 - fx) * (1 - fy) + img[y0, x0 + 1] * fx * (1 - fy)
+                + img[y0 + 1, x0] * (1 - fx) * fy + img[y0 + 1, x0 + 1] * fx * fy)
+    P = np.stack([samp(med[..., c]) for c in range(3)], -1)     # (nA, nR, 3)
+    L = P.mean(2)
+    body = L[:, int(nR * 0.05):int(nR * 0.90)]
+    # separable fit: L(a, r) ~ g(a) * h(r)
+    h = body.mean(0); h /= h.mean()
+    g = (body / h[None, :]).mean(1)
+    K = 16
+    M = np.c_[np.ones(nA)] if False else np.ones((nA, 1))
+    cols = [np.ones(nA)]
+    for k in range(1, K + 1): cols += [np.cos(k * a), np.sin(k * a)]
+    M = np.stack(cols, 1)
+    coef = np.linalg.lstsq(M, g, rcond=None)[0]
+    gfit = M @ coef
+    resid = body - gfit[:, None] * h[None, :]
+    radial = np.interp(np.linspace(0.05, 0.90, 12), rr[int(nR * 0.05):int(nR * 0.90)], h)
+    rim = L[:, int(nR * 0.88):].mean(0)
+    rimProf = np.interp(np.linspace(0.88, 1.0, 12), rr[int(nR * 0.88):], rim)
+    # rim: per radial band (6 bands over r = 0.88 .. 1.0) a 6-harmonic angle series
+    KR = 8
+    colsR = [np.ones(nA)]
+    for k in range(1, KR + 1): colsR += [np.cos(k * a), np.sin(k * a)]
+    MR = np.stack(colsR, 1)
+    rimCoef = []
+    for rb in np.linspace(0.885, 0.995, 23):
+        j = int(round(rb * nR - 0.5))
+        rimCoef.append(np.linalg.lstsq(MR, L[:, j], rcond=None)[0].tolist())
+    tint = (P[:, int(nR * 0.05):int(nR * 0.9)].reshape(-1, 3).mean(0) / L[:, int(nR * 0.05):int(nR * 0.9)].mean())
+    # pointer (pip): difference between the default shot (pointer up) and the median, on the up ray
+    up = np.stack([samp(ims[0][..., c]) for c in range(3)], -1).mean(2)
+    pip = (up - L)[nA // 2 - 6:nA // 2 + 7]       # angles around 0 (index nA/2 is a=0)
+    prof = pip.min(0)
+    on = np.where(prof < -25)[0]
+    pipR = (rr[on.min()], rr[on.max()]) if len(on) else (0, 0)
+    width = (pip[:, (on.min() + on.max()) // 2] < -25).sum() * (2 * np.pi / nA) * R * rr[(on.min() + on.max()) // 2] if len(on) else 0
+    pipCol = (np.stack([samp(ims[0][..., c]) for c in range(3)], -1)[nA // 2, (on.min() + on.max()) // 2]) if len(on) else [0, 0, 0]
+    print(f"{name}: centre ({cx:.2f}, {cy:.2f}) R {R:.2f} (200% px) -> design ({cx/2:.2f}, {cy/2:.2f}) R {R/2:.2f}")
+    print(f"   fit rms {np.sqrt((resid**2).mean()):.2f} grey levels, tint {tint.round(3)}, pip r {pipR}, width {width:.1f}px, colour {np.round(pipCol)}")
+    out[name] = dict(cx=cx / 2, cy=cy / 2, r=R / 2, coef=coef.tolist(), radial=radial.tolist(), rim=rimProf.tolist(),
+                     tint=tint.tolist(), rimCoef=rimCoef, pip=[float(pipR[0]), float(pipR[1]), float(width / 2)], pipColour=[float(c) for c in pipCol])
+
+with open('reference/knob_fit.json', 'w') as f: json.dump(out, f, indent=1)
+
+# token-sized summary: the face's mean grey and its first two angular harmonics (amplitude, angle from up, clockwise)
+for name, m in out.items():
+    c = m['coef']
+    h1 = np.hypot(c[1], c[2]); a1 = np.degrees(np.arctan2(c[2], c[1])) % 360
+    h2 = np.hypot(c[3], c[4]); a2 = (np.degrees(np.arctan2(c[4], c[3])) / 2) % 180
+    print(f"{name}: mean grey {c[0]:.0f}, bias {h1:.0f} toward {a1:.0f} deg, sheen {h2:.0f} along {a2:.0f} deg, "
+          f"pointer {m['pip'][0]:.2f} .. {m['pip'][1]:.2f} R, width {m['pip'][2]:.2f} px")

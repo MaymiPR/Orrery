@@ -1,0 +1,8 @@
+# Provenance: what this repository may hold and ship. The release check reads this file: a release fails on a file
+# the gate stops unless an allow: line keeps it, with the reason and the approval recorded with its date.
+#
+# vendor: words that never appear in a control label, a preset name, a file name or a plug-in name
+vendor: Cradle, Orion, The God Particle, God Particle, The Spirit, The Prince, State Machine, Jaycen Joshua, Louis Bell
+#
+# allow: <path glob>  <reason, with the approval recorded and its date>
+allow: plugins/Wraith/ir/*.bin  measured reverb responses, room and plate per sample rate (approval recorded, 2026-11-01)

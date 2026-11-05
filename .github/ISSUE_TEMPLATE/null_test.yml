@@ -1,0 +1,30 @@
+name: Null-test report
+description: A setting or material where a plug-in differs from the original more than NULLTESTS.md says.
+labels: [null test]
+body:
+  - type: input
+    id: plugin
+    attributes:
+      label: Plug-in, its version and the original's version
+      placeholder: "Positron 1.x.y against the original vX.Y"
+    validations:
+      required: true
+  - type: textarea
+    id: settings
+    attributes:
+      label: Settings
+      description: Every control that is not at its default, or attach the preset.
+    validations:
+      required: true
+  - type: textarea
+    id: material
+    attributes:
+      label: Material and the residual you measured
+      description: Genre and level of the audio, and the residual in dB (the difference between the original and ours, below the original's level), if you measured one.
+    validations:
+      required: true
+  - type: textarea
+    id: how
+    attributes:
+      label: How you nulled
+      description: DAW, sample rate, both plug-ins on copies of the same track, one phase-inverted, delay compensation on. A short audio example of the difference helps most.

@@ -1,0 +1,6 @@
+#pragma once
+// The suite's shared controls (shared/ui/Widgets.h), seen here in namespace po
+#include "shared/ui/Widgets.h"
+#include "Theme.h"
+
+namespace po { using namespace orrery; }

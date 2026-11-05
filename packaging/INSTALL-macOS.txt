@@ -1,0 +1,18 @@
+Orrery Suite for macOS (universal: Apple Silicon and Intel, macOS 10.13 or later)
+=================================================================================
+
+Open OrrerySuite-<version>-macOS.pkg. It installs every Orrery Suite plug-in as AU, VST3 and CLAP, and the
+standalone apps if you tick them (Customize lets you choose):
+  - AU   -> /Library/Audio/Plug-Ins/Components
+  - VST3 -> /Library/Audio/Plug-Ins/VST3/Orrery Suite
+  - CLAP -> /Library/Audio/Plug-Ins/CLAP/Orrery Suite
+  - Apps -> /Applications/Orrery Suite
+
+A signed and notarized installer opens without a warning. An unsigned one (the release notes say which) is stopped
+by macOS the first time:
+  - macOS 15 and later: open it once, then System Settings > Privacy & Security > "Open Anyway".
+  - Earlier macOS: right-click (Control-click) the .pkg, choose Open, then Open.
+Restart your DAW afterwards (Logic rescans AUs at launch).
+
+To check the download, compare its SHA-256 with SHA256SUMS.txt on the Releases page:
+  shasum -a 256 OrrerySuite-<version>-macOS.pkg
