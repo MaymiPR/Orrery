@@ -52,7 +52,10 @@ originals are the reference for every behaviour, as [Positron's](plugins/Positro
 
 - **Particle visualisers that follow your music**, in each original's style or ours, moving with the project's tempo.
 
-  <img src="docs/screenshots/particle-styles.png" alt="Particle styles. Top: Positron's own style (left) and the classic style (right). Bottom: Scorpius's own style, then the classic style" width="100%">
+  <img
+    src="docs/screenshots/particle-styles.png"
+    alt="Particle styles. Top: Positron's own style (left) and the classic style (right). Bottom: Scorpius's own style, then the classic style"
+    width="100%">
 
 - **Resizable** from 50 to 200 %. Oversampling up to 8x in Positron.
 
