@@ -165,16 +165,16 @@ NULLTESTS.md: "character:" cases; the presets without the doubler follow them.
 
 ## 6. Reverb
 
-Scripts: `nulltest/probe_reverb.py`, `plate_record.py`, `pack_reverb.py`, `null_plate.py`, `plate_filter_capture.py`,
+Scripts: `nulltest/probe_reverb.py`, `record_plate.py`, `pack_reverb.py`, `null_plate.py`, `capture_plate_filter.py`,
 `probe_plate_filter.py`.
 
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
 | Mix | a linear crossfade: dry 1 - m, wet m | nine values | exact to -136 dB |
 | Filter | an RBJ low-pass on the wet signal, Q 0.7, w0 unwarped; it stays in at the 20 kHz setting (the fitted corner there is 19924 / 19952 / 19998 / 19999 Hz at 44.1 / 48 / 88.2 / 96 kHz) | `probe_reverb.py` | -120 to -152 dB |
-| Filter on the plate | one fixed low-pass after the plate, not a damping inside its tail: each setting's response against the 20 kHz one is the same, per band, in every window from the first 50 ms to 1 to 2 s (within about 1 dB) | `plate_filter_capture.py`: seven real-time captures (an impulse at Filter 2 / 5.2 / 8 / 11.4 / 20 kHz, the 5.2 kHz impulse twice, noise at 11.4 kHz; Mix 1, 48 kHz) | the same capture twice agrees to -137 dB; the 11.4 kHz impulse predicts the noise capture to -133 dB (still in time and linear); Wraith against the captures -78, -78, -77, -69, -52 dB |
+| Filter on the plate | one fixed low-pass after the plate, not a damping inside its tail: each setting's response against the 20 kHz one is the same, per band, in every window from the first 50 ms to 1 to 2 s (within about 1 dB) | `capture_plate_filter.py`: seven real-time captures (an impulse at Filter 2 / 5.2 / 8 / 11.4 / 20 kHz, the 5.2 kHz impulse twice, noise at 11.4 kHz; Mix 1, 48 kHz) | the same capture twice agrees to -137 dB; the 11.4 kHz impulse predicts the noise capture to -133 dB (still in time and linear); Wraith against the captures -78, -78, -77, -69, -52 dB |
 | Responses | linear and time-invariant, left and right independent (no cross-feed); room: T60 about 1.5 s, 2.27 s long; plate: T60 about 4.7 s; the same length in seconds at every rate | impulses | |
-| Capture | both responses recorded with the editor open (`tools/RefCapture record=1`, 5 s of silence first, repeated until two runs agree below -100 dB; the room recorded this way equals the offline render to -132 to -137 dB); the 20 kHz low-pass taken out by regularised deconvolution; each response cut where its decay energy has fallen 80 dB (room 2.07 s, plate 6.07 s), faded over 30 ms and stored as float16 (-73.5 to -73.8 dB re the response): 9 MB for four rates (`ir/`) | `plate_record.py`, `pack_reverb.py` | |
+| Capture | both responses recorded with the editor open (`tools/RefCapture record=1`, 5 s of silence first, repeated until two runs agree below -100 dB; the room recorded this way equals the offline render to -132 to -137 dB); the 20 kHz low-pass taken out by regularised deconvolution; each response cut where its decay energy has fallen 80 dB (room 2.07 s, plate 6.07 s), faded over 30 ms and stored as float16 (-73.5 to -73.8 dB re the response): 9 MB for four rates (`ir/`) | `record_plate.py`, `pack_reverb.py` | |
 | Nulls | room at the start-up preset -97 dB, fully wet -79 dB (the float16 floor); plate at Mix 0.1 and Filter 8 kHz -95 dB, fully wet -52 dB | `null_plate.py` | NULLTESTS.md "reverb:" cases |
 
 ### 6.1 The reverb comes before the doubler (`probe_plate_presets.py`)
@@ -191,7 +191,7 @@ Scripts: `nulltest/probe_reverb.py`, `plate_record.py`, `pack_reverb.py`, `null_
 ## 7. Doubler
 
 Scripts: `probe_doubler.py`, `probe_voices.py`, `fit_dbl_voice.py`, `probe_dbl_rate.py`, `probe_dbl_residue.py`,
-`probe_dbl_voiceresp.py`, `probe_dbl_voices2.py`, `probe_dbl_voicegain.py`, `doubler_metric.py`.
+`probe_dbl_voiceresp.py`, `probe_dbl_voices2.py`, `probe_dbl_voicegain.py`, `measure_doubler.py`.
 
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
@@ -201,7 +201,7 @@ Scripts: `probe_doubler.py`, `probe_voices.py`, `fit_dbl_voice.py`, `probe_dbl_r
 | Stereo | each voice goes to its own side with gain 1 + 1.636 × Stereo and to the other with 1 - 1.636 × Stereo | five settings | exact |
 | Linearity | white noise at -40 / -28 / -16 / -4 dBFS gives the voices' level re the input to the printed 0.1 dB in every band | `probe_dbl_residue.py` | exact |
 | Compander | isolated clicks give the voices 64 times the dry energy while steady material barely changes in level; a compander (2:1 before the line, 1:2 after it, 5 to 60 ms) changes the nulls by under 0.3 dB on noise, music and drums | clicks, noise | not modelled |
-| Behaviour metric (full wet) | level within 0.11 dB of the original, third-octave spectrum within 0.4 to 0.6 dB rms, left / right correlation 0.949 against the original's 0.912 at Stereo 1 on pink noise | `doubler_metric.py` | NULLTESTS.md, the doubler table |
+| Behaviour metric (full wet) | level within 0.11 dB of the original, third-octave spectrum within 0.4 to 0.6 dB rms, left / right correlation 0.949 against the original's 0.912 at Stereo 1 on pink noise | `measure_doubler.py` | NULLTESTS.md, the doubler table |
 
 ### 7.1 Modulation (`nulltest/probe_dbl_rate.py`)
 

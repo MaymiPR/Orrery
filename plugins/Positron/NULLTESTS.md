@@ -60,7 +60,7 @@ stress tests below (163 cases over settings, levels, signals, automation, rates 
 
 A 70 s future-house demo track (16-bit, 44.1 kHz, about -10 dBFS RMS: loud, dense and bright), through the
 reference and the built VST3 at 44.1 kHz with the stage buttons as a user would press them, including the limiter
-and the character section switched off and back on while it plays (`python nulltest/track.py`; `--vary` sends
+and the character section switched off and back on while it plays (`python nulltest/null_track.py`; `--vary` sends
 irregular host blocks as FL Studio does, with the same results). The worst second is the loudest part.
 
 | Setting | Residual (dB) | Worst second (dB) |
@@ -132,7 +132,7 @@ side-chain bus, through the reference and the built VST3 at 48 kHz (`python null
 
 ## Stress tests
 
-`python nulltest/stress.py`: 163 cases over the settings (amounts and gains between the fitted nodes,
+`python nulltest/null_stress.py`: 163 cases over the settings (amounts and gains between the fitted nodes,
 EQ extremes, input / output gain, stage combinations), levels and signals (bass-heavy, bright, extreme stereo,
 quiet / loud passages, a sweep), parameter automation (sweeps, jumps, switches), sample rates and block sizes.
 Median -66.0 dB, worst -44.1 dB (version 1.1.1: median -63.3, worst -40.4).

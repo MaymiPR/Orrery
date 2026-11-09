@@ -1,9 +1,9 @@
 """Harmonic EQ: the soft clip's ceiling and knee (and per-band ceiling scales) fitted by nulling our processor against
-the reference on loud program material (nullmod.py's signals), all bands at +6 one at a time."""
+the reference on loud program material (null_modules.py's signals), all bands at +6 one at a time."""
 import numpy as np
 from scipy.optimize import minimize
-import harness as o
-import nullmod as N
+import ori as o
+import null_modules as N
 
 sig = N.signals()
 loud = {k: v for k, v in sig.items() if '-' not in k}

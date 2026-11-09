@@ -1,12 +1,12 @@
 """Parameter smoothing: a quiet steady tone (below every threshold) while one parameter jumps at a block boundary
 (block 64; the change lands at sample 2 s after the pre-roll). The gain on the tone vs time (complex demodulation,
 1 ms window) re the same render without the change shows each parameter's smoothing law and time.
-Writes measurements/smoothing/smoothing.json and a plot."""
+Writes measurements/Positron/smoothing/smoothing.json and a plot."""
 import json, os
 import numpy as np
 import tgp, plotstyle as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'smoothing'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'smoothing'); os.makedirs(OUT, exist_ok=True)
 FS = tgp.FS
 PRE = 2 * FS
 AT = PRE + 2 * FS

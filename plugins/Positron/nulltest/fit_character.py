@@ -4,7 +4,7 @@ stepped through levels (static curve, shaper) and burst on and off (attack, rele
 synthetic mix at two levels each (a tone alone over-fits: the low band's detector came out right for the tone and
 wrong for music). Minimises the mean waveform residual (reference - ours) with Nelder-Mead from the current table.
 Writes
-measurements/character/fit_char.json and Source/dsp/CharacterTable.h (the plug-in's defaults).
+measurements/Positron/character/fit_char.json and Source/dsp/CharacterTable.h (the plug-in's defaults).
 
     python fit_character.py                    # every band and node
     python fit_character.py mid 4              # one band / node (prints the residual before and after)"""
@@ -17,7 +17,7 @@ FS = tgp.FS
 PRE = 2 * FS
 BANDS = {'low': 70.0, 'mid': 700.0, 'high': 8000.0}
 FREE = ['mix', 'cubic', 'thresh', 'ratio', 'knee', 'attack', 'release']   # make-up: the identified small-signal gain
-OUT_JSON = os.environ.get('FIT_CHAR_JSON', os.path.join(tgp.ROOT, 'measurements', 'character', 'fit_char.json'))
+OUT_JSON = os.environ.get('FIT_CHAR_JSON', os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', 'fit_char.json'))
 HEADER = os.path.join(tgp.PLUGIN, 'Source', 'dsp', 'CharacterTable.h')
 DEFAULTS = {'low': dict(mix=0.7, cubic=0.9, thresh=-30, ratio=2.0, knee=20, attack=10, release=300, gainAttack=5, gainRelease=50, attack2=200, release2=3000, slowOffset=-3),
             'mid': dict(mix=0.79, cubic=0.87, thresh=-23, ratio=1.7, knee=35, attack=190, release=90, gainAttack=5, gainRelease=50, attack2=200, release2=3000, slowOffset=-3),
@@ -47,9 +47,9 @@ def signals(band):
     import nulltest as NT
     cut = lambda x: np.concatenate([np.zeros((2, PRE) if x.ndim == 2 else PRE, np.float32), x[..., :3 * FS]], axis=-1)
     out = [signal(BANDS[band]), cut(NT.sig_noise(-18)), cut(NT.sig_noise(-6)), cut(NT.sig_music(-10)), cut(NT.sig_music(-2))]
-    if WIDE:          # also drums, a sweep and the crest-factor set (crest.py): keeps the fit from trading them away
-        import crest
-        cs = crest.signals(band, PRE + 3 * FS)
+    if WIDE:          # also drums, a sweep and the crest-factor set (probe_crest.py): keeps the fit from trading them away
+        import probe_crest
+        cs = probe_crest.signals(band, PRE + 3 * FS)
         out += [cut(NT.sig_drums(-1)), cut(NT.sig_sweep(-6)), (cs['two-tone'] * 10 ** (-10 / 20)).astype(np.float32),
                 (cs['noise'] * 10 ** (-10 / 20)).astype(np.float32), (cs['noise'] * 10 ** (-4 / 20)).astype(np.float32)]
     return out

@@ -7,13 +7,13 @@
   step      DC steps (loud / the same x 1/1000): output ratio = the limiter's gain at sample resolution (look-ahead ramp,
             fast and slow release, how the slow part charges)
   stereo    loud L only, pilot on R (linking)
-Writes measurements/limiter/limiter.json and plots."""
+Writes measurements/Positron/limiter/limiter.json and plots."""
 import json, os
 import numpy as np
 from scipy.signal import resample_poly
 import tgp, plotstyle as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'limiter'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'limiter'); os.makedirs(OUT, exist_ok=True)
 FS = tgp.FS
 PRE = 2 * FS
 STEP = 0.6

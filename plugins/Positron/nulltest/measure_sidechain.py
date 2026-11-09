@@ -1,13 +1,13 @@
 """Side-chain EXT (a host-only setting, set through the saved state): default chain, a steady 1 kHz main tone, and
 side-chain bursts. Gain on the main tone with the side-chain quiet vs loud, INT vs EXT; and whether the main
-signal still drives the dynamics in EXT. Writes measurements/sidechain/sidechain.json."""
+signal still drives the dynamics in EXT. Writes measurements/Positron/sidechain/sidechain.json."""
 import json, os, sys
 import numpy as np
 import tgp
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'tools'))   # tools/tgpstate.py
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'tools'))   # scripts/tgpstate.py
 import tgpstate
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'sidechain'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'sidechain'); os.makedirs(OUT, exist_ok=True)
 FS = tgp.FS
 PRE = 2 * FS
 REF = os.path.join(tgp.ROOT, 'reference')

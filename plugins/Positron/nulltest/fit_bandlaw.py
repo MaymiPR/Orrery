@@ -10,14 +10,14 @@ Free: the shaper drive k, the mix, the static law (threshold, knee, ratio), the 
 slow second detector. Robust least squares on the probe signals of ident_signals.py, with soft-L1 loss.
 
     python fit_bandlaw.py mid 4 [--dual] [--peak] [--force] [--from <node>] [--rich] [--out file.json]
-Writes measurements/character/bandlaw.json (one entry per band / node), read by fit_character.py --from-bandlaw."""
+Writes measurements/Positron/character/bandlaw.json (one entry per band / node), read by fit_character.py --from-bandlaw."""
 import json, os, sys
 import numpy as np
 from scipy.optimize import least_squares
 import tgp, ident as I, ident_signals as S, charsim as C
 
 FS = tgp.FS
-OUT = os.path.join(tgp.ROOT, 'measurements', 'character', 'bandlaw.json')
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', 'bandlaw.json')
 if '--out' in sys.argv: OUT = os.path.join(os.path.dirname(OUT), sys.argv[sys.argv.index('--out') + 1])
 BI = {'low': 0, 'mid': 1, 'high': 2}
 RICH = '--rich' in sys.argv

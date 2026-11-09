@@ -1,13 +1,13 @@
-"""Harmonic EQ, linear part: each band's small-signal response (linear.py's impulse responses at +3 and +6) as
+"""Harmonic EQ, linear part: each band's small-signal response (measure_linear.py's impulse responses at +3 and +6) as
 1 + k * H(f), H a second-order band-pass (or high-pass / low-pass) with unity peak, fitted in magnitude and phase
 from 20 Hz to 20 kHz.
     python fit_eq.py"""
 import os
 import numpy as np
 from scipy.optimize import least_squares
-import harness as o
+import ori as o
 
-IR = os.path.join(o.ROOT, 'measurements', 'scorpius', 'ir')
+IR = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'ir')
 FS = o.FS
 f = np.geomspace(20, 20000, 400)
 z = np.exp(-2j * np.pi * f / FS)

@@ -56,9 +56,9 @@ and the offline renderer give the same numbers. Every case: [NULLTESTS.md](NULLT
 - `tests/PositronTests.cpp`: unit tests of the DSP and the processor, including filters, the FIR crossover, latency,
   bypass, the limiter's ceiling, state and extreme input (`ctest` after a build).
 - `nulltest/`: the null tests against an installed copy of the original (Windows, Python 3.12 or newer with the root
-  `requirements.txt`; not in CI). `nulltest.py` (the table in NULLTESTS.md), `stress.py` (163 cases) and `track.py`
+  `requirements.txt`; not in CI). `nulltest.py` (the table in NULLTESTS.md), `null_stress.py` (163 cases) and `null_track.py`
   (a music file of your own) are the entry points; `tgp.py` is the render harness. The other scripts are the
   measurements and fits that MEASUREMENTS.md cites. Reference renders and measurement data stay local (git-ignored).
 - `tools/`: PoRender (our processor offline, every DSP constant open to change), the editor snapshot, the band gain
   computer as a C library for the fits, and the measuring tools for the knobs and the glass (their numbers become the
-  drawing's tokens; `draw_glass.py` draws the glass textures).
+  drawing's tokens; `make_glass.py` draws the glass textures).

@@ -3,10 +3,10 @@ convolution, shipped on recorded approval). The reference's reverb is linear and
 its left and right paths independent (no cross-feed), and its wet path is the response followed by an RBJ low-pass that
 stays in even at the 20 kHz setting (MEASUREMENTS.md "Reverb"). So each response is captured with Mix at 1 and Filter at
 20 kHz, the 20 kHz low-pass (fitted per rate from the filter-only path) is taken out by regularised deconvolution, and
-the result is stored per rate as 16-bit floats. Both responses come from plate_record.py (recorded with the
+the result is stored per rate as 16-bit floats. Both responses come from record_plate.py (recorded with the
 reference's editor open, since its script loads the plate).
 
-Writes plugins/Wraith/ir/reverb_<rate>.bin: per reverb (room, plate): uint32 length, then length x 2 float16
+Writes plugins/Wraith/resources/ir/reverb_<rate>.bin: per reverb (room, plate): uint32 length, then length x 2 float16
 (L, R interleaved per sample).
 
     python pack_reverb.py
@@ -18,7 +18,7 @@ from scipy.signal import lfilter
 import ts as h
 import probe_reverb as pr
 
-OUT = os.path.join(h.PLUGIN, 'ir')
+OUT = os.path.join(h.PLUGIN, 'resources', 'ir')
 RATES = (44100, 48000, 88200, 96000)
 FILTER_ONLY = os.path.join(pr.REF, 'filteronly.state')    # a state whose response does not load: the filter alone
 TYPES = ('room', 'plate')
@@ -39,7 +39,7 @@ def main():
         f0, q = lp20k(fs)
         blob = b''
         for name in TYPES:
-            # recorded with the editor open (plate_record.py): the plate only loads there; the room recorded this way
+            # recorded with the editor open (record_plate.py): the plate only loads there; the room recorded this way
             # equals the offline render to -132 dB and better
             y = np.load(os.path.join(pr.REF, f'{name}_rec_{fs}.npy')).astype(float)
             e = np.cumsum((y[:, ::-1] ** 2).sum(0))[::-1]

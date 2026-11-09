@@ -1,17 +1,17 @@
 """Training material for the learned modules (drive per colour and hi-pass setting, lift): drums, excerpts of the local
 demo track, pink noise and log sweeps at many levels, rendered through the reference with only that module on.
-Saved (local, git-ignored) to measurements/scorpius/nn/<case>.npz: x (input, mono), y (output), and which pieces
+Saved (local, git-ignored) to measurements/Scorpius/nn/<case>.npz: x (input, mono), y (output), and which pieces
 are held out for validation.
     python capture_nn.py [case ...]      cases: drive_a drive_b drive_c drive_a_hp ... lift harm80 harm50 grit
 Grit is captured on the left channel alone (the right silent): it works on each channel by itself, except that on
 input whose channels are exactly equal and near full scale it behaves differently (MEASUREMENTS.md 9)."""
 import os, sys
 import numpy as np
-import harness as o
-import nullmod as N
-from order import drums
+import ori as o
+import null_modules as N
+from probe_order import drums
 
-OUT = os.path.join(o.ROOT, 'measurements', 'scorpius', 'nn'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'nn'); os.makedirs(OUT, exist_ok=True)
 FS = 48000
 
 

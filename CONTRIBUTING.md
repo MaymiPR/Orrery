@@ -13,9 +13,9 @@ presets) enters the repository; a decision is recorded as the rule it produced, 
 nobody's words are quoted in a file, a commit message, a tag or release notes.
 
 One exception, approved on 2026-11-01 and listed in `.provenance`: Wraith's room and plate reverb responses
-(`plugins/Wraith/ir/`) are measured from The Spirit's output with impulses and run by convolution, because its reverbs
+(`plugins/Wraith/resources/ir/`) are measured from The Spirit's output with impulses and run by convolution, because its reverbs
 are recordings that a model cannot null. They are measurements of its output, not its files;
-`plugins/Wraith/nulltest/plate_record.py` and `pack_reverb.py` make them.
+`plugins/Wraith/nulltest/record_plate.py` and `pack_reverb.py` make them.
 
 ## Build
 
@@ -104,8 +104,8 @@ named in `local.yaml` (`<Id>.ref_vst3` and `<Id>.ref_name` per plug-in), and the
 
 | Plug-in | Entry points |
 |---|---|
-| Positron | `nulltest.py` (every case; `--vst3` for the built binary; `--report` writes NULLTESTS.md), `stress.py` (the stress grid), `track.py` (a music file of one's own) |
-| Scorpius | `nullchain.py` (presets and settings), `nullmod.py` (module by module), `nullquiet.py` (quiet material), `autom_probe.py` (automation) |
+| Positron | `first_null.py` (the self-check of the harness, the hosts and the build), `nulltest.py` (every case; `--vst3` for the built binary; `--report` writes NULLTESTS.md), `null_stress.py` (the stress grid), `null_track.py` (a music file of one's own) |
+| Scorpius | `first_null.py` (the self-check), `nulltest.py` (runs `null_chain.py`, presets and settings; `null_modules.py`, module by module; `null_quiet.py`, quiet material), `probe_autom.py` (automation) |
 | Wraith | `first_null.py` (the self-check of the harness, the hosts and the build), `nulltest.py` (every case; `--vst3`; `--report` writes NULLTESTS.md) |
 
 The results are in each plug-in's NULLTESTS.md.
@@ -121,11 +121,11 @@ The results are in each plug-in's NULLTESTS.md.
 | `scorpius.png`, `scorpius-classic-style.png` | `ScorpiusSnapshot <file> --levels=-14,-12 --audio`, with `--style=scorpius` (its own style, the default) or `--style=classic` |
 | `wraith.png` | `WraithSnapshot <file> --scale=1 --levels=-12,-14`, at its start-up preset (lead) |
 | `hero.png` | `positron.png`, `scorpius.png` and `wraith.png` side by side, 24 px apart, each centred in height, transparent between, scaled to 1800 px wide |
-| `top-bar.png` | the shared top bar: the top 62 px of Scorpius at `--scale=2` |
-| `particle-styles.png` | Positron's glass in both styles, then Scorpius's stripe in both. Each glass is cut from a `--scale=1.7` render (`--anti` or `--classic`, `--levels=-10,-9 --audio`) at design x 179.5 to 556.5, y 34.5 to 262.5, centred in its half of a 1317 x 515 frame; each stripe is cut from a `--scale=1.5` render at x 8 to 1325 (Scorpius style y 402 to 459, pasted at y 398; classic style y 400 to 459, pasted at y 456) |
+| `orrerysuite-top-bar.png` | the shared top bar: the top 62 px of Scorpius at `--scale=2` |
+| `orrerysuite-particle-styles.png` | Positron's glass in both styles, then Scorpius's stripe in both. Each glass is cut from a `--scale=1.7` render (`--anti` or `--classic`, `--levels=-10,-9 --audio`) at design x 179.5 to 556.5, y 34.5 to 262.5, centred in its half of a 1317 x 515 frame; each stripe is cut from a `--scale=1.5` render at x 8 to 1325 (Scorpius style y 402 to 459, pasted at y 398; classic style y 400 to 459, pasted at y 456) |
 
 When an editor changes, render its shots again and compare them with the committed files (an unchanged editor
-renders the same, or within a few meter pixels); rebuild `hero.png`, `top-bar.png` and `particle-styles.png` from the
+renders the same, or within a few meter pixels); rebuild `hero.png`, `orrerysuite-top-bar.png` and `orrerysuite-particle-styles.png` from the
 new renders.
 
 ## Versions
@@ -136,7 +136,5 @@ One version for the suite (`project(... VERSION ...)` in `CMakeLists.txt`). A ne
 
 ## Deviations from the standard
 
-- Each plug-in keeps its own null-test harness style: Positron's `tgp.py` with `nulltest.py` and `stress.py`,
-  Scorpius's `harness.py` with `nullchain.py`, `nullmod.py` and `nullquiet.py` (its NULLTESTS.md is assembled from
-  their tables), and Wraith's `ts.py` with `first_null.py` and `nulltest.py`, the starter's form. Only Wraith has
-  `first_null.py`.
+- Scorpius's NULLTESTS.md is assembled from the tables of `null_chain.py`, `null_modules.py` and `null_quiet.py`
+  (its `nulltest.py` runs the three); Positron's and Wraith's `nulltest.py --report` write theirs.

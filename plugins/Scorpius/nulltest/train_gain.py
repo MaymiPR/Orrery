@@ -3,14 +3,14 @@ fitted IIR is the gain's dynamics). The wet path becomes
     y = IIR(x * g(x) * 10^(c / 20)),   c = WaveNet(x; our gain in dB as an extra input)
 with g our gain computer (Compressor.h, prep_comp.gain) and the IIR the plug-in's own (LinearFits.h compWetA / B, as
 a long FIR here); c (dB) starts at zero and is learned on capture_nn.py's comp_a / comp_b material (mono: the mid is
-the signal). Validated by nulls on the held-out pieces against c = 0. Writes measurements/scorpius/nn/
+the signal). Validated by nulls on the held-out pieces against c = 0. Writes measurements/Scorpius/nn/
 comp_<m>_gain.pt in train_wn.py's layout (Pre a unit impulse, Post zero, bypass: the network's output alone), for
 export_models.py.
     python train_gain.py a|b [steps] [channels] [layers]"""
 import os, sys, time
 import numpy as np
 import torch
-import harness as o
+import ori as o
 from train_wh import fftconv, NN
 from prep_comp import gain, iir, TUNE
 

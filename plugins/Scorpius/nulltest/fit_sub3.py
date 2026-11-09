@@ -4,8 +4,8 @@ import itertools
 import numpy as np
 from scipy.optimize import least_squares, minimize
 from scipy.signal import butter, sosfilt
-import harness as o
-import nullmod as N
+import ori as o
+import null_modules as N
 
 FS = 48000
 sig = N.signals()

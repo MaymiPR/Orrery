@@ -14,7 +14,7 @@ set(WR_SOURCES
 
 # the reverb's measured responses per rate (nulltest/pack_reverb.py)
 juce_add_binary_data(WraithIR HEADER_NAME WraithIR.h NAMESPACE WraithIR SOURCES
-    ${WR_DIR}/ir/reverb_44100.bin ${WR_DIR}/ir/reverb_48000.bin ${WR_DIR}/ir/reverb_88200.bin ${WR_DIR}/ir/reverb_96000.bin)
+    ${WR_DIR}/resources/ir/reverb_44100.bin ${WR_DIR}/resources/ir/reverb_48000.bin ${WR_DIR}/resources/ir/reverb_88200.bin ${WR_DIR}/resources/ir/reverb_96000.bin)
 set_target_properties(WraithIR PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 set(WR_DEFS ${SUITE_DEFS} SUITE_REPOSITORY="${SUITE_REPOSITORY}")

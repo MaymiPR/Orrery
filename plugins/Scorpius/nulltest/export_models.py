@@ -6,9 +6,9 @@ whose output on silence is taken off their output bias (as the LSTMs' always is)
 import os, sys
 import numpy as np
 import torch
-import harness as o
+import ori as o
 
-NN = os.path.join(o.ROOT, 'measurements', 'scorpius', 'nn')
+NN = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'nn')
 
 
 def trimmed(h, floor_db=-80.0, minimum=64):

@@ -4,7 +4,7 @@ impulse responses at the nine amount settings span exactly three fixed FIR filte
 of them with matching gains gives the same small-signal sound), so the split is chosen to be closest to the
 measured band shapes: Linkwitz-Riley 4th-order magnitudes at 157 / 2676 Hz with linear phase. Writes
 Source/dsp/BandFilters.h (the IRs, and the per-band small-signal gains at each amount node) and
-measurements/character/bands.json."""
+measurements/Positron/character/bands.json."""
 import json, os
 import numpy as np
 import tgp
@@ -54,4 +54,4 @@ if __name__ == '__main__':
     lines += ['};', '}', '']
     open(os.path.join(tgp.PLUGIN, 'Source', 'dsp', 'BandFilters.h'), 'w').write('\n'.join(lines))
     json.dump(dict(taps=n, reconstruction_error=float(err), gains_dB=gains_db.round(4).tolist(),
-                   singular_values=(s / s[0]).tolist()), open(os.path.join(tgp.ROOT, 'measurements', 'character', 'bands.json'), 'w'), indent=1)
+                   singular_values=(s / s[0]).tolist()), open(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', 'bands.json'), 'w'), indent=1)

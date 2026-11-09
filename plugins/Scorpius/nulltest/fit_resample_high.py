@@ -6,8 +6,8 @@ reference's measured delay, fitted on drums and the track with every module off 
 import numpy as np
 import scipy.signal as sg
 from scipy.optimize import minimize
-import harness as o
-import nullmod as N
+import ori as o
+import null_modules as N
 
 sig = N.signals()
 RATES = {88200: (147, 80), 96000: (2, 1), 176400: (147, 40), 192000: (4, 1)}

@@ -141,11 +141,11 @@ def run(vst3=False, only=None, cache=True, no_plate=False, tune=None):
                     continue
             else:
                 ref = h.render_many([dict(x=x, **refset)], 'ref', cache=cache)[0]
-            if plate:       # the capture plays plate_record.LEAD s of silence first (the plate loads): ours plays the
+            if plate:       # the capture plays record_plate.LEAD s of silence first (the plate loads): ours plays the
                             # same, so the doubler's modulation (0.503 Hz, not 0.5) is at the same phase when the signal
                             # starts
-                import plate_record
-                lead = int(plate_record.LEAD * FS)
+                import record_plate
+                lead = int(record_plate.LEAD * FS)
                 our = our_render([dict(x=nl.stereo(np.concatenate([np.zeros(lead, np.float32), mono])), **oursettings)])[0][:, lead:]
             else:
                 our = our_render([dict(x=x, **oursettings)])[0]
@@ -177,7 +177,7 @@ def report(results):
     for part, v in by.items():
         rows.append(f'| {part} | {len(v)} | {np.median(v):.1f} | {min(v):.1f} | {max(v):.1f} |')
     notes = open(os.path.join(HERE, 'nulltests_notes.md'), encoding='utf-8').read().strip()
-    if '{doubler_metric}' in notes:             # the behaviour table, from doubler_metric.py's results
+    if '{doubler_metric}' in notes:             # the behaviour table, from measure_doubler.py's results
         dm = json.load(open(os.path.join(HERE, 'renders', 'doubler_metric.json')))
         t = ['  | Signal, setting | Spectrum error, rms (dB, third octaves) | Spectrum error, worst (dB) | L / R correlation, original | ours | Level, ours less original (dB) |',
              '  |---|---|---|---|---|---|']

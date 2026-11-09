@@ -33,7 +33,7 @@ def gain_db(band, node):
     """small-signal gain at a node of the 25 % grid (fractional: 0.5 steps are measured)"""
     return GAINS16[band][int(round(node * 2))]
 
-# What each band's nonlinear stage (detector and shaper) hears (nlhear.py): its FIR band on the pass side, but beyond
+# What each band's nonlinear stage (detector and shaper) hears (probe_nl_hear.py): its FIR band on the pass side, but beyond
 # the band edge a steep Linkwitz-Riley slope instead of the FIR's shallow stopband (the mid band's FIR passes 8 kHz at
 # -29.5 dB, its nonlinear stage hears it at -40). Only the mid band's high side is made steep: the low band's stage
 # hears its FIR band as it is (as far as it can be measured, to 300 Hz; a steep edge at 157 Hz would also need more
@@ -41,13 +41,13 @@ def gain_db(band, node):
 # (pink noise at -6 dBFS: -41.3 against -42.6 dB). The rest of the FIR band passes linearly:
 #     y_b = M_b (x_b - s_b + F_b(s_b))
 FC1, FC2 = 157.1, 2675.8
-# The mid band's gain and shaper reach the audio through a path that differs from that edge (xprobe2.py: quiet probes
+# The mid band's gain and shaper reach the audio through a path that differs from that edge (probe_cross2.py: quiet probes
 # under a loud masker in the band, the complex change of the probes): from about 2 kHz up it falls faster (-1.3 dB at
 # 3.5 kHz, -2.8 at 4.6, -5.4 at 7.6 kHz) and leads in phase. The same in Hz at 44.1 to 192 kHz and at 50 to 200 %.
-# MID_RATIO: the measured ratio of that path to the plain edge (midedge.py --save, from probes taken with the plain
+# MID_RATIO: the measured ratio of that path to the plain edge (probe_mid_edge.py --save, from probes taken with the plain
 # edge), applied to the mid band's filter from 900 Hz up. (Its low side differs by up to 0.4 dB below 100 Hz; applying
-# that made music worse, midedge.py --null.)
-MID_RATIO = os.path.join(tgp.ROOT, 'measurements', 'character', 'mid_ratio.npz')
+# that made music worse, probe_mid_edge.py --null.)
+MID_RATIO = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', 'mid_ratio.npz')
 
 
 def mid_ratio(f):

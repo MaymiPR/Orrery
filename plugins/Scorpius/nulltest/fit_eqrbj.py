@@ -1,5 +1,5 @@
 """Harmonic EQ bands as RBJ-cookbook filters (peaking, low / high shelf), their gain in dB from the knob: fitted to
-linear.py's impulse responses at +3 and +6 (f0, Q, the dB gain at each)."""
+measure_linear.py's impulse responses at +3 and +6 (f0, Q, the dB gain at each)."""
 import numpy as np
 from scipy.optimize import least_squares
 from fit_eqbands import measured, f, z, FS

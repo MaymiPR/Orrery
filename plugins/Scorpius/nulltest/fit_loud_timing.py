@@ -4,8 +4,8 @@ on level steps, drums and the track, the error measured on the parallel's contri
 import sys
 import numpy as np
 from scipy.optimize import minimize
-import harness as o
-import nullmod as N
+import ori as o
+import null_modules as N
 
 FS = o.FS
 L = {**o.NONE, 'Par Loud On/Off': 1, 'Par Loud Level': 1.0}

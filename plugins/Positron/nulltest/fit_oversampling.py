@@ -4,7 +4,7 @@ Kaiser-windowed sinc cut at a quarter of that rate, its length and window from t
 transition band between a passband edge in Hz and its mirror image and a stopband depth; unit gain at DC (the
 two numbers are fitted here). The path simulated is
 up-sampling stages, the fixed delay with its fraction at the high rate, down-sampling stages. Result: depth 100 dB,
-edge 16.7 ... 17.1 kHz at 48 kHz (45 / 21 / 17 taps), narrowed to 16.9 ... 17.0 by 44.1 kHz (os_rates_fit.py, which
+edge 16.7 ... 17.1 kHz at 48 kHz (45 / 21 / 17 taps), narrowed to 16.9 ... 17.0 by 44.1 kHz (fit_os_rates.py, which
 also gives the per-rate delays in Engine.cpp).
     python fit_oversampling.py [edgeHz depthDb]"""
 import os, sys

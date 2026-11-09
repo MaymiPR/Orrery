@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/branding/orrery-banner-dark.svg">
-    <img src="docs/branding/orrery-banner-light.svg" alt="Orrery Suite: open-source recreations of Cradle's mix-bus plug-ins, null-tested against the originals" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/branding/orrerysuite-banner-dark.svg">
+    <img src="docs/branding/orrerysuite-banner-light.svg" alt="Orrery Suite: open-source recreations of Cradle's mix-bus plug-ins, null-tested against the originals" width="100%">
   </picture>
 </p>
 
@@ -48,12 +48,12 @@ originals are the reference for every behaviour, as [Positron's](plugins/Positro
 - **A few additions**, in the same top bar on every plug-in: A / B compare, an external side-chain (INT / EXT) and
   **I/O LINK**, which turns the output down as you turn the input up so you can drive harder at the same level.
 
-  <img src="docs/screenshots/top-bar.png" alt="The shared top bar: A / B compare, preset menu, side-chain INT / EXT, I/O LINK, UI scale" width="100%">
+  <img src="docs/screenshots/orrerysuite-top-bar.png" alt="The shared top bar: A / B compare, preset menu, side-chain INT / EXT, I/O LINK, UI scale" width="100%">
 
 - **Particle visualisers that follow your music**, in each original's style or ours, moving with the project's tempo.
 
   <img
-    src="docs/screenshots/particle-styles.png"
+    src="docs/screenshots/orrerysuite-particle-styles.png"
     alt="Particle styles. Top: Positron's own style (left) and the classic style (right). Bottom: Scorpius's own style, then the classic style"
     width="100%">
 

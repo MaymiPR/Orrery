@@ -1,12 +1,12 @@
 """Character section (EQ and limiter bypassed): steady-state gain vs input level for sines in each region, at five
 amount settings. A staircase per (frequency, amount): 1.2 s per level, gain read over the last 0.4 s of each step
 (lock-in at the tone frequency). Also runs the staircase downwards (hysteresis / release) at the default amount.
-Writes measurements/character/static.json."""
+Writes measurements/Positron/character/static.json."""
 import json, os, sys
 import numpy as np
 import tgp
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'character'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character'); os.makedirs(OUT, exist_ok=True)
 FS = tgp.FS
 STEP = 1.2
 LEVELS = list(range(-80, 7, 3))

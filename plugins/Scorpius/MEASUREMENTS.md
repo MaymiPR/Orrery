@@ -10,9 +10,9 @@ editor are in [RESEARCH.md](RESEARCH.md).
 |---|---|
 | Reference | Cradle Orion 1.2.1, VST3, Windows |
 | Offline host | `tools/RefRender.cpp` (shared with Positron): renders float32 files at a fixed rate and block size, sets parameters by displayed value, loads a saved state; `settle=ms` runs the message loop after the parameters are set |
-| Harness | `nulltest/harness.py`: `render_many(jobs)`, `ONLY(...)` (only the named modules on), settings the host cannot see written into a copy of the default state, test signals, nulls, an on-disk render cache |
+| Harness | `nulltest/ori.py`: `render_many(jobs)`, `ONLY(...)` (only the named modules on), settings the host cannot see written into a copy of the default state, test signals, nulls, an on-disk render cache |
 | State editing | `nulltest/refstate.py` edits a saved state by its path in the preset table (the hidden settings and the preferences) |
-| Survey scripts | `nulltest/survey.py`, `order.py`, `linear.py`: a first look at every module, the signal order, the small-signal impulse responses (`measurements/scorpius/ir/`) |
+| Survey scripts | `nulltest/probe_survey.py`, `probe_order.py`, `measure_linear.py`: a first look at every module, the signal order, the small-signal impulse responses (`measurements/Scorpius/ir/`) |
 | Rate, block | 48 kHz, block 512 |
 | Start state | the factory preset "default"; each test switches the other modules off with their own power buttons (`ONLY`) |
 | Settle | 400 ms of message loop after setting parameters: the original applies settings asynchronously, at a random point of the render (without the settle two renders of one input null at -8 dB; with it they are bit-identical) |
@@ -20,10 +20,10 @@ editor are in [RESEARCH.md](RESEARCH.md).
 | Noise floor | a time-shifted input leaves a residual of -117 dBFS at any level: the original adds a very low noise (or dither) while a module is on; it limits nulls on quiet signals only |
 | Gain | the level of the test tone's fundamental (Hann window) at the output re the input |
 
-Data and plots live in `measurements/scorpius/` and the renders in `nulltest/renders/`, both git-ignored. This file is
+Data and plots live in `measurements/Scorpius/` and the renders in `nulltest/renders/`, both git-ignored. This file is
 the published record; every number in it is reproduced by the script its section names.
 
-## 1. Structure (`order.py`)
+## 1. Structure (`probe_order.py`)
 
 Both modules on, against the two modules rendered one after the other in each order (nulls in dB):
 
@@ -38,10 +38,10 @@ Both modules on, against the two modules rendered one after the other in each or
 
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
-| Chain | input gain → drive (+ hi-pass) → harmonics → compression → lift → harmonic EQ → the parallels → output gain | `order.py` | exact |
-| Parallels (sub, low, loud, grit) | fed from the end of the chain (after the EQ); each nulls against "chain, then the parallel" | `order.py` | -284 … -294 dB (grit: below) |
+| Chain | input gain → drive (+ hi-pass) → harmonics → compression → lift → harmonic EQ → the parallels → output gain | `probe_order.py` | exact |
+| Parallels (sub, low, loud, grit) | fed from the end of the chain (after the EQ); each nulls against "chain, then the parallel" | `probe_order.py` | -284 … -294 dB (grit: below) |
 | Mixing | independent paths mixed in, not a series: out = chain + Σ (pathₖ - chain) | two parallels on at once | -143 … -145 dB |
-| Grit | works on each channel by itself (14); after drive it nulls against "chain, then grit" at -86 dB, after compression at -31 dB (stereo material; 14) | `order.py` | measured |
+| Grit | works on each channel by itself (14); after drive it nulls against "chain, then grit" at -86 dB, after compression at -31 dB (stereo material; 14) | `probe_order.py` | measured |
 | All modules off | bit-exact, latency 0 | null | -280 dB at 48 kHz |
 
 ## 2. Sample rates
@@ -65,7 +65,7 @@ The DSP runs at a fixed 48 kHz. At other rates the audio is converted in and out
 
 NULLTESTS.md: "all off" at each rate.
 
-## 3. The low-level expander (`fit_exp.py`, `nullquiet.py`)
+## 3. The low-level expander (`fit_exp.py`, `null_quiet.py`)
 
 Drive, harmonics, compression and lift share one downward expander; the EQ and the parallels have none, and with all
 four modules off there is none.
@@ -80,13 +80,13 @@ four modules off there is none.
 | Holds | once the mid's peak has reached the threshold, fully open for 1.10 s after the last such sample, even after a 2 ms burst; below the threshold it holds the peak of the last 0.10 s | 28 level patterns per 1 ms (drops from above and below the threshold, rises, bursts of 2 … 50 ms, repeated bursts, stairs) | every pattern within 0.04 dB |
 | Closing | a one-pole on the linear gain, 0.10 s time constant (it closes over about 0.6 s after the hold, the same from -20 or -40 dBFS) | as above | as above |
 | Opening | a one-pole on the linear gain, 1 ms, from the -44.5 dB floor: the gain at the sound's n-th sample after silence is 1 - 0.994 e^(-(n + 1) / 48), at -12 and -30 dB alike and at any time in the render | drums after silence, only the compression on at amount 0 | -141 dB |
-| Switched on | the modules' expander starts closed, as after silence | `switch_on.py` | exact |
+| Switched on | the modules' expander starts closed, as after silence | `probe_switch_on.py` | exact |
 | At creation | with lift on, the expander starts fully open and holds 1.1 s as after a loud passage, then closes (the default preset, with the drive off, and with the colour, the hi-pass or an amount changed); with lift off (lift alone off, lift and harmonics off, any one module alone) it starts closed | -70 dBFS tone from the first sample | the default preset within 0.3 dB |
 | With the drive | drive a alone: the threshold sits 1.4 dB higher for a sine and about 3.2 dB higher for pink noise than the expander's own, the drive's gain on each (-1.39 / -3.22 dB below the expander) | sine and pink noise | after the drive: within 0.3 dB (sine, -80 … -56 dBFS); pink noise through drive a, either hi-pass setting, within 0.1 dB at -50 … -80 dBFS RMS |
 
 NULLTESTS.md, "Quiet material" and "Automation" (the switches).
 
-## 4. Small-signal responses (`linear.py`)
+## 4. Small-signal responses (`measure_linear.py`)
 
 Impulse responses from 20 s of white noise at -50 dBFS (above the expander, below the modules' saturation). Gain in
 dB at chosen frequencies (Hz); every module processes both channels alike (L - R below -300 dB):
@@ -157,7 +157,7 @@ The learned models are in 14. NULLTESTS.md, "Module by module" (drive rows) and 
 | Compression | little: the boost at 120 Hz is +5.8 dB up to -12 dBFS, +5.3 at 0, +4.3 at +6 | tones | measured |
 | Amount | almost a wet / dry mix (5); the processing changes with it (14) | | measured |
 
-## 8. Compression (`comp.py`, `comp_colour.py`)
+## 8. Compression (`probe_comp.py`, `probe_comp_colour.py`)
 
 At amount 1 (the wet path; the amount mixes it with the dry signal exactly):
 
@@ -169,7 +169,7 @@ At amount 1 (the wet path; the amount mixes it with the dry signal exactly):
 | Timing | after a step from -30 to +6 dBFS the reduction reaches 90 % in ~2 ms (-9 dB of -11 after 2 ms); it recovers in ~20 ms (the make-up back after 30 … 40 ms) | steps | measured |
 | Gain modulation | within the cycle, odd harmonics at low frequencies (40 Hz at 0 dBFS: h3 -27 dB) | tones | measured |
 | The modes | agree in every tone test (static, steps, bursts, low frequencies) but for the 0.33 dB of make-up; on drums they differ (null -23 dB after the make-up): they differ in their wet filters and fine dynamics (14) | tones, drums | measured |
-| Colour | the wet path is not linear besides its gain: steady tones below the threshold, where the gain stands still, come out with even harmonics in both modes (h2 -88 dB re the tone at -36 dBFS, -70 at -24, -65 at -18; 1 kHz and 100 Hz alike), about 1 dB more per dB, as from a gentle quadratic term; at amount 0 nothing (below -150 dB); modes a and b very likely colour the wet signal after the gain, each in its own way | `comp_colour.py` | inferred |
+| Colour | the wet path is not linear besides its gain: steady tones below the threshold, where the gain stands still, come out with even harmonics in both modes (h2 -88 dB re the tone at -36 dBFS, -70 at -24, -65 at -18; 1 kHz and 100 Hz alike), about 1 dB more per dB, as from a gentle quadratic term; at amount 0 nothing (below -150 dB); modes a and b very likely colour the wet signal after the gain, each in its own way | `probe_comp_colour.py` | inferred |
 
 The fitted law and the learned gain correction are in 14.
 
@@ -205,7 +205,7 @@ Each path is mixed in with the faders' taper (5); levels below at level 1.
 
 The identified laws and learned models are in 14.
 
-## 12. Smoothing and switching (`nulltest/autom_probe.py`, `autom_curve.py`, `switch_on.py`, `harm_ramp.py`)
+## 12. Smoothing and switching (`nulltest/probe_autom.py`, `measure_autom_curve.py`, `probe_switch_on.py`, `measure_harm_ramp.py`)
 
 First readings, a 1 kHz tone at -20 dBFS, a change at a 64-sample block boundary:
 
@@ -223,12 +223,12 @@ MEASUREMENTS.md 5):
 
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
-| Amounts | two stages: a 5 ms ramp read once per 128-sample control chunk (chunks from the block's start), then a 5 ms linear glide to each reading, started afresh every chunk: 0.284 at the first chunk's end, then 0.0030 per sample, there at 368 samples; the same at blocks of 128, 256 and 512 | `autom_curve.py` | predicts the measured curve |
-| A module's power | switches at the block's start, no crossfade; with blocks under 128 samples a change waits until a whole chunk has gathered: 128 - n, rounded up to whole blocks (+64 at 64, +96 at 32) | `autom_probe.py` | exact |
-| Switched back on | every module starts as if from silence: its output after the switch equals its output on the same input with silence before it (harmonics, compression, lift to -44 … -57 dB from the first sample; the drive to -43 … -60 dB from 10 ms on, its first milliseconds differing), not its output carrying on from where it stopped (-4 … -30 dB in the first 20 ms); the drive's ~100 ms of settling is a process with memory hearing sound after silence; the EQ restarts too | `switch_on.py` | measured |
-| EQ gains | a plain 5 ms ramp | `autom_probe.py` | -44 dB (Declined changes) |
+| Amounts | two stages: a 5 ms ramp read once per 128-sample control chunk (chunks from the block's start), then a 5 ms linear glide to each reading, started afresh every chunk: 0.284 at the first chunk's end, then 0.0030 per sample, there at 368 samples; the same at blocks of 128, 256 and 512 | `measure_autom_curve.py` | predicts the measured curve |
+| A module's power | switches at the block's start, no crossfade; with blocks under 128 samples a change waits until a whole chunk has gathered: 128 - n, rounded up to whole blocks (+64 at 64, +96 at 32) | `probe_autom.py` | exact |
+| Switched back on | every module starts as if from silence: its output after the switch equals its output on the same input with silence before it (harmonics, compression, lift to -44 … -57 dB from the first sample; the drive to -43 … -60 dB from 10 ms on, its first milliseconds differing), not its output carrying on from where it stopped (-4 … -30 dB in the first 20 ms); the drive's ~100 ms of settling is a process with memory hearing sound after silence; the EQ restarts too | `probe_switch_on.py` | measured |
+| EQ gains | a plain 5 ms ramp | `probe_autom.py` | -44 dB (Declined changes) |
 | Parallels' levels | limited by the parallels themselves | | measured |
-| Harmonics amount change | during and after the change the original's output is not that of any held amount: its output swings well away from both steady states during the ramp (-15 dB, while they differ by -36); the difference lies below 200 Hz and dies away over ~30 ms, after the ramp has ended | `harm_ramp.py` | at every held amount 0.2 … 0.9 Scorpius nulls at -65 … -71 dB |
+| Harmonics amount change | during and after the change the original's output is not that of any held amount: its output swings well away from both steady states during the ramp (-15 dB, while they differ by -36); the difference lies below 200 Hz and dies away over ~30 ms, after the ramp has ended | `measure_harm_ramp.py` | at every held amount 0.2 … 0.9 Scorpius nulls at -65 … -71 dB |
 
 Scorpius: a learned model keeps the state it has after silence, computed when prepared, and returns to it when its
 module is switched on (the LSTM drives' rest state is written with the model by `export_models.py`); the expander

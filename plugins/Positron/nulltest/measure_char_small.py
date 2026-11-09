@@ -1,13 +1,13 @@
 """Character section, small-signal response vs amount: an impulse at -60 dBFS (below every threshold) through the
 character stage only, divided by the all-bypassed path. Each response is fitted with the 3-band LR4 model from
 fit_crossover.py (crossovers fixed, one real gain per band), which gives the per-band make-up gain vs amount and shows
-what the band model leaves unexplained. Writes measurements/character/small_signal.json and a plot."""
+what the band model leaves unexplained. Writes measurements/Positron/character/small_signal.json and a plot."""
 import json, os
 import numpy as np
 from scipy.optimize import least_squares
 import tgp, plotstyle as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'character')
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character')
 FS = tgp.FS
 PRE = 2 * FS; N = 65536
 AMOUNTS = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0]

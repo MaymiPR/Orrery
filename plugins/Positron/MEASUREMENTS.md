@@ -18,7 +18,7 @@ results are in [NULLTESTS.md](NULLTESTS.md), cited here by case name; the contro
 | Pre-roll | 2 s: after loading, the original's internal delay ramps from 54 to 152 samples over about 0.25 s |
 | Stage isolation | the other stages bypassed with their own power buttons |
 | Gain | the level of the test tone's fundamental (lock-in, Hann window) at the output re the input |
-| Repeatability | every null-suite case rendered fresh twice differs from its cached render by less than -430 dB (`refcheck.py`) |
+| Repeatability | every null-suite case rendered fresh twice differs from its cached render by less than -430 dB (`check_reference.py`) |
 
 `measurements/` and `nulltest/renders/` are git-ignored. This file is the published record; every number in it is
 reproduced by the script its section names.
@@ -46,7 +46,7 @@ reproduced by the script its section names.
 | Gain law | the gain in dB equals the knob value (±6 dB, linear) | `measure_eq.py` | exact |
 | Level dependence | none: impulses at -40 and -12 dBFS agree | `measure_eq.py` | exact |
 | With oversampling | the filters are designed at the higher rate, so the top octave differs: high shelf +6 dB at 15 kHz reads 5.56 (1x), 5.09 (2x), 4.98 (4x), 4.95 dB (8x) | `measure_eq.py` | measured |
-| Filter structure while gains move | state-variable filters, the gain gliding in linear amplitude (5.1) | `steps.py` | matches the glide; direct forms do not |
+| Filter structure while gains move | state-variable filters, the gain gliding in linear amplitude (5.1) | `null_steps.py` | matches the glide; direct forms do not |
 
 NULLTESTS.md: "eq: low +6 mid -4 high +3", "eq: sweep, low -6 high +6".
 
@@ -206,7 +206,7 @@ subtracted to -52 dB); `fit_multistart.py` starts each fit from several detector
 | High | mean-square | ≈ 1 ms / ≈ 91 ms | threshold ≈ -10 dB, hard knee, ratio ≈ 3 | k, mix | -50 to -56 dB |
 
 The laws hold away from the probe frequency: the mid law fitted at 700 Hz predicts a 300 Hz staircase to -55 … -74 dB
-per step (`predict.py`), so the detectors hear the same FIR band signals as the audio.
+per step (`compare_prediction.py`), so the detectors hear the same FIR band signals as the audio.
 
 **Band laws from program material** (`fit_music.py`): each band and node fitted against the original on music,
 drums, a bass-heavy mix, pink noise and the probes at once, through a Python model of the whole section
@@ -224,7 +224,7 @@ the same at every amount:
   each signal weighed equally in dB (`fit_music.py mid N --loud --track --relative --fixed`); the 200 % node again on
   the path of 3.15.
 - The high band's laws are fitted around its measured shaper (3.14) and detector (3.17).
-- The fitted laws are in `measurements/character/bandlaw_final_v13.json`, compiled into the plug-in's band tables.
+- The fitted laws are in `measurements/Positron/character/bandlaw_final_v13.json`, compiled into the plug-in's band tables.
 
 ### 3.10 Stereo: mid-only detectors and a side gain after the shaper (`fit_width.py`)
 
@@ -245,7 +245,7 @@ Side gain relative to the mid, in dB:
 
 At 100 % a left-only signal above 5 kHz leaks into the right channel at -15 dB.
 
-### 3.11 What the nonlinear stages hear (`nulltest/nlhear.py`)
+### 3.11 What the nonlinear stages hear (`nulltest/probe_nl_hear.py`)
 
 The FIR bands have shallow stopbands: the mid band passes 8 kHz at -29.5 dB and stays at -28 dB up to 20 kHz (the
 complementary remainder of a split whose high band sits 0.3 dB low). Part of each band bypasses its nonlinear stage.
@@ -272,18 +272,18 @@ The small-signal response is unchanged and exact. Only the mid band's upper edge
 high band's stage made the broadband nulls worse, and one for the low band would need more pre-ringing than the
 151 samples the delay allows.
 
-### 3.12 Other sample rates (`nulltest/ident_rate.py`)
+### 3.12 Other sample rates (`nulltest/measure_band_rates.py`)
 
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
 | Rank | at 44.1, 88.2, 96 and 192 kHz the nine small-signal IRs again span exactly three filters, with the per-band gains of 48 kHz | rank-3 fit | error below 1e-7 |
-| Design | per rate, not resampled: 608 taps at 44.1 kHz, 1216 at 88.2, 1323 at 96, 2647 at 192 kHz | `ident_rate.py` | exact |
+| Design | per rate, not resampled: 608 taps at 44.1 kHz, 1216 at 88.2, 1323 at 96, 2647 at 192 kHz | `measure_band_rates.py` | exact |
 | Top | at 88.2 kHz and above all bands fall away above about 22.5 kHz | | exact |
 | Ours | the original's own filters at those rates (BandFiltersRates.h) | | -89 … -123 dB per band |
 
 With oversampling the 48 kHz filters are redrawn at the processing rate (7).
 
-### 3.13 The high band's detector reads sample peaks (`nulltest/crest.py`, `staticn.py`)
+### 3.13 The high band's detector reads sample peaks (`nulltest/probe_crest.py`, `measure_static_n.py`)
 
 A sine, two tones and band noise at the same RMS through each band:
 
@@ -304,7 +304,7 @@ A sine, two tones and band noise at the same RMS through each band:
   and 6 to 16 kHz 0.11 to 0.18 dB quieter: the original's detector has a steeper low edge than its shaper, about
   0.6 dB at 4 kHz. Not modelled (Declined changes).
 
-### 3.14 The shapers read directly (`nulltest/shapeside.py`, `h3cmp.py`, `shapemid.py`)
+### 3.14 The shapers read directly (`nulltest/probe_shape_side.py`, `compare_h3.py`, `probe_shape_mid.py`)
 
 A tone with L and R in anti-phase is not compressed (3.10), so a band's side output is its shaper alone: plotted
 sample by sample against the band signal, it is the shaper's curve. Tones sit where the plug-in reads back its own
@@ -313,10 +313,10 @@ settings exactly: 9 kHz (high band), 800 Hz (mid), 25 Hz (low).
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
 | High band form | with a dry share, d · u + (1 - d) · sin(k · u) / k | side output against the band signal | -92 … -124 dB at every amount (a pure sine: -46 … -57 dB) |
-| High band k | rises linearly with the amount: 1.40 at 12.5 %, 1.865 at 100 %, then more slowly to 2.34 at 200 % | `shapeside.py` | measured |
-| High band d | falls smoothly from 0.89 at 12.5 % to -0.037 at 100 % and stays near -0.04 above | `shapeside.py` | measured |
-| Mid and low bands | below 100 % the program-fitted laws match (k within 1 to 2 %, d within 0.01); above 100 % the mid k reads 3 to 4 % lower than the fitted one, with d = -0.01; the fitted values are kept (Declined changes) | `shapeside.py` | measured |
-| Mid and side shaping (γ) | the shaper's distortion, (1 - d) · (sin(k · u) / k - u), reaches the output's mid 1 + γ times as strong as its side; γ grows by 0.0019 per 12.5 % step to 0.0153 at 100 %, peaks at 0.0177 at 137.5 % and is 0.0142 at 200 % | `h3cmp.py`, `shapemid.py`; BandParam `shapeMid` | in the mid band the in/anti ratio matches to 0.1 to 0.4 % |
+| High band k | rises linearly with the amount: 1.40 at 12.5 %, 1.865 at 100 %, then more slowly to 2.34 at 200 % | `probe_shape_side.py` | measured |
+| High band d | falls smoothly from 0.89 at 12.5 % to -0.037 at 100 % and stays near -0.04 above | `probe_shape_side.py` | measured |
+| Mid and low bands | below 100 % the program-fitted laws match (k within 1 to 2 %, d within 0.01); above 100 % the mid k reads 3 to 4 % lower than the fitted one, with d = -0.01; the fitted values are kept (Declined changes) | `probe_shape_side.py` | measured |
+| Mid and side shaping (γ) | the shaper's distortion, (1 - d) · (sin(k · u) / k - u), reaches the output's mid 1 + γ times as strong as its side; γ grows by 0.0019 per 12.5 % step to 0.0153 at 100 %, peaks at 0.0177 at 137.5 % and is 0.0142 at 200 % | `compare_h3.py`, `probe_shape_mid.py`; BandParam `shapeMid` | in the mid band the in/anti ratio matches to 0.1 to 0.4 % |
 
 What shows γ: below the threshold a high-band tone in phase has a 3rd harmonic 1.53 % stronger than the same tone in
 anti-phase (100 %), at every level from -30 to -15 dBFS, with the same fundamental; a left-only tone splits the
@@ -330,23 +330,23 @@ excerpts). From 100 % up each signal is weighed equally in dB (`--relative`); be
 fits better.
 
 - The steady curve matches: read through the shaper on steady staircases (tone, two tones, band noise, -18 … 0 dBFS
-  in 1 dB steps, `staticn.py`, `fit_music.py --static`), with γ included, the laws follow the original's curve to
+  in 1 dB steps, `measure_static_n.py`, `fit_music.py --static`), with γ included, the laws follow the original's curve to
   0.003 dB rms at 12.5 %, 0.019 at 100 %, 0.023 at 87.5 % (0.05 dB after the refits). The remaining high-band
   difference on loud material is in the detector's timing, not in the curve.
 - On the mastered track (70 s, 44.1 kHz, about -10 dBFS RMS) the band's gain is right on average (±0.1 dB per 20 ms
   frame); the difference is in how fast the detector moves, at 44.1 and 48 kHz alike and with the irregular host
   blocks FL Studio sends. The band holds most of the section's residual there (84 %, -34 dB relative to the band,
   before the refits of 3.15 and 3.17).
-- The gain trace on loud drums (`hightrace2.py`) is the check for the start and depth of compression through each hit.
+- The gain trace on loud drums (`measure_high_trace2.py`) is the check for the start and depth of compression through each hit.
 
-### 3.15 What the mid band's gain acts on above its band (`nulltest/xprobe.py`, `xprobe2.py`, `midedge.py`)
+### 3.15 What the mid band's gain acts on above its band (`nulltest/probe_cross.py`, `probe_cross2.py`, `probe_mid_edge.py`)
 
 Quiet tones above 1.5 kHz under a loud masker below 1 kHz turn the original down by nothing between 4 and 8 kHz
-(`xprobe.py`; a mid gain applied to the whole steep-edged band of 3.11 turns them down 0.05 to 0.15 dB), and on pink
+(`probe_cross.py`; a mid gain applied to the whole steep-edged band of 3.11 turns them down 0.05 to 0.15 dB), and on pink
 noise at -18 dBFS the original's high-band gain sits a steady 0.03 dB above such a model's while neither compresses
-(`hightrace3.py`): the mid band's gain reaches less far up than its nonlinear stage's input.
+(`measure_high_trace3.py`): the mid band's gain reaches less far up than its nonlinear stage's input.
 
-Probe (`xprobe2.py`): quiet tones (-50 dBFS, 60 frequencies from 0.9 to 18 kHz, too quiet to move any detector) under
+Probe (`probe_cross2.py`): quiet tones (-50 dBFS, 60 frequencies from 0.9 to 18 kHz, too quiet to move any detector) under
 a loud in-band masker (pink noise, 250 to 700 Hz, -6 dBFS RMS), and the masker alone. Each tone's complex change (with
 the masker, less alone, less the masker's own output) is the band's gain change times the response of the path the
 gain is applied through. Normalised at 900 Hz; the plug-in reads its own path to within 0.05 dB this way.
@@ -369,7 +369,7 @@ Model: the measured ratio is applied to the mid band's nonlinear-stage filter fr
 NlBandFilters.h and BandFiltersRates.h at every supported rate), no law refitted for it. NULLTESTS.md: "char: pink
 -18, 100 %", "char: pink -6, 100 %", "char: drums -6, 100 %", "char: music -10, 50 %" and "100 %".
 
-**The mid shaper's drive.** Tone staircases at 300, 500, 700 and 1000 Hz (`midstatic.py`, 100 %) show the band's
+**The mid shaper's drive.** Tone staircases at 300, 500, 700 and 1000 Hz (`measure_mid_static.py`, 100 %) show the band's
 steady gain within 0.01 dB of the original's from -44 to +4 dBFS, with the 3rd harmonic 0.37 dB too strong at low
 levels at every frequency: the drive, not a filter. The fitted k (2.514) is 2 % above the 2.445 read with anti-phase
 tones (3.14); the measured drive fits worse on program material (Declined changes), so the fitted drive compensates
@@ -379,7 +379,7 @@ for a mid-band difference not yet found (8).
 correlation of 0.993 (0.974 before the mid path was measured). The nodes at 100, 125 and 175 % are refitted on it;
 25, 150 and 200 % keep their laws (Declined changes).
 
-### 3.16 The detectors' release, read from tone drops (`nulltest/midrel.py`, `midtimes.py`, `hirel.py`, `histatic.py`)
+### 3.16 The detectors' release, read from tone drops (`nulltest/measure_mid_release.py`, `measure_mid_times.py`, `measure_high_release.py`, `fit_high_static.py`)
 
 Probe: a steady tone in one band (700 Hz for the mid band, 8 kHz for the high band) drops from a loud level to a
 quiet one; the other two bands are taken off the output through their laws, the rest inverted through the band's
@@ -389,12 +389,12 @@ within 0.2 ms.
 
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
-| Mid release | one fixed speed: after a drop to -45 dBFS the level falls at a steady 48.2 dB/s from 0 or -20 dBFS, a mean-square release of 90.0 to 91.0 ms at every amount from 25 to 200 % | `midrel.py`, `midtimes.py` | measured |
-| Mid attack | agrees with the fitted laws within 3 % | `midtimes.py` | measured |
+| Mid release | one fixed speed: after a drop to -45 dBFS the level falls at a steady 48.2 dB/s from 0 or -20 dBFS, a mean-square release of 90.0 to 91.0 ms at every amount from 25 to 200 % | `measure_mid_release.py`, `measure_mid_times.py` | measured |
+| Mid attack | agrees with the fitted laws within 3 % | `measure_mid_times.py` | measured |
 | Mid laws | keep their program-fitted release, 84.7 to 88.2 ms (the release shows only in quiet tails, which carry almost no energy; Declined changes) | `fit_music.py` | |
-| High release against drop depth | shallow drops release slowly, deep ones never faster than about 48 dB/s (47.2 to 48.1 dB/s from 25 to 200 %) | `hirel.depth_slopes` | measured |
-| Hold time | how long the tone was held before the drop (30 ms to 3 s) changes nothing: no slow second detector shows here | `hirel.py` | measured |
-| High steady curve | fitted directly to a 0.5 dB staircase with one sample-peak detector it matches to 0.012 dB rms | `histatic.py` | measured |
+| High release against drop depth | shallow drops release slowly, deep ones never faster than about 48 dB/s (47.2 to 48.1 dB/s from 25 to 200 %) | `measure_high_release.depth_slopes` | measured |
+| Hold time | how long the tone was held before the drop (30 ms to 3 s) changes nothing: no slow second detector shows here | `measure_high_release.py` | measured |
+| High steady curve | fitted directly to a 0.5 dB staircase with one sample-peak detector it matches to 0.012 dB rms | `fit_high_static.py` | measured |
 
 High band, after a drop from 0 dBFS (100 %, the slope 20 ms after the drop):
 
@@ -403,7 +403,7 @@ High band, after a drop from 0 dBFS (100 %, the slope 20 ms after the drop):
 | Original (dB/s) | -31 | -36 | -39 | -41 | -42 | -43 | -44 | -44 |
 | Positron (dB/s) | -33 | -39 | -42 | -44 | -46 | -47 | -48 | -48 |
 
-### 3.17 The high band's detector releases on the power (`nulltest/grdrop.py`, `fit_music.py --ms --hidrops`)
+### 3.17 The high band's detector releases on the power (`nulltest/probe_gr_drop.py`, `fit_music.py --ms --hidrops`)
 
 The release table of 3.16 is what a one-pole release on the square of the signal gives: after a deep drop its level
 falls at 4.34 / τ dB/s, and more slowly when the new level is close to the old one, because the decaying power adds to
@@ -419,20 +419,20 @@ A one-pole on |x| gives -22 dB/s for the drop to -3 dBFS and one on x⁴ gives -
 
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
-| Detector | mean-square at every amount (`characterDetectorPeak` off), its slow second detector kept, no fall limit (`fallRate` 0) | `grdrop.py`, `fit_music.py` | |
+| Detector | mean-square at every amount (`characterDetectorPeak` off), its slow second detector kept, no fall limit (`fallRate` 0) | `probe_gr_drop.py`, `fit_music.py` | |
 | Release | 88.5 to 91.0 ms at every amount (the tone drops alone give 98 ms; program material prefers a little faster) | `fit_music.py high N --shaper --loud --track --hidrops --ms --set fallRate=0 --fixed bandlaw_final_v11.json`, `--relative` from 125 %, 8 kHz tone drops in the set, at 200 % pink noise at -10 dBFS RMS with another seed than the stress suite's (`--pink10`) | fit objective -53.87 dB at 100 %, -49.15 at 200 % |
-| Laws | `measurements/character/bandlaw_final_v13.json` | | |
+| Laws | `measurements/Positron/character/bandlaw_final_v13.json` | | |
 
 NULLTESTS.md: "defaults, sweep -6", "defaults, drums -1", the mastered track. The sweep at -6 dBFS nulls at -56 to
--66 dB in the crossover region (1.5 to 3.5 kHz), within 0.013 dB of the original's level (`nulltest/sweepres.py`,
+-66 dB in the crossover region (1.5 to 3.5 kHz), within 0.013 dB of the original's level (`nulltest/probe_sweep_residual.py`,
 50 ms windows).
 
-### 3.18 The mid band on loud material (`nulltest/middetspec.py`, `middet.py`, `fit_music.py`)
+### 3.18 The mid band on loud material (`nulltest/probe_mid_det_spectrum.py`, `probe_mid_det.py`, `fit_music.py`)
 
-The mid band reduces loud pink noise a steady 0.04 dB more than the original (`hightrace3.py --band mid`; pink noise at
+The mid band reduces loud pink noise a steady 0.04 dB more than the original (`measure_high_trace3.py --band mid`; pink noise at
 -6 dBFS, "char: pink -6, 100 %"), and its fitted drive sits 2 % above the measured one (3.15).
 
-**What the detector hears** (`middetspec.py --map`: a 700 Hz probe at -40 dBFS rides on a steady sine pump; the
+**What the detector hears** (`probe_mid_det_spectrum.py --map`: a 700 Hz probe at -40 dBFS rides on a steady sine pump; the
 probe's gain is the band's reduction, read back through each plug-in's own in-band curve as a level). In band (300 Hz
 to 2 kHz) Positron reads the pump within 0.02 dB of the original; below the band it reads it louder, more at higher
 levels; above 2.4 kHz slightly quieter:
@@ -447,7 +447,7 @@ The measured drive in place of the fitted one changes none of these by more than
 difference that grows with level, and a highpass in front of the mid detector costs music (Declined changes): on
 program material the mid detector hears the bass as the original's does, and the low-side difference under a steady
 pump is not identified (8). On the sweep at -6 dBFS the same difference shows as 0.014 to 0.025 dB more reduction from
-157 Hz to 1.5 kHz, where the sweep nulls at -53 to -54 dB (`sweepres.py`).
+157 Hz to 1.5 kHz, where the sweep nulls at -53 to -54 dB (`probe_sweep_residual.py`).
 
 ## 4. Limiter (`measure_limiter.py`)
 
@@ -468,7 +468,7 @@ The first model these readings gave, gain = 1 / max(fast, slow) with a box-smoot
 and a slow envelope charging with τ ≈ 25 ms and relaxing to 1 with τ = 0.378 s (levels relative to the ceiling,
 0.98855), is refined by the algorithm of 4.1.
 
-### 4.1 The algorithm, identified with probes (`nulltest/lim_probe.py`)
+### 4.1 The algorithm, identified with probes (`nulltest/probe_limiter.py`)
 
 Isolated clicks, click pairs and trains at chosen spacings and heights, the gain trace read back sample by sample.
 The model reproduces the probes to 0.0007 in gain and the trains to an RMS error of 0.00035.
@@ -508,7 +508,7 @@ A pair of peaks exactly 24 samples apart still differs for the first 3 samples a
 The single-peak and pair probes match to 0.004 at 96 and 192 kHz. Pairs exactly one sample beyond the window still
 differ at 44.1 and 88.2 kHz: after a peak the original appears to look one sample further than its attack from idle.
 
-**The interpolator per rate** (`nulltest/limrate.py`). None of the time constants (window, release, reach, slow
+**The interpolator per rate** (`nulltest/null_lim_rate.py`). None of the time constants (window, release, reach, slow
 envelope) improves the nulls when changed; the interpolator does. Over a grid of Kaiser taps and window β, scored on
 five signals (drums peaking at -1 dBFS, pink -6, a track excerpt, drums at 12 dB input gain, music -2), the good
 settings lie on a narrow ridge along which the window's Gaussian core, σ = (taps / 2) / √β, stays the same: 4.4
@@ -524,7 +524,7 @@ near-ties), so they were chosen by the mean.
 | 96 kHz | 12, 14.5 | -56.7 |
 | 192 kHz | 10, 16 | -55.4 |
 
-**The level estimate against the original's readings** (`nulltest/limpulse.py`, `limident.py`, `limpy.py`, `limnl.py`):
+**The level estimate against the original's readings** (`nulltest/probe_lim_pulse.py`, `probe_lim_interp.py`, `limpy.py`, `probe_lim_nl.py`):
 an isolated pulse above the ceiling is planned to exactly its level, so at its loudest point output / input =
 trim / level. On 3873 isolated pulses (1084 of them raw bursts 2 to 6 samples long):
 
@@ -545,7 +545,7 @@ No linear interpolator is left to gain from; on short raw noise bursts the origi
 the plug-in exactly, every variant (peaks of the sample magnitudes, peaks over two neighbours, a minimum prominence,
 the steepest reachable peak) is far worse (pink noise -21 … -29 dB against -47.5).
 
-**How far the limiter can null** (`nulltest/sensitivity.py`): the original against itself, white noise added to pink
+**How far the limiter can null** (`nulltest/probe_sensitivity.py`): the original against itself, white noise added to pink
 noise at -6 dBFS (5 dB into the limiter). Noise at -140 or -120 dBFS moves its output by -132 / -113 dB, as a linear
 stage would; at -100 dBFS by -67.5 dB, at -80 dBFS by -57.5 dB. A difference of a ten-thousandth in the level changes
 plan decisions (near-ties: a local maximum 0.001 above its neighbour that the original does not count as one), and
@@ -555,7 +555,7 @@ moves it by -87 dB): its residual is a model difference, mostly the mid band (3.
 drum loop nulls to only -35 dB: a 1e-4 DC pilot changes the original's output there by orders of magnitude more than
 its size, so its peak planning sits on a tie.
 
-**At the maximum input gain** (12 dB, `limmax.py`): the limiter alone nulls music at -2 dBFS to -55.8 dB, drums to
+**At the maximum input gain** (12 dB, `null_lim_max.py`): the limiter alone nulls music at -2 dBFS to -55.8 dB, drums to
 -78.4, pink -10 to -58.7, music at -10 dBFS to -96.8; the full chain music -10 -61.2, music -2 -53.1, drums -6 -51.9,
 pink -10 -43.2 (-43.1 with the 100 % high-band refit of 3.14). 94 % of the residual sits in 5 % of the time: single plan
 decisions (a plan that starts a few samples later, a release restarted from a slowly falling level). The slow envelope's
@@ -583,19 +583,19 @@ the raw path delay included (3.2 ms with the limiter off, 4.0 ms on):
 | Limiter Bypass | instant | the 38-sample delay changes at once (it can click on program material) |
 | Bypass (main) | instant | |
 
-### 5.1 The control rate (`nulltest/steps.py`, per-sample envelopes of steady tones)
+### 5.1 The control rate (`nulltest/null_steps.py`, per-sample envelopes of steady tones)
 
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
-| Chunks | each host block is cut into chunks of up to 128 samples, counted from the block's start (64-sample blocks: 64-sample chunks) | `steps.py` | exact |
-| Input and output gains | one-pole smoothed once per chunk by chunk/τ of the remaining distance in linear gain (forward Euler, τ = 478.8 samples, about 10 ms); the gain ramps linearly between chunk ends (the output's slope is piecewise constant in 128-sample pieces) | `steps.py` | input-gain steps of +12, +6 and -12 dB at blocks of 64 and 128 to within 0.0005 in gain |
-| Input gain, first stage | the parameter ramps linearly in dB over 237.6 samples (about 5 ms), read at each chunk's end (in the first chunk after a change the target is about halfway); the output gain has no such ramp | `steps.py` | as above |
-| EQ gains and the amount | the same 5 ms parameter ramp read at chunk ends, then a linear glide over 5 ms to each new value, re-planned only when the value changes: a slower first chunk, then a straight line to the end, about 368 samples after the change; the EQ is state-variable filters whose gain glides in linear amplitude | `steps.py` | the gliding response matches; direct forms do not |
-| Limiter input gain | a linear ramp over 10 ms in linear gain, no chunking | `steps.py` | within 0.003 dB |
-| EQ switch | follows its own 5 ms ramp and takes effect at the start of the chunk after the one in which the ramp crossed half way (512-sample blocks: 128 samples after the block start) | `steps.py` | exact |
-| Character and limiter switches | at once; while off they do not run, and switched back on they start from silence (detectors at rest, empty filter and look-ahead buffers) | `steps.py` | the bypass toggles null at -60 dB this way, -31 dB with the stages kept running |
-| Amount 0 | the character section's detectors keep running: a jump from 0 % settles as fast as one from 100 % | `steps.py` | exact |
-| Host blocks under 128 samples | the switches of the oversampled section (EQ and character on/off) take effect once a control chunk's worth has gathered: 128 - n rounded up to whole blocks later (96 samples at 32-sample blocks, 64 at 64, 96 at 96) | `steps.py` | bypass toggles at 64-sample blocks -57.8 dB; every stress case at 64, 333 and 4096-sample blocks nulls as at 512 |
+| Chunks | each host block is cut into chunks of up to 128 samples, counted from the block's start (64-sample blocks: 64-sample chunks) | `null_steps.py` | exact |
+| Input and output gains | one-pole smoothed once per chunk by chunk/τ of the remaining distance in linear gain (forward Euler, τ = 478.8 samples, about 10 ms); the gain ramps linearly between chunk ends (the output's slope is piecewise constant in 128-sample pieces) | `null_steps.py` | input-gain steps of +12, +6 and -12 dB at blocks of 64 and 128 to within 0.0005 in gain |
+| Input gain, first stage | the parameter ramps linearly in dB over 237.6 samples (about 5 ms), read at each chunk's end (in the first chunk after a change the target is about halfway); the output gain has no such ramp | `null_steps.py` | as above |
+| EQ gains and the amount | the same 5 ms parameter ramp read at chunk ends, then a linear glide over 5 ms to each new value, re-planned only when the value changes: a slower first chunk, then a straight line to the end, about 368 samples after the change; the EQ is state-variable filters whose gain glides in linear amplitude | `null_steps.py` | the gliding response matches; direct forms do not |
+| Limiter input gain | a linear ramp over 10 ms in linear gain, no chunking | `null_steps.py` | within 0.003 dB |
+| EQ switch | follows its own 5 ms ramp and takes effect at the start of the chunk after the one in which the ramp crossed half way (512-sample blocks: 128 samples after the block start) | `null_steps.py` | exact |
+| Character and limiter switches | at once; while off they do not run, and switched back on they start from silence (detectors at rest, empty filter and look-ahead buffers) | `null_steps.py` | the bypass toggles null at -60 dB this way, -31 dB with the stages kept running |
+| Amount 0 | the character section's detectors keep running: a jump from 0 % settles as fast as one from 100 % | `null_steps.py` | exact |
+| Host blocks under 128 samples | the switches of the oversampled section (EQ and character on/off) take effect once a control chunk's worth has gathered: 128 - n rounded up to whole blocks later (96 samples at 32-sample blocks, 64 at 64, 96 at 96) | `null_steps.py` | bypass toggles at 64-sample blocks -57.8 dB; every stress case at 64, 333 and 4096-sample blocks nulls as at 512 |
 
 NULLTESTS.md: the stress group "automation" at blocks 512, 64 and 4096; the mastered track's switched cases.
 
@@ -605,7 +605,7 @@ NULLTESTS.md: the stress group "automation" at blocks 512, 64 and 4096; the mast
 
 | Quantity | Value | Method | Confidence |
 |---|---|---|---|
-| Bars | 33, each fully on or off (no partial brightness): floor(5.5 × GR), 33 bars over 6 dB, no bar under 0.18 dB, none forced on (`gr_bars.png`) | films of per-band tone staircases and a pink-noise ramp, the band's reduction from the model (`nulltest/stairgr.py`, `grtarget.py`) | bar for bar where the model's reduction agrees |
+| Bars | 33, each fully on or off (no partial brightness): floor(5.5 × GR), 33 bars over 6 dB, no bar under 0.18 dB, none forced on (`gr_bars.png`) | films of per-band tone staircases and a pink-noise ramp, the band's reduction from the model (`nulltest/measure_stair_gr.py`, `measure_gr_meters.py`) | bar for bar where the model's reduction agrees |
 | Readings | 8 kHz at -6 dBFS: 4.7 dB, 25 bars; 100 Hz at 0 dBFS, low band: 2.8 dB, 15 bars; the mid band is pinned at 33 bars for 7.1 dB and more | films | measured |
 | Quantity shown | the band's internal (wet-path) reduction, larger than the net change of the audio (1 kHz at -6 dBFS reads 7.1 dB while the fundamental drops 4.9 dB) | films, 3.8 | measured |
 | Rise | follows the band's attack: high and low reach their count within one frame (< 30 ms), mid takes ≈ 0.1 s to fill | films | measured |
@@ -626,7 +626,7 @@ passing between them.
 
 ### I/O LED meters
 
-Ramp film, every LED read per frame (`ledread.py`); the meter redraws about 22 times a second.
+Ramp film, every LED read per frame (`read_leds.py`); the meter redraws about 22 times a second.
 
 | Part | Law | Confidence |
 |---|---|---|
@@ -640,13 +640,13 @@ Ramp film, every LED read per frame (`ledread.py`); the meter redraws about 22 t
 | Readout | Law | Method | Confidence |
 |---|---|---|---|
 | Band and limiter readouts | hold the deepest GR so far: mid -7.1 (1 kHz -6 dBFS), -9.9 (0 dBFS), -13.1 (+6 dBFS); high -4.7; low -2.8; limiter -0.1, -1.4, -3.0 for the same bursts at the defaults | films | measured |
-| RMS readout | live, not held; updates every 0.231 s; the plain RMS (one-pole on x², 89 ms) + 1.5 dB; in silence falls exactly 11.27 dB per update (48.7 dB/s); below -96 dB reads -inf (-96.0 is shown, the next step is -inf); rises within one update (the second update after an onset within 0.1 dB) | `readout_probe.py` (tones, noise, bursts, steps, pulse trains, DC, repeated runs, a fade, 30 s of music), `readouts.py` | 0.5 dB rms on music, 0.55 dB rms on steady probes; the original spreads ±0.3 dB between identical runs (a -6 dBFS 1 kHz tone read -7.2, -7.3, -7.3, -7.7) |
-| RMS readout, not modelled | signals of constant magnitude read higher (an fs/4 tone at 45° and DC: +2.1 … +2.6 dB over their RMS); sparse pulse trains only +0.3 … +0.6 dB | `readout_probe.py` | measured |
+| RMS readout | live, not held; updates every 0.231 s; the plain RMS (one-pole on x², 89 ms) + 1.5 dB; in silence falls exactly 11.27 dB per update (48.7 dB/s); below -96 dB reads -inf (-96.0 is shown, the next step is -inf); rises within one update (the second update after an onset within 0.1 dB) | `probe_readout.py` (tones, noise, bursts, steps, pulse trains, DC, repeated runs, a fade, 30 s of music), `read_readouts.py` | 0.5 dB rms on music, 0.55 dB rms on steady probes; the original spreads ±0.3 dB between identical runs (a -6 dBFS 1 kHz tone read -7.2, -7.3, -7.3, -7.7) |
+| RMS readout, not modelled | signals of constant magnitude read higher (an fs/4 tone at 45° and DC: +2.1 … +2.6 dB over their RMS); sparse pulse trains only +0.3 … +0.6 dB | `probe_readout.py` | measured |
 | Peak readout | the sample peak, held until clicked, but sampled: about every 46 ms it takes the latest block's peak, so peaks in the blocks between are never seen (music with +2.12 dBFS overs read +0.9, a 480-sample block whose peak was +0.93; the onset spike of a tone at the output, -0.1 dBFS with a steady peak of -2.6, read -1.3); output readings match block peaks with blocks offset about 230 samples from the host's; input readings match no block of the raw input at any offset (the input meter may see a slightly filtered signal; sines read their peak exactly) | films | measured |
 | Position | after the gains: input readouts after the input gain, output readouts after the output gain (-12 dBFS in, +6 / -6 dB gains: input -6.0, output peak -7.3) | films | exact |
 | Display | rounded to 0.1 dB (-2.67 shows -2.7); a positive peak turns red | films | exact |
 
-**Short-term LUFS mode** (`nulltest/lufs_probe.py`; films with the settings page switched to Short-term LUFS & Peak and
+**Short-term LUFS mode** (`nulltest/probe_lufs.py`; films with the settings page switched to Short-term LUFS & Peak and
 back, the readouts read frame by frame):
 
 | Quantity | Value | Confidence |
@@ -657,7 +657,7 @@ back, the readouts read frame by frame):
 | Not modelled | the text sometimes stays unchanged for seconds while the loudness moves (after a tone it held -27.8 instead of reaching -inf; across a change of frequency at a constant level it held for 10 s): the editor not redrawing it | measured |
 | Positron (`Source/Loudness.h`) | K-weighting designed for the host rate from the standard's analog parameters, 3 s in 10 ms bins, both channels summed, shown every third RMS update; on the same fifteen tones it reads the standard's value (1 kHz at -20 dBFS: -20.0; 63 Hz: -23.4, the standard -23.35); PositronTests checks 1 kHz and 100 Hz at 44.1 and 48 kHz, the half-filled window and its emptying | tests |
 
-### Limiter meter (`nulltest/dashmeter.py`)
+### Limiter meter (`nulltest/measure_dash_meter.py`)
 
 Films of a 1 kHz tone through the limiter alone at 12 dB input gain, rising in 0.5 dB and then 0.1 dB steps, the
 reduction read from the output. 31 dash cells on a 4 px pitch from y 90 per channel.
@@ -668,7 +668,7 @@ reduction read from the output. 31 dash cells on a 4 px pitch from y 90 per chan
 | Bar | from cell 0, following the current reduction, one cell shorter than the marker's position: a steady reduction shows the bar, one dark cell, then the marker (12 dB: cells 0 to 6 and 8); when the input stops the bar falls back over about 1.1 s with the limiter's release and the marker stays | measured |
 | Positron | the same bar and held marker in its own style: on both probes its cells match the original's at all 50 steps, and after the input stops its bar falls back on the same frames (0.10 to 1.07 s against 0.11 to 1.07 s) | filmed |
 
-## 7. Oversampling (`measure_oversampling.py`, `fit_oversampling.py`, `measure_os_rates.py`, `os_rates_fit.py`)
+## 7. Oversampling (`measure_oversampling.py`, `fit_oversampling.py`, `measure_os_rates.py`, `fit_os_rates.py`)
 
 The setting is switched through the original's own settings page and restored to 1x afterwards.
 
@@ -686,11 +686,11 @@ the small-signal response below 15 kHz do not change.
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
 | Extra delay at 48 kHz | 22.488 / 27.711 / 29.655 samples at 2x / 4x / 8x (group delay at 1 kHz) | `measure_oversampling.py` | measured |
-| Design rule | stage k runs at 2^(k+1) times the host rate and is designed when prepared: a Kaiser-windowed sinc cut at a quarter of the stage's rate (a half-band filter), length and window from the textbook Kaiser formulas for a transition band (a passband edge and its mirror image) and a stopband depth, unit gain at DC; filters, latency and top octave change with the host rate | `fit_oversampling.py`, `os_rates_fit.py` | |
+| Design rule | stage k runs at 2^(k+1) times the host rate and is designed when prepared: a Kaiser-windowed sinc cut at a quarter of the stage's rate (a half-band filter), length and window from the textbook Kaiser formulas for a transition band (a passband edge and its mirror image) and a stopband depth, unit gain at DC; filters, latency and top octave change with the host rate | `fit_oversampling.py`, `fit_os_rates.py` | |
 | Edge and depth | 17 kHz, 100 dB: at 48 kHz any edge from 16.7 to 17.1 kHz with 100 dB gives the measured lengths (45 / 21 / 17 taps) and the path to 0.03 dB; 44.1 kHz narrows the edge to 16.9 … 17.0 kHz (57 / 23 / 17 taps) | `measure_os_rates.py` | the whole path to 0.000 dB at 44.1, 48, 88.2 and 96 kHz and every ratio |
 | Simulated path | upsample, the fixed delay with its fraction at the high rate, downsample; because of the fractional delay between up- and downsampling the folded image does not add in phase (a filter designed as if it did is off by 2 dB at 20 kHz at 2x) | `fit_oversampling.py` | within 0.002 dB and 0.2° up to 23.9 kHz at all three ratios |
 | Reported latencies | e.g. 44.1 kHz 1x / 2x / 4x / 8x = 179 / 207 / 213 / 215, 96 kHz 357 / 367 / 371 / 373 | host report | exact |
-| Residual delay | a fraction of a sample per rate and ratio after the filters (-0.14 … +0.71), tabulated | `os_rates_fit.py` | |
+| Residual delay | a fraction of a sample per rate and ratio after the filters (-0.14 … +0.71), tabulated | `fit_os_rates.py` | |
 | 8x | the original's 8x output equals its 4x output two samples later (-82 dB below 16 kHz), so Positron processes 8x at 4x; its bypassed path alone is 1.95 samples later than 4x, but with the character on exactly 2.0 nulls best (music -64.8 against -45 dB) | renders | measured |
 | Character path offset | with oversampling the character path keeps its ~22.5 kHz low-pass and sits later than the bypassed path, refined per rate on drums and pink (the nulls move about 10 dB per 0.002 samples; both signals agree): 44.1 kHz +0.010 / +0.033 / +0.033, 48 kHz +0.014 / +0.040 / +0.040 (0.012 / 0.040 at first reading), 96 kHz +0.052 / +0.160 / +0.040 samples at 2x / 4x / 8x; 88.2 kHz treated like 96 kHz (not measured with music) | `null_oversampling.py` | measured |
 | Character crossover with oversampling | above 48 kHz the host rate's own filters (at 96 kHz its 96 kHz filters redrawn at the processing rate: drums -41 dB against -36 with the 48 kHz ones); at 44.1 kHz the 48 kHz filters redrawn (-59 against -31 dB) | `null_oversampling.py` | measured |
@@ -719,19 +719,19 @@ NULLTESTS.md, "Oversampling".
 | The mid and low shapers at their measured k and d above 100 % | music at 200 % -62.3 → -61.2 dB |
 | Each node refitted on the music set and the steady curve together | at most amounts the music objective slightly worse; kept only at 100 % (3.14) |
 | A first-order highpass in front of the high band's detector, fitted with the law (`--dethp`) | went to its lower bound: no filter |
-| A detector-only highpass on the high band without refitting (`detedge.py`) | program nulls change by under 1 dB either way |
+| A detector-only highpass on the high band without refitting (`probe_det_edge.py`) | program nulls change by under 1 dB either way |
 | The mid band's low-side path difference (up to 0.45 dB below 100 Hz) applied | music at 100 % -75.1 → -67.8 dB |
 | The mid laws refitted at 25 to 175 % on the path of 3.15 | fit objective 0.05 to 0.2 dB, stress median -66.0 → -65.8 dB |
 | The mid compressor fitted with the measured drive (`fit_music.py --shaper`) | worse at every node (100 %: -57.4 against -60.8 dB in the fit) |
 | Dry and compressed shares shaped apart, (1 - mix) · F(s) + mix · F(wet · s), with the measured drive | -52.4 dB in the fit |
 | The mid release held at the measured 90.1 ms, tone steps added (`--steps --set release=90.1`) | -60.25 against -60.64 dB in the fit |
-| A first-order highpass in front of the mid detector only (`middet.py`) | pink -6 -47.6 → -49.8 dB at 120 Hz, music and drums 4 to 22 dB worse |
-| A second-order highpass in front of the mid detector (0 dB at 700 Hz, `middet.py fc/2`) at 40 / 55 / 66 / 80 Hz | pink -6 0.04 to 0.3 dB better; music -10 -75.1 → -69.7 / -65.3 / -63.0 / -61.2 dB, the bass line 3 to 12 dB worse |
+| A first-order highpass in front of the mid detector only (`probe_mid_det.py`) | pink -6 -47.6 → -49.8 dB at 120 Hz, music and drums 4 to 22 dB worse |
+| A second-order highpass in front of the mid detector (0 dB at 700 Hz, `probe_mid_det.py fc/2`) at 40 / 55 / 66 / 80 Hz | pink -6 0.04 to 0.3 dB better; music -10 -75.1 → -69.7 / -65.3 / -63.0 / -61.2 dB, the bass line 3 to 12 dB worse |
 | A smoothing of the mid band's reduction in dB (`--gr`) | fits to 0.06 / 4 ms: -43.60 against -43.58 dB, drums -1 -58.6 against -58.9, pink -6 -47.2 both; with the drive free it fits to 2.9 ms (-52.44 against -52.25, pink -6 -47.5 against -47.6) |
 | The mid band as an instant level, the static curve, then attack and release on the reduction | -40.95 against -43.58 dB, drums -1 -44.6, pink -6 -44.5 |
 | The high band's measured steady curve with one sample-peak detector (release 181 ms, no slow detector) | 100 %: -53.8 against -55.4 dB in the fit (the release on program material is faster than on a steady tone) |
 | A fall-rate limit of 47 dB/s on the high band's detector, the law refitted around it | releases 56 to 96 ms; shallow drops release at -43 to -47 dB/s where the original has -32 to -41 (replaced by 3.17) |
-| The high band as an instant level, the static curve, then attack and release on the reduction in dB (`grdrop.py --fit`) | 0.12 to 0.82 dB rms per probe against 0.10 to 0.37; deep drops do not share one slope |
+| The high band as an instant level, the static curve, then attack and release on the reduction in dB (`probe_gr_drop.py --fit`) | 0.12 to 0.82 dB rms per probe against 0.10 to 0.37; deep drops do not share one slope |
 | A peak detector then a smoothing of the reduction in dB (`fit_music.py --gr`) | the smoothing fits to about 0.01 ms (100 %: -52.60 against -53.17 dB without it) |
 | A mean-square high-band detector without the slow one | 100 %: -53.04 against -53.87 dB |
 | The high band refitted at 25, 150 or 200 % against the mid band of 3.15 | pink noise at -10 dBFS 3 to 5 dB worse at those amounts |

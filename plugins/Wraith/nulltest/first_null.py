@@ -10,7 +10,7 @@ Checks (PASS / FAIL, the thresholds are the ones every project reached):
   3. our built VST3's bypass (RefRender) is the same: below -100 dB (the build and the renderer agree)
   4. our VST3 and our renderer agree at default settings on noise: below -100 dB (the check every number must pass)
   5. (--ref-bypass NAME) the reference's bypass is the input delayed by its latency: below -80 dB; if not, the latency
-     or the state is wrong (docs/02-null-testing.md: start-up state, settle time, parameters before the first block)
+     or the state is wrong (docs/null-testing.md in the knowledge base: start-up state, settle time, parameters before the first block)
 """
 import argparse, sys
 import numpy as np

@@ -1,9 +1,9 @@
-"""Plots for the character section from the JSON files the measure_char_* scripts write (measurements/character/)."""
+"""Plots for the character section from the JSON files the measure_char_* scripts write (measurements/Positron/character/)."""
 import json, os
 import numpy as np
 import tgp, plotstyle as ps
 
-D = os.path.join(tgp.ROOT, 'measurements', 'character')
+D = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character')
 st = json.load(open(os.path.join(D, 'static.json')))
 dy = json.load(open(os.path.join(D, 'dyn.json')))
 FREQS = sorted({int(k.split('|')[0]) for k in st})

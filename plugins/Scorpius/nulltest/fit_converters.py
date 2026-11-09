@@ -11,8 +11,8 @@ Writes the filters into Source/dsp/ConverterFits.h.
 import os, time
 import numpy as np
 import scipy.signal as sg
-import harness as o
-import nullmod as N
+import ori as o
+import null_modules as N
 
 L = 160
 CASES = {96000: dict(R=2, S=48, d0=16), 192000: dict(R=4, S=80, d0=28)}

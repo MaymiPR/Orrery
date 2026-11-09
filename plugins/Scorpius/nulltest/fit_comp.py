@@ -4,8 +4,8 @@ the reference at amount 1 on program material and tone steps (Nelder-Mead on the
 import sys
 import numpy as np
 from scipy.optimize import minimize
-import harness as o
-import nullmod as N
+import ori as o
+import null_modules as N
 
 FS = 48000
 mode = sys.argv[1] if len(sys.argv) > 1 else 'b'

@@ -38,7 +38,7 @@ enum BandParam
     bpMixDb,      // 1: the mix scales the reduction in dB (n = g^mix, mix may exceed 1); 0: dry / wet blend
     bpShapeDry,   // -1 .. 1, share of the band that bypasses the shaper: y = d u + (1 - d) sin (k u) / k
     bpShapeMid,   // the shaper's distortion, (1 - d) (sin (k u) / k - u), reaches the output's mid 1 + this times as strong
-                  // as its side (the high band: up to 1.8 %, nulltest/shapemid.py)
+                  // as its side (the high band: up to 1.8 %, nulltest/probe_shape_mid.py)
     bpFallRate,   // dB/s, the fastest the detector's level may fall while it releases (0 = no limit)
     kBandParams
 };
@@ -73,7 +73,7 @@ struct Tuning
     double limCut = 1.0;                  // the sinc's cutoff, a fraction of Nyquist (experiments)
     double limGauss = 0;                  // > 0: a Gaussian window of this width (samples) instead of the Kaiser one
     double limLevelScale = 1.00014;       // the reference reads every level this much higher (a 0.0012 dB lower ceiling;
-                                          // isolated pulses, nulltest/limident.py)
+                                          // isolated pulses, nulltest/probe_lim_interp.py)
     double limSlowAttackMs = 24.47, limSlowReleaseMs = 377.8;
     double limTrimDb = -0.1;              // after the 0 dBFS ceiling: the output's ceiling and small-signal gain
 

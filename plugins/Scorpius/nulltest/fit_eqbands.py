@@ -1,14 +1,14 @@
-"""Harmonic EQ: each band's filter at +6 (the band's contribution B6 = H6 - 1 of linear.py's impulse response), as three
+"""Harmonic EQ: each band's filter at +6 (the band's contribution B6 = H6 - 1 of measure_linear.py's impulse response), as three
 biquads in cascade (poles from (fc, Q), free numerators), magnitude and phase from 15 Hz to 22 kHz. Writes
 Source/dsp/EqBands.h.
     python fit_eqbands.py"""
 import os
 import numpy as np
 from scipy.optimize import least_squares
-import harness as o
+import ori as o
 
 NS = 3                     # biquads per band
-IR = os.path.join(o.ROOT, 'measurements', 'scorpius', 'ir')
+IR = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'ir')
 FS = o.FS
 f = np.geomspace(15, 22000, 600)
 z = np.exp(-2j * np.pi * f / FS)

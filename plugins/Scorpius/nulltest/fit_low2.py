@@ -10,7 +10,7 @@ envelope and the level terms on tones, chords and bursts (pure Python, slow: a f
 import numpy as np
 import scipy.signal as sg
 from scipy.optimize import minimize
-import harness as o
+import ori as o
 
 FS = o.FS
 P = {**o.NONE, 'Par Low On/Off': 1, 'Par Low Level': 1.0}

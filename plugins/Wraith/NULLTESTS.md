@@ -153,7 +153,7 @@ Median -23.8 dB over 97 cases; worst -4.4 dB (preset: hard squeeze / drums -6).
   pseudo-random wobble of its delay. The voices are band-limited (a high-pass near 500 Hz, low-passes above 6 kHz)
   and the lows pass the delay line undelayed, as measured. It nulls at -25 to -39 dB at Mix 0.1 and -11 to -27 dB
   fully wet; at full wet what is left is in the voices themselves, not their delay (worst on the sweep and on drums
-  at Stereo 1). By what it does, at full wet (doubler_metric.py):
+  at Stereo 1). By what it does, at full wet (measure_doubler.py):
 
   | Signal, setting | Spectrum error, rms (dB, third octaves) | Spectrum error, worst (dB) | L / R correlation, original | ours | Level, ours less original (dB) |
   |---|---|---|---|---|---|

@@ -1,12 +1,12 @@
 """Oversampling (the reference's global setting 1 / 2 / 4 / 8x, set by clicking its settings page with
 tools/RefCapture): latency, the core path's response, the EQ high shelf near Nyquist, the character section's
 small-signal response, aliasing of the character's harmonics and its static gain. Restores 1x (the default) at the
-end. Writes measurements/oversampling/oversampling.json and plots."""
+end. Writes measurements/Positron/oversampling/oversampling.json and plots."""
 import json, os, subprocess, sys
 import numpy as np
 import tgp, plotstyle as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'oversampling'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'oversampling'); os.makedirs(OUT, exist_ok=True)
 FS = tgp.FS
 PRE = 2 * FS; N = 32768
 CAP = os.path.join(tgp.ROOT, 'build', 'RefCapture_artefacts', 'Release', 'RefCapture.exe')

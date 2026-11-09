@@ -3,16 +3,16 @@
 Pre a causal FIR (starts as a unit impulse), N a static shaper (an asymmetric soft clip with learned drive, ceiling,
 bias and knee, plus a small MLP correction that starts at zero), Post a long causal FIR (starts as the measured
 small-signal impulse response). Trained on capture_nn.py's material (mean squared error relative to each piece's
-level), validated by nulls on the held-out pieces. Writes measurements/scorpius/nn/<case>_model.pt and a JSON copy.
+level), validated by nulls on the held-out pieces. Writes measurements/Scorpius/nn/<case>_model.pt and a JSON copy.
     python train_wh.py <case> [steps] [ir name]"""
 import json, os, sys, time
 import numpy as np
 import torch
-import harness as o
+import ori as o
 
 FS = 48000
-NN = os.path.join(o.ROOT, 'measurements', 'scorpius', 'nn')
-IR = os.path.join(o.ROOT, 'measurements', 'scorpius', 'ir')
+NN = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'nn')
+IR = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'ir')
 KPRE, KPOST, SEG, BATCH = int(os.environ.get("KPRE", 256)), 8192, 8192, 12
 torch.set_num_threads(max(1, os.cpu_count() // 2))
 
