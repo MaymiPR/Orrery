@@ -4,7 +4,7 @@ signal still drives the dynamics in EXT. Writes measurements/Positron/sidechain/
 import json, os, sys
 import numpy as np
 import tgp
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'tools'))   # scripts/tgpstate.py
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'scripts'))   # scripts/tgpstate.py
 import tgpstate
 
 OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'sidechain'); os.makedirs(OUT, exist_ok=True)
