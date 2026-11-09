@@ -4,12 +4,12 @@ filters (PyTorch; on the GPU when there is one):
 Pre a short causal FIR (starts as a unit impulse), Post a long causal FIR (starts as the measured small-signal impulse
 response), the WaveNet learning what the filters cannot (its output starts at zero). Trained on capture_nn.py's
 material up to `maxpeak` dBFS (the reference's own behaviour is erratic far above full scale), validated by nulls on
-the held-out pieces. Writes measurements/scorpius/nn/<case>_wn.pt.
+the held-out pieces. Writes measurements/Scorpius/nn/<case>_wn.pt.
     python train_wn.py <case> [steps] [channels] [layers]"""
 import os, sys, time
 import numpy as np
 import torch
-import harness as o
+import ori as o
 from train_wh import fftconv, NN, IR, load
 
 FS = 48000

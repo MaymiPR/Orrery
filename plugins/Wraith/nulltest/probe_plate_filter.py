@@ -1,4 +1,4 @@
-"""The plate's Filter, from its impulse responses (plate_filter_capture.py; MEASUREMENTS.md "Reverb"):
+"""The plate's Filter, from its impulse responses (capture_plate_filter.py; MEASUREMENTS.md "Reverb"):
 - run to run: the 5.2 kHz impulse twice;
 - is the Filter one fixed low-pass after the plate: each setting's response against the 20 kHz one through a fixed
   filter (the best per frequency over the whole response) and, in time, the spectrum of early and late windows re the

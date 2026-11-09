@@ -19,7 +19,7 @@ by measuring the plug-in from the outside.
 | **W5** | [KVR product page](https://www.kvraudio.com/product/orion-by-cradle) (secondary) | listing, reviews |
 | **L1** | The installed plug-in (VST3) and the version information it carries | version 1.2.1, VST 3.7.8 SDK, category Fx; built in January 2025 |
 | **L2** | `tools/ParamDump` run on L1 (`reference/orion/params_{48k,41pt,44k,96k}.txt`) | every host parameter: names, ranges, defaults, display text; buses, latency, editor size |
-| **L3** | The plug-in's default saved state, from L2 (read with `tools/tgpstate.py`) | the preset structure, including settings the host cannot see |
+| **L3** | The plug-in's default saved state, from L2 (read with `scripts/tgpstate.py`) | the preset structure, including settings the host cannot see |
 | **L5** | Screenshots of the editor at 100 % and 200 % (`tools/RefCapture`, 50 Hz tone bursts; `reference/orion/editor_*.png`), menus and settings page (`ui_*.png`), every factory preset (`preset_*.png`, `presets_dump.txt`); RefCapture films at 200 % | the 1.2.1 layout, 888 × 403 px; every preset's settings; the animations |
 | **L7** | The maker's installer | 1.2.2 is current; 1.2.1 measured (VST3 and AAX installed) |
 

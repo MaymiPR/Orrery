@@ -4,12 +4,12 @@ reference/gr_meter_test.f32 (tone bursts per band, see gr_meter_test.json):
   python measure_meters.py film.raw
 Counts the lit bars of the three band meters per frame (33 bars, 1 px wide on a 4 px pitch, growing left from
 x 700 at y 86 / 151 / 216). The numeric readouts beside them hold the deepest GR since the start (read from the
-frames by eye: see MEASUREMENTS.md). Writes measurements/meters/gr_bars.json and a plot."""
+frames by eye: see MEASUREMENTS.md). Writes measurements/Positron/meters/gr_bars.json and a plot."""
 import json, os, sys
 import numpy as np
 import tgp, plotstyle as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'meters'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'meters'); os.makedirs(OUT, exist_ok=True)
 W, H = 888, 359
 COLS = np.array([572 + 4 * k for k in range(33)])
 ROWS = {'high': 90, 'mid': 155, 'low': 220}

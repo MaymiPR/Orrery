@@ -3,13 +3,13 @@
   envelope  tone bursts (-40 -> step -> -40 dBFS): attack and release of the gain, per band
   detector  one sine vs two tones of the same RMS (3 dB more peak): peak or RMS detection
   stereo    loud tone on L only, quiet probe on R (linking); pure side vs pure mid (M/S processing)
-Writes measurements/character/dyn.json."""
+Writes measurements/Positron/character/dyn.json."""
 import json, os
 import numpy as np
 from scipy.signal import hilbert
 import tgp
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'character'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character'); os.makedirs(OUT, exist_ok=True)
 FS = tgp.FS
 PRE = 2 * FS                     # skip the start-up delay ramp
 CORE = 152                       # raw delay of the path with the limiter bypassed

@@ -9,7 +9,7 @@ import numpy as np
 import tgp, ident as I, charsim as C
 
 FS = tgp.FS
-WIDTH = json.load(open(os.path.join(tgp.ROOT, 'measurements', 'character', 'width.json')))
+WIDTH = json.load(open(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', 'width.json')))
 NAMES = ['low', 'mid', 'high']
 
 
@@ -19,7 +19,7 @@ def prep(x):
 
 
 def det_hp(x, fc):
-    """a first-order highpass at fc, 0 dB at 8 kHz (experiment: a detector-only low edge, detedge.py)"""
+    """a first-order highpass at fc, 0 dB at 8 kHz (experiment: a detector-only low edge, probe_det_edge.py)"""
     from scipy.signal import lfilter
     k = np.tan(np.pi * fc / FS); b = np.array([1, -1]) / (1 + k); a = np.array([1, (k - 1) / (1 + k)])
     z = np.exp(-2j * np.pi * 8000 / FS); g8 = abs((b[0] + b[1] * z) / (a[0] + a[1] * z))

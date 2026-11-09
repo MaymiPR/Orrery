@@ -1,4 +1,4 @@
-// Renders the Positron editor to a PNG for the visual comparison with the reference (tools/ui_compare.py):
+// Renders the Positron editor to a PNG for the visual comparison with the reference (tools/compare_ui.py):
 //   PositronSnapshot out.png [--scale=2] [--size=W] [paramID=value ...] [--levels=inDb,outDb] [--audio] [--ext] [--anti | --classic]
 // --size resizes the open editor to W px wide as a host or the corner grip would (the constrainer keeps the proportions).
 // Parameter values are in real units (dB, 0..1); --levels freezes the I/O meters, --audio shows the particles.

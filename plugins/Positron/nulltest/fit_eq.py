@@ -82,4 +82,4 @@ for kind in ('low', 'mid', 'high'):
         out[f'{kind}/{name}'] = dict(f0=round(float(r.x[0]), 3), q=round(float(r.x[1]), 5),
                                      max_mag_err_dB=round(float(np.max(np.abs(mag))), 4), rms=round(float(np.sqrt(np.mean(r.fun ** 2))), 5))
         print(kind, name, out[f'{kind}/{name}'])
-json.dump(out, open(os.path.join(tgp.ROOT, 'measurements', 'eq', 'eq_fit.json'), 'w'), indent=1)
+json.dump(out, open(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'eq', 'eq_fit.json'), 'w'), indent=1)

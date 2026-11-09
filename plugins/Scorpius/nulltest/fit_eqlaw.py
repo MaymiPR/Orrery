@@ -2,8 +2,8 @@
 value against the reference (drums at -12 dBFS: below the soft clip's reach, so the gain alone counts)."""
 import numpy as np
 from scipy.optimize import minimize_scalar
-import harness as o
-from order import drums
+import ori as o
+from probe_order import drums
 
 x = drums() * 10 ** (-12 / 20)
 KNOB = [0.5, 1, 2, 3, 4, 5, 6]

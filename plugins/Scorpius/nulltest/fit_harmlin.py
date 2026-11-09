@@ -1,16 +1,16 @@
-"""Harmonics, linear part at amount 1 (linear.py's impulse responses at 80 and 50 Hz): an RBJ filter (peaking or low
+"""Harmonics, linear part at amount 1 (measure_linear.py's impulse responses at 80 and 50 Hz): an RBJ filter (peaking or low
 shelf) whose boost passes a Butterworth high-pass (order 2 or 4), fitted in magnitude and phase."""
 import os, itertools
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.signal import butter, sosfreqz
-import harness as o
+import ori as o
 from fit_eqrbj import rbj, H
 from fit_eqbands import f, z
 
 FS = 48000
 def measured(name):
-    h = np.load(os.path.join(o.ROOT, 'measurements', 'scorpius', 'ir', name + '.npy'))[0].astype(np.float64)
+    h = np.load(os.path.join(o.ROOT, 'measurements', 'Scorpius', 'ir', name + '.npy'))[0].astype(np.float64)
     Hm = np.fft.rfft(h, 1 << 18); fr = np.fft.rfftfreq(1 << 18, 1 / FS)
     return np.interp(f, fr, Hm.real) + 1j * np.interp(f, fr, Hm.imag)
 

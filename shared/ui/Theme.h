@@ -4,7 +4,7 @@
 // Orrery Suite's own look, the same on every editor: true black behind, deep violet-black cards and wells, lavender-white
 // lettering, the sun's gold for values and meters, the crescent's pearl for pointers and selections, the mark in its
 // violet
-// (docs/branding/colours.json, docs/branding/orrery-icon.svg). The layouts keep each plug-in's measured positions and
+// (docs/branding/colours.json, docs/branding/orrerysuite-icon.svg). The layouts keep each plug-in's measured positions and
 // sizes; everything drawn on them comes from here.
 namespace orrery::theme
 {

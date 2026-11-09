@@ -5,7 +5,7 @@
 #include "Filters.h"
 #include "Tuning.h"
 
-// The master limiter (MEASUREMENTS.md 4), identified with probe signals (nulltest/lim_probe.py): a ceiling at 0 dBFS
+// The master limiter (MEASUREMENTS.md 4), identified with probe signals (nulltest/probe_limiter.py): a ceiling at 0 dBFS
 // followed by a -0.1 dB trim, stereo-linked, with a look-ahead delay. The gain is 1 / env, where env (in units of the
 // ceiling, >= 1) is the largest of:
 //   - the level of the sample leaving now: its inter-sample (16x interpolated) peak over [n, n + 1);
@@ -26,7 +26,7 @@ public:
         lookahead = limiterLookahead (fs);
         // window and release are set per rate, not scaled from 48 kHz (single and paired peaks probed at each rate), and
         // so is the inter-sample interpolator: a Kaiser-windowed sinc whose taps and window were fitted on program
-        // material at each rate (nulltest/limrate.py). Its effective width is not constant (about a Gaussian of
+        // material at each rate (nulltest/null_lim_rate.py). Its effective width is not constant (about a Gaussian of
         // sigma 4.4 samples at 44.1 kHz, 3.5 at 48, 1.3 - 1.8 above), so it is no fixed-length kernel scaled with the rate.
         struct PerRate { double rate; int window, release, taps; double beta; };
         constexpr PerRate perRate[] { { 44100, 19, 20, 28, 10.0 }, { 48000, 21, 22, 24, 12.0 }, { 88200, 39, 40, 12, 11.0 },

@@ -5,7 +5,7 @@
 namespace po
 {
 // The centre "particle" visualiser, measured on the reference (RESEARCH.md "Visualiser"):
-//  - a black glass racetrack around the amount pill, our procedural drawing (tools/fit/draw_glass.py) at the measured
+//  - a black glass racetrack around the amount pill, our procedural drawing (tools/fit/make_glass.py) at the measured
 //    layout;
 //  - while audio plays, a swarm of short-lived sparks swirls round the ring: a free-running 1 s loop at 30 frames/s
 //    (the reference's sprite repeats every second and does not restart with the audio), ~290 sparks on screen,

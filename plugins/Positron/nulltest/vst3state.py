@@ -1,7 +1,7 @@
 """Wraps a plug-in's own state (getStateInformation bytes) the way JUCE's VST3 host stores it, so RefCapture /
 RefRender can load it into the VST3 build:  python nulltest/vst3state.py inner.bin out.bin"""
 import os, struct, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'tools'))   # tools/tgpstate.py
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'tools'))   # scripts/tgpstate.py
 from tgpstate import b64enc
 
 

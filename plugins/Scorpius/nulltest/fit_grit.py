@@ -2,8 +2,8 @@
 program material and tone bursts (compression off: with it on, the reference's grit listens to the compressor)."""
 import numpy as np
 from scipy.optimize import minimize
-import harness as o
-import nullmod as N
+import ori as o
+import null_modules as N
 
 FS = 48000
 sig = N.signals()

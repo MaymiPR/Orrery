@@ -3,25 +3,25 @@ fits of fit_bandlaw.py alone have near-equivalent minima that differ on music). 
 Python (charmodel.py, identical to the plug-in to -120 dB); the other two bands are fixed, each signal weighs the same.
 
     python fit_music.py low 2 [start law files ... | broad] [--truepeak] [--shaper]     writes the best into
-    measurements/character/bandlaw_music.json (bandlaw_music_tp.json with --truepeak)
+    measurements/Positron/character/bandlaw_music.json (bandlaw_music_tp.json with --truepeak)
 --loud: the loud program signals too (drums -1, pink -6, music 0, bright -8), where the high band works hardest;
 writes bandlaw_music[_tp]_loud[_shp].json
---static W: (high band) the reference's steady gain curve too (staticn.py: tone, two tones, band noise at -18 ... 0 dBFS,
+--static W: (high band) the reference's steady gain curve too (measure_static_n.py: tone, two tones, band noise at -18 ... 0 dBFS,
 read through the measured shaper), its error in nepers weighed by W; writes ..._static.json
 --track: two 6 s excerpts of the demo track (reference/demo_future_house.wav, 30 s and 44 s, resampled to 48 kHz) too;
 writes ..._track.json
---dethp: (high band) a first-order highpass in front of the detector only, its corner fitted too (detedge.py)
+--dethp: (high band) a first-order highpass in front of the detector only, its corner fitted too (probe_det_edge.py)
 --fixed FILE: the other two bands from that law file (as the plug-in's table has them), not the defaults
---out FILE: write the fitted law into measurements/character/FILE instead (one file per parallel fit)
+--out FILE: write the fitted law into measurements/Positron/character/FILE instead (one file per parallel fit)
 --set KEY=V: (repeatable) a law constant fixed at a measured value, not fitted (e.g. --set release=90.1, the mid
-detector's release read from tone steps, midtimes.py)
---steps: the mid band's tone steps too (midrel.py: 0 -> -45, -20 -> -45, -45 -> 0, -30 -> 0, -12 -> -24 dBFS at 700 Hz)
---shaper: the shaper's k and dry share fixed at the values read directly with anti-phase tones (shapeside.py,
-measurements/character/shaper_<band>.txt); the other bands from bandlaw_final.json; writes bandlaw_music_shp.json
+detector's release read from tone steps, measure_mid_times.py)
+--steps: the mid band's tone steps too (measure_mid_release.py: 0 -> -45, -20 -> -45, -45 -> 0, -30 -> 0, -12 -> -24 dBFS at 700 Hz)
+--shaper: the shaper's k and dry share fixed at the values read directly with anti-phase tones (probe_shape_side.py,
+measurements/Positron/character/shaper_<band>.txt); the other bands from bandlaw_final.json; writes bandlaw_music_shp.json
 --gr: the smoothing of the gain reduction in dB (gainAttack, gainRelease) fitted too
 --nodual: (high band) no slow second detector
 --ms: (high band) a mean-square detector instead of the peak one
---hidrops: (high band) 8 kHz tone drops from 0 dBFS to -5, -11 and -45 dBFS too (hirel.py)
+--hidrops: (high band) 8 kHz tone drops from 0 dBFS to -5, -11 and -45 dBFS too (measure_high_release.py)
 --pink10: pink noise at -10 dBFS RMS too (another seed than the stress suite's)
 start 'header': the law in the plug-in's table (Source/dsp/CharacterTable.h)"""
 import json, os, sys
@@ -29,7 +29,7 @@ import numpy as np
 from scipy.optimize import least_squares
 import tgp, charsim as C, ident as I, nulltest as N, stress as S, ident_signals as IS, charmodel as M, fit_bandlaw as F
 
-D = os.path.join(tgp.ROOT, 'measurements', 'character')
+D = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character')
 OUT = os.path.join(D, ('bandlaw_music_tp' if '--truepeak' in sys.argv else 'bandlaw_music') + ('_rel' if '--relative' in sys.argv else '')
                    + ('_loud' if '--loud' in sys.argv else '') + ('_shp' if '--shaper' in sys.argv else '')
                    + ('_static' if '--static' in sys.argv else '') + ('_track' if '--track' in sys.argv else '')
@@ -40,7 +40,7 @@ SHAPER = '--shaper' in sys.argv
 
 
 def measured_shaper(band, node):
-    """k and the dry share at a node of the 25 % grid from shapeside.py's readings (lines 'SHAPER band amount k d ...')"""
+    """k and the dry share at a node of the 25 % grid from probe_shape_side.py's readings (lines 'SHAPER band amount k d ...')"""
     rows = [l.split() for l in open(os.path.join(D, f'shaper_{band}.txt')) if l.startswith('SHAPER')]
     for r in rows:
         if abs(float(r[2]) * 8 - node) < 1e-6: return float(r[3]), float(r[4])
@@ -66,15 +66,15 @@ def signals(band):
     if '--loud' in sys.argv: progs += [pad(N.sig_drums(-1)), pad(N.sig_noise(-6)), pad(N.sig_music(0)), pad(S.sig_bright(-8))]
     if '--track' in sys.argv:
         from scipy.signal import resample_poly
-        import track as T
+        import null_track as T
         x, fs = T.load(T.WAV)
         x = resample_poly(x, 160, 147, axis=1).astype(np.float32) if fs == 44100 else x
         progs += [pad(x[:, int(t * tgp.FS):int(t * tgp.FS) + N.SECS * tgp.FS]) for t in (30, 44)]
     if '--steps' in sys.argv:
-        import midrel as R
+        import measure_mid_release as R
         progs += [R.step_signal(a, b, 700.0) for a, b in ((0, -45), (-20, -45), (-45, 0), (-30, 0), (-12, -24))]
     if '--hidrops' in sys.argv:
-        import hirel as H
+        import measure_high_release as H
         progs += [H.drop_signal(0.0, b, 8000.0) for b in (-5, -11, -45)]
     if '--pink10' in sys.argv: progs += [pad(N.sig_noise(-10, seed=5))]
     probes = [stereo(IS.static_signal(band)), stereo(IS.burst_signal(band)), stereo(IS.twotone_signal(band)), stereo(IS.noise_signal(band))]
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     static_w = float(sys.argv[sys.argv.index('--static') + 1]) if '--static' in sys.argv else 0.0
     static_data = None
     if static_w > 0 and band == 'high':
-        import staticn as SN
+        import measure_static_n as SN
         ref_n = np.load(os.path.join(D, f'staticn_{node / 8}_8000.npy'))[:, 0]
         sel = [i for i, l in enumerate(SN.LEVELS) if -18 <= l <= 0]
         static_data = []
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     best = None
     for sf in starts:
         if sf == 'header':        # the plug-in's table
-            from hightrace3 import header_laws
+            from measure_high_trace3 import header_laws
             st = header_laws(int(round(node * 2)))[band]
         elif sf == 'broad':         # the broadband fit (fit_char.json)
             row = broad[band][int(node)]

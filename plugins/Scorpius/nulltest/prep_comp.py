@@ -1,4 +1,4 @@
-"""Compression's wet path as gain -> colour (comp_colour.py finds even harmonics in the wet path below the threshold,
+"""Compression's wet path as gain -> colour (probe_comp_colour.py finds even harmonics in the wet path below the threshold,
 where the gain stands still, so it is more than a gain and a linear filter). Puts our fitted gain computer
 (Compressor.h, Tuning.h
 constants, the same arithmetic) in front: u = x g(x), and writes <case>_u.npz for train_wn.py, with a linear
@@ -11,7 +11,7 @@ import re
 import os, sys
 import numpy as np
 from scipy.signal import fftconvolve
-import harness as o
+import ori as o
 from train_wh import NN, IR
 
 FS = 48000

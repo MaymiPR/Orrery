@@ -6,7 +6,7 @@ reverb. Prints them and writes renders/presets.json (MEASUREMENTS.md "Presets").
 """
 import json, os, re, sys
 import ts as h
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'tools'))   # tools/tgpstate.py
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'tools'))   # scripts/tgpstate.py
 import tgpstate as tgp
 
 REF = os.path.join(h.ROOT, 'reference', 'Wraith')

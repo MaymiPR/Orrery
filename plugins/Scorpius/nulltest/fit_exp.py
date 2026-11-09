@@ -8,7 +8,7 @@ level and out of phase.
 import os
 import numpy as np
 from scipy.optimize import minimize
-import harness as o
+import ori as o
 
 FS = 48000
 SPEC = dict(params={**o.ONLY('comp'), 'Comp Amount': 0})

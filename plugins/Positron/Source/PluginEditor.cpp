@@ -403,7 +403,7 @@ void PositronEditor::updateMeter (Meter& m, po::LevelTap& tap)
 }
 
 // The I/O readouts as the reference updates them (MEASUREMENTS.md 6), measured with RefCapture films read frame by
-// frame (nulltest/readouts.py):
+// frame (nulltest/read_readouts.py):
 // - peak: every 46 ms it takes the latest block's sample peak and holds the highest (until clicked); peaks in the
 //   blocks in between are not seen, so a short spike reads lower than the sample peak (music with +2.1 dBFS overs
 //   reads +0.9)

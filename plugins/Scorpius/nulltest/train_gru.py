@@ -7,7 +7,7 @@ samples, longer for modules with slow envelopes (grit: 9600). Grit's linear filt
 import os, sys, time
 import numpy as np
 import torch
-import harness as o
+import ori as o
 from train_wh import fftconv, NN, IR, load
 from train_wn import irname_of, MAXPEAK
 
@@ -30,7 +30,7 @@ STATEWARM = int(os.environ.get("STATEWARM", 0))
 SKIP = float(os.environ.get("SKIP", 1))
 # LR: the network's peak learning rate (one cycle); lower it where a long run diverges
 LR = float(os.environ.get("LR", 5e-3))
-# RESUME: a saved model (measurements/scorpius/nn/<name>.pt) to start from instead of fresh weights; with a low LR a
+# RESUME: a saved model (measurements/Scorpius/nn/<name>.pt) to start from instead of fresh weights; with a low LR a
 # second, finer pass over the same material
 RESUME = os.environ.get("RESUME", "")
 

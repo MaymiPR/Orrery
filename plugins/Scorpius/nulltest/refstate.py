@@ -1,9 +1,9 @@
 """Read / edit Orion's saved state (the same JUCE VST3 wrapper and Lua-table snapshot as The God Particle's, see
-tools/tgpstate.py). Values are set by their path in the preset table:
+scripts/tgpstate.py). Values are set by their path in the preset table:
   python refstate.py in.bin out.bin prefs.uiScaling=2 preset.drive.driveMode=b preset.eq.onOff=1 preset.eq.gain3=6
   python refstate.py in.bin -          (prints the snapshot)"""
 import os, re, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'tools'))   # tools/tgpstate.py
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'tools'))   # scripts/tgpstate.py
 import tgpstate
 
 

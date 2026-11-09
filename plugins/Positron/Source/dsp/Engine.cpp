@@ -7,7 +7,7 @@ namespace
 constexpr int kSub = 16;                                        // parameter ramps advance per 16 samples
 static_assert (kSub * 8 <= Character::maxStretch, "a stretch (kSub samples, oversampled) must fit the character section's buffers");
 // with oversampling the reference's path is its filters' delay plus a fraction of a sample, measured per rate at 2x and
-// 4x (nulltest/os_rates_fit.py: the whole path's delay fitted with the designed filters in place); its 8x is its 4x
+// 4x (nulltest/fit_os_rates.py: the whole path's delay fitted with the designed filters in place); its 8x is its 4x
 // exactly 2 samples later (music -64.8 dB that way; its bypassed path alone fits 1.95)
 double oversamplingResidual (double fs, int factor)
 {
@@ -49,7 +49,7 @@ void Engine::prepare (double sampleRate, int block, int oversampling, const Tuni
     bypassDelay.prepare ((double) reportedLatency);
 
     // with oversampling the reference's character path is a little later than its bypassed path (48 kHz: from the
-    // phase of the small-signal response, then refined on drums and pink, nulltest/os_probe.py: the nulls move by
+    // phase of the small-signal response, then refined on drums and pink, nulltest/probe_os.py: the nulls move by
     // 10 dB per 0.002 samples, drums and pink agreeing)
     const double offs[3][3] { { 0.0097, 0.0330, 0.0330 }, { 0.0137, 0.0395, 0.0395 }, { 0.0517, 0.1595, 0.0395 } };   // 44.1 / 48 / 96 kHz; 2x / 4x / 8x
     const int row = std::abs (fs - 44100.0) < 1.0 ? 0 : std::abs (fs - 96000.0) < 1.0 ? 2 : 1;

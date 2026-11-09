@@ -1,5 +1,5 @@
 """The plate against the reference (MEASUREMENTS.md "Reverb"): the reference only plays the plate with its editor open,
-so its side is recorded through tools/RefCapture record=1 (plate_record.py); ours through WrRender.
+so its side is recorded through tools/RefCapture record=1 (record_plate.py); ours through WrRender.
 
     python null_plate.py
 """
@@ -7,7 +7,7 @@ import os, subprocess
 import numpy as np
 import nulltest_lib as nl
 import ts as h
-import plate_record as prc
+import record_plate as prc
 
 
 def ref_plate(x, fs, params, state=None):

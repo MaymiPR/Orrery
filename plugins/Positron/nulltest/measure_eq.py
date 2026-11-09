@@ -1,10 +1,10 @@
 """EQ stage of the reference (character and limiter bypassed): frequency responses per band and knob setting, at two
-input levels (is it a dynamic EQ?), and the knob law. Writes measurements/eq/eq.json and plots."""
+input levels (is it a dynamic EQ?), and the knob law. Writes measurements/Positron/eq/eq.json and plots."""
 import json, os
 import numpy as np
 import tgp, plotstyle as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'eq'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'eq'); os.makedirs(OUT, exist_ok=True)
 FS = tgp.FS
 N = 65536
 PRE = 2 * FS                       # start-up: the path's delay settles in ~0.25 s

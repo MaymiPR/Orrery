@@ -193,7 +193,7 @@ void Visualizer::advance (float inputPeakDb, float mix, bool animate, bool posit
     if (wasOn || level > 0.0f || glow > 0.0f) repaint();
 }
 
-// The glass: our procedural drawing rendered as a field (resources/glass/*.png from tools/fit/draw_glass.py and its
+// The glass: our procedural drawing rendered as a field (resources/glass/*.png from tools/fit/make_glass.py and its
 // glass_params.json: rim and sheen lines with soft highlights, the reflections as soft-edged bands between cubic edge
 // curves with our own shading, the sparks' light as our own seeded streaks; positions, sizes and colours measured and
 // rounded to tokens): x = station around the track (25 per straight, 144 per curved end), y = radius 52 .. 114 in

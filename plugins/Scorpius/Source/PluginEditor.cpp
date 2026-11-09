@@ -10,7 +10,7 @@ static const juce::String repository = SUITE_REPOSITORY;     // the Orrery Suite
 
 namespace
 {
-// Layout measured on the reference at 200 % (plugins/Scorpius/tools/measure_ui.py, measure_text.py), design px.
+// Layout measured on the reference at 200 % (plugins/Scorpius/scripts/measure_ui.py, measure_text.py), design px.
 constexpr float columnX[] { 86.0f, 175.0f, 424.0f, 608.0f, 801.0f };
 constexpr float panelTop = 31.75f, panelBottom = 308.0f, plateTop = 310.75f;
 constexpr float dividerTop = 36.0f, dividerBottom = 272.5f, stripeLine = 272.5f;

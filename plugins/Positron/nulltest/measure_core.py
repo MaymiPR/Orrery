@@ -1,12 +1,12 @@
 """The always-present core path (every stage bypassed) and the limiter's look-ahead at several sample rates: delay
-and the first-order all-pass (fitted: h = delay(D) * (a + z^-1) / (1 + a z^-1)). Writes measurements/core/core.json."""
+and the first-order all-pass (fitted: h = delay(D) * (a + z^-1) / (1 + a z^-1)). Writes measurements/Positron/core/core.json."""
 import json, os
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.signal import lfilter
 import tgp
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'core'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'core'); os.makedirs(OUT, exist_ok=True)
 
 if __name__ == '__main__':
     res = {}

@@ -6,11 +6,11 @@ of the signal's amplitude, -60 dB is inaudible in practice. Both renders are com
 latency, block 512; the first 0.1 s is skipped (the reference ramps its settings in over the first ~5 ms). Settings
 are applied 400 ms before each render (the reference applies them asynchronously; MEASUREMENTS.md).
 
-Signals: **drums**, a synthetic drum loop (`nulltest/order.py`), peaks near full scale, and the same 12 dB lower;
+Signals: **drums**, a synthetic drum loop (`nulltest/probe_order.py`), peaks near full scale, and the same 12 dB lower;
 **track**, 6 s of a mastered track (local only, not in the repository), and the same 10 dB lower.
 
-Reproduce: `python nulltest/nullchain.py model` (our processor through tools/ScRender) or `python nulltest/nullchain.py
-ours` (the built VST3; the same numbers), `python nulltest/nullmod.py` for the EQ bands. The reference renders stay
+Reproduce: `python nulltest/null_chain.py model` (our processor through tools/ScRender) or `python nulltest/null_chain.py
+ours` (the built VST3; the same numbers), `python nulltest/null_modules.py` for the EQ bands. The reference renders stay
 local (git-ignored).
 
 ## The whole plug-in: the factory presets
@@ -41,7 +41,7 @@ local (git-ignored).
 ## Quiet material
 
 Where the shared expander acts (below about -58 dBFS peak; MEASUREMENTS.md 3): the same signals far lower, and pink
-noise (`python nulltest/nullquiet.py`). Each cell reads without → with the expander reading the end of the group and
+noise (`python nulltest/null_quiet.py`). Each cell reads without → with the expander reading the end of the group and
 its mid and starting open when created with lift on, and lift giving no DC on silence:
 
 | Signal | default | drive colour a alone (hi-pass on) |
@@ -88,7 +88,7 @@ a second pass the same way: -35.4 (-26.1) held out, hi-pass off.
 
 ## Automation
 
-A parameter jumps at 1 s and back at 2 s on the drums at -12 dB, one module on (`python nulltest/autom_probe.py`):
+A parameter jumps at 1 s and back at 2 s on the drums at -12 dB, one module on (`python nulltest/probe_autom.py`):
 the null in the 0.15 s around each jump, at host blocks of 512 / 64 samples. Each cell reads without → with Cradle's
 control rate (chunked amount smoothing, switches at the block start; MEASUREMENTS.md 12), modules switched on
 starting from silence with the expander closed (MEASUREMENTS.md 3, 12) and the expander reading the end of the group

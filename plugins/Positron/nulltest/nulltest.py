@@ -178,7 +178,7 @@ def report(before=None):
         lines += ['## A mastered track', '',
                   'A 70 s future-house demo track (16-bit, 44.1 kHz, about -10 dBFS RMS: loud, dense and bright), through the',
                   'reference and the built VST3 at 44.1 kHz with the stage buttons as a user would press them, including the limiter',
-                  'and the character section switched off and back on while it plays (`python nulltest/track.py`; `--vary` sends',
+                  'and the character section switched off and back on while it plays (`python nulltest/null_track.py`; `--vary` sends',
                   'irregular host blocks as FL Studio does, with the same results). The worst second is the loudest part.', '',
                   '| Setting | Residual (dB) | Worst second (dB) |', '|---|---|---|']
         for name, v in json.load(open(trp)).items():
@@ -209,7 +209,7 @@ def report(before=None):
         st = json.load(open(stp))
         vals = list(st.values())
         lines += ['## Stress tests', '',
-                  f'`python nulltest/stress.py`: {len(vals)} cases over the settings (amounts and gains between the fitted nodes,',
+                  f'`python nulltest/null_stress.py`: {len(vals)} cases over the settings (amounts and gains between the fitted nodes,',
                   'EQ extremes, input / output gain, stage combinations), levels and signals (bass-heavy, bright, extreme stereo,',
                   'quiet / loud passages, a sweep), parameter automation (sweeps, jumps, switches), sample rates and block sizes.',
                   f'Median {np.median(vals):.1f} dB, worst {max(vals):.1f} dB'

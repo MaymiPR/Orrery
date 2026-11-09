@@ -28,4 +28,4 @@ if __name__ == '__main__':
     finally:
         set_factor(1)
     print('restored 1x; latency', tgp.latency())
-    json.dump(lat, open(os.path.join(tgp.ROOT, 'measurements', 'oversampling', 'latency_rates.json'), 'w'), indent=1)
+    json.dump(lat, open(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'oversampling', 'latency_rates.json'), 'w'), indent=1)

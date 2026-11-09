@@ -6,10 +6,10 @@ import json, os
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.signal import lfilter
-import harness as o
+import ori as o
 from fit_eq import biquad
 
-D = json.load(open(os.path.join(o.ROOT, 'measurements', 'scorpius', 'eq_tones.json')))
+D = json.load(open(os.path.join(o.ROOT, 'measurements', 'Scorpius', 'eq_tones.json')))
 G = {0.5: 0.634, 1: 1.258, 2: 2.482, 3: 3.677, 4: 4.846, 5: 5.994, 6: 7.124}     # knob dB -> centre gain dB (measured)
 FC, Q = 997.56, 1.001
 b, a = biquad('bp', FC, Q)
