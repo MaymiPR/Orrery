@@ -205,7 +205,8 @@ Each path is mixed in with the faders' taper (5); levels below at level 1.
 
 The identified laws and learned models are in 14.
 
-## 12. Smoothing and switching (`nulltest/probe_autom.py`, `measure_autom_curve.py`, `probe_switch_on.py`, `measure_harm_ramp.py`)
+## 12. Smoothing and switching (`nulltest/probe_autom.py`, `measure_autom_curve.py`, `probe_switch_on.py`,
+`measure_harm_ramp.py`)
 
 First readings, a 1 kHz tone at -20 dBFS, a change at a 64-sample block boundary:
 
@@ -388,7 +389,8 @@ step with the drums: the expander, which reads the mid (3).
 
 ## Scripts
 
-Each value above names the script that measured or fitted it. `fit_low_parallel.py` fits the low parallel, `fit_sub_parallel.py` the sub parallel; `scripts/export_models.py` writes `Source/dsp/LearnedModels.h`.
+Each value above names the script that measured or fitted it. `fit_low_parallel.py` fits the low parallel,
+`fit_sub_parallel.py` the sub parallel; `scripts/export_models.py` writes `Source/dsp/LearnedModels.h`.
 
 ## Provenance
 
@@ -404,5 +406,8 @@ How each part of Scorpius was made:
   fader caps, meters, boxes and plate); the visualiser's stripe and glass in both particle styles drawn in code from
   measured tokens with our own shading.
 - Shipped on recorded approval: the original's factory preset values, under our own names.
-- Published measurement data (approval recorded 2026-11-09): [`measurements/Scorpius/`](../../measurements/Scorpius/), measured responses and fitted values of our own: the compressor's measured curves, the EQ tones, the module survey and the drive's responses, and the null tests' results (`nulltest/results.json`, the data behind NULLTESTS.md). It holds no render of the original and no file the original or a host wrote.
+- Published measurement data (approval recorded 2026-11-09): [`measurements/Scorpius/`](../../measurements/Scorpius/),
+  measured responses and fitted values of our own: the compressor's measured curves, the EQ tones, the module survey and
+  the drive's responses, and the null tests' results (`nulltest/results.json`, the data behind NULLTESTS.md). It holds
+  no render of the original and no file the original or a host wrote.
 - None of the original's code, artwork, preset files, fonts or other files ships with Scorpius.

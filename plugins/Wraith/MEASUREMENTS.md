@@ -324,7 +324,10 @@ unexplained on white noise (most below 200 Hz and above 12 kHz); it sets the ful
 
 ## Scripts
 
-Each value above names the script that measured or fitted it. `fit_focus_eq.py` fits the Focus EQ whose sections ship (`scripts/make_focus_eq.py` writes `Source/dsp/FocusEq.h`); it replaces the earlier single-cascade fit, whose shared pieces are `focus_eq_lib.py`. `probe_dbl_voice_cancel.py` compares the doubler's two voices where their delays cross; `scripts/pack_reverb.py` writes `resources/ir/`.
+Each value above names the script that measured or fitted it. `fit_focus_eq.py` fits the Focus EQ whose sections ship
+(`scripts/make_focus_eq.py` writes `Source/dsp/FocusEq.h`); it replaces the earlier single-cascade fit, whose shared
+pieces are `focus_eq_lib.py`. `probe_dbl_voice_cancel.py` compares the doubler's two voices where their delays cross;
+`scripts/pack_reverb.py` writes `resources/ir/`.
 
 ## Provenance
 
@@ -341,5 +344,8 @@ How each part of Wraith was made:
   meters and toggles): the faceplate, the knobs, the buttons, the meters and the displays.
 - Shipped on recorded approval: the room and plate reverb responses, measured from the original's output at each
   sample rate (`ir/`); the original's factory preset values, under our own names.
-- Published measurement data (approval recorded 2026-11-09): [`measurements/Wraith/`](../../measurements/Wraith/), measured responses and fitted values of our own: the Character section's fitted band models per order and band count (`char/`) and the doubler's behaviour metric (`nulltest/doubler_metric.json`). It holds no render of the original and no file the original or a host wrote.
+- Published measurement data (approval recorded 2026-11-09): [`measurements/Wraith/`](../../measurements/Wraith/),
+  measured responses and fitted values of our own: the Character section's fitted band models per order and band count
+  (`char/`) and the doubler's behaviour metric (`nulltest/doubler_metric.json`). It holds no render of the original and
+  no file the original or a host wrote.
 - None of the original's code, artwork, preset files, fonts or other files ships with Wraith.
