@@ -95,7 +95,7 @@ if(ORRERY_TOOLS)
     target_link_libraries(PositronSnapshot PRIVATE PositronData OrreryShared juce::juce_recommended_config_flags)
 
     # Offline renders through our own processor with every DSP constant open to change (fitting, null tests), and a
-    # second copy for trying DSP changes while a fit is running with the first (nulltest/tgp.py: PO_RENDER=dev)
+    # second copy for trying DSP changes while a fit is running with the first (nulltest/po_ref.py: PO_RENDER=dev)
     foreach(t PoRender PoRenderDev)
         juce_add_console_app(${t} PRODUCT_NAME "${t}")
         target_sources(${t} PRIVATE ${PO_DIR}/tools/PoRender.cpp ${PO_SOURCES})
@@ -105,7 +105,7 @@ if(ORRERY_TOOLS)
             juce::juce_recommended_config_flags)
     endforeach()
 
-    # the band gain computer as a plain C library for the fitting scripts (nulltest/charsim.py)
+    # the band gain computer as a plain C library for the fitting scripts (nulltest/charsim_lib.py)
     add_library(charsim SHARED ${PO_DIR}/tools/CharSim.cpp)
     target_include_directories(charsim PRIVATE ${PO_DIR}/Source)
     set_target_properties(charsim PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/charsim)

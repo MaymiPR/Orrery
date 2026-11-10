@@ -4,10 +4,10 @@ amount settings. A staircase per (frequency, amount): 1.2 s per level, gain read
 Writes measurements/Positron/character/static.json."""
 import json, os, sys
 import numpy as np
-import tgp
+import po_ref
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character'); os.makedirs(OUT, exist_ok=True)
-FS = tgp.FS
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character'); os.makedirs(OUT, exist_ok=True)
+FS = po_ref.FS
 STEP = 1.2
 LEVELS = list(range(-80, 7, 3))
 FREQS = [40, 100, 300, 1000, 3000, 8000, 15000]
@@ -52,9 +52,9 @@ if __name__ == '__main__':
     jobs, keys = [], []
     for fq in FREQS:
         for am in AMOUNTS:
-            jobs.append(dict(x=staircase(fq, LEVELS), norm={**tgp.CHAR_ONLY, 'Character': am})); keys.append((fq, am, 'up'))
-        jobs.append(dict(x=staircase(fq, LEVELS[::-1]), norm={**tgp.CHAR_ONLY, 'Character': 0.5})); keys.append((fq, 0.5, 'down'))
-    ys = tgp.render_many(jobs, cache=True)
+            jobs.append(dict(x=staircase(fq, LEVELS), norm={**po_ref.CHAR_ONLY, 'Character': am})); keys.append((fq, am, 'up'))
+        jobs.append(dict(x=staircase(fq, LEVELS[::-1]), norm={**po_ref.CHAR_ONLY, 'Character': 0.5})); keys.append((fq, 0.5, 'down'))
+    ys = po_ref.render_many(jobs, cache=True)
     res = {}
     for (fq, am, d), y in zip(keys, ys):
         lv = LEVELS if d == 'up' else LEVELS[::-1]

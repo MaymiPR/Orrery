@@ -7,17 +7,17 @@ the plug-in's own gain computer (charsim.dll, BandDynamics.h) followed by the si
 nonlinear stage hears (s_b, ident.nl_bands: the band with steeper edges); the rest of the band passes linearly:
     y_b = M (x_b - s_b + sin(k n(t) s_b) / k),   n from s_b
 Free: the shaper drive k, the mix, the static law (threshold, knee, ratio), the detector times, and optionally the
-slow second detector. Robust least squares on the probe signals of ident_signals.py, with soft-L1 loss.
+slow second detector. Robust least squares on the probe signals of ident_signals_lib.py, with soft-L1 loss.
 
     python fit_bandlaw.py mid 4 [--dual] [--peak] [--force] [--from <node>] [--rich] [--out file.json]
 Writes measurements/Positron/character/bandlaw.json (one entry per band / node), read by fit_character.py --from-bandlaw."""
 import json, os, sys
 import numpy as np
 from scipy.optimize import least_squares
-import tgp, ident as I, ident_signals as S, charsim as C
+import po_ref, ident_lib as I, ident_signals_lib as S, charsim_lib as C
 
-FS = tgp.FS
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', 'bandlaw.json')
+FS = po_ref.FS
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character', 'bandlaw.json')
 if '--out' in sys.argv: OUT = os.path.join(os.path.dirname(OUT), sys.argv[sys.argv.index('--out') + 1])
 BI = {'low': 0, 'mid': 1, 'high': 2}
 RICH = '--rich' in sys.argv
@@ -53,7 +53,7 @@ def load(band, node, table=None):
     names = {v: k for k, v in BI.items()}
     xs = [S.static_signal(band), S.burst_signal(band)]
     if RICH: xs += [S.twotone_signal(band), S.noise_signal(band)]
-    ys = tgp.render_many([dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': node / 8}, raw=True) for x in xs], cache=True)
+    ys = po_ref.render_many([dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': node / 8}, raw=True) for x in xs], cache=True)
     M = [10 ** (I.gain_db(b, node) / 20) for b in range(3)]
     data = []
     for x, y in zip(xs, ys):

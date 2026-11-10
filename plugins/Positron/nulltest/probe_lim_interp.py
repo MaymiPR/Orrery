@@ -7,9 +7,9 @@ pulses, and the two steps repeat.
     python probe_lim_interp.py [taps] [phases]"""
 import sys
 import numpy as np
-import tgp, limpy, limpulse as P
+import po_ref, limiter_lib, probe_lim_pulse as P
 
-FS = tgp.FS; PRE = FS; GAP = 1200; NPULSE = 4096
+FS = po_ref.FS; PRE = FS; GAP = 1200; NPULSE = 4096
 TRIM = P.TRIM
 RAW = []          # per pulse of the last pulses() call: a raw noise burst (content up to Nyquist)
 
@@ -46,12 +46,12 @@ def windows(xin, at, taps, span=40):
 def fit(taps=16, sub=16, iters=24):
     x, at = pulses()
     xin = P.limiter_input(x)
-    y = tgp.render_many([dict(x=np.stack([x, x]).astype(np.float32), norm=tgp.LIM_ONLY, params={'Limiter Input Gain': 0})], 'ref', cache=True)[0][0]
+    y = po_ref.render_many([dict(x=np.stack([x, x]).astype(np.float32), norm=po_ref.LIM_ONLY, params={'Limiter Input Gain': 0})], 'ref', cache=True)[0][0]
     ref = P.read(xin, y, at)
     # only pulses whose reading is the level for our own plug-in (no plan or slow envelope in the way); the plug-in
     # reads 1.00014 times limpy's level (limLevelScale), so the two agree to a few 1e-4
     raw = np.array(RAW)
-    ym = tgp.render_many([dict(x=np.stack([x, x]).astype(np.float32), norm=tgp.LIM_ONLY, params={'Limiter Input Gain': 0})], 'model')[0][0]
+    ym = po_ref.render_many([dict(x=np.stack([x, x]).astype(np.float32), norm=po_ref.LIM_ONLY, params={'Limiter Input Gain': 0})], 'model')[0][0]
     ok = np.abs(P.read(xin, ym, at) / P.port_levels(xin, at) - 1) < 5e-4
     print(f'{ok.sum()} of {len(at)} pulses usable', flush=True)
     at = [a for a, o in zip(at, ok) if o]; ref = ref[ok]; raw = raw[ok]
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     taps = int(sys.argv[1]) if len(sys.argv) > 1 else 16
     sub = int(sys.argv[2]) if len(sys.argv) > 2 else 16
     T, err = fit(taps, sub)
-    np.save(f'{tgp.ROOT}/measurements/Positron/limiter_interp_{taps}x{sub}.npy', T)
+    np.save(f'{po_ref.ROOT}/measurements/Positron/limiter_interp_{taps}x{sub}.npy', T)
     np.set_printoptions(precision=5, suppress=True, linewidth=200)
     print('phase sums', T.sum(1))
     print('phase 0', T[0])

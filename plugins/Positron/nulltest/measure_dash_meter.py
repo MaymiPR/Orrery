@@ -3,15 +3,15 @@ rising in steps; per step the lit cells of the left channel's 31 dash cells (4 p
 how far the limiter's input goes above 0 dBFS, and after the last step how the cells fall back.
 
     python measure_dash_meter.py write [coarse|fine]     renders/tmp/dash_probe[2].f32 (mono float32 48 kHz) and .json
-    RefCapture "<TGP.vst3>" "The God Particle" film.raw "Character Bypass=1" "EQ Bypass=1" "Limiter Input Gain=1"
+    RefCapture "<reference.vst3>" "<reference name>" film.raw "Character Bypass=1" "EQ Bypass=1" "Limiter Input Gain=1"
                in=<that file> rows=0.0,0.62
     python measure_dash_meter.py read film.raw [coarse|fine]"""
 import json, os, sys
 import numpy as np
-import tgp
-from filmtools import Film
+import po_ref
+from film_lib import Film
 
-FS = tgp.FS
+FS = po_ref.FS
 GAIN = 12.0
 CX = 744
 
@@ -30,9 +30,9 @@ def cells(frame):
 
 if __name__ == '__main__':
     kind = sys.argv[-1] if sys.argv[-1] in ('coarse', 'fine') else 'coarse'
-    base = os.path.join(tgp.WORK, 'dash_probe' + ('' if kind == 'coarse' else '2'))
+    base = os.path.join(po_ref.WORK, 'dash_probe' + ('' if kind == 'coarse' else '2'))
     if sys.argv[1] == 'write':
-        x, meta = probe(kind); os.makedirs(tgp.WORK, exist_ok=True)
+        x, meta = probe(kind); os.makedirs(po_ref.WORK, exist_ok=True)
         x.tofile(base + '.f32'); json.dump(meta, open(base + '.json', 'w')); print(base + '.f32', len(x) / FS, 's')
         raise SystemExit
     f = Film(sys.argv[2]); meta = json.load(open(base + '.json'))

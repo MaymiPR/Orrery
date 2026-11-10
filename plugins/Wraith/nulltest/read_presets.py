@@ -5,9 +5,9 @@ reverb. Prints them and writes renders/presets.json (MEASUREMENTS.md "Presets").
     python read_presets.py
 """
 import json, os, re, sys
-import ts as h
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'scripts'))   # scripts/tgpstate.py
-import tgpstate as tgp
+import wr_ref as h
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'scripts', 'nulltest'))   # scripts/nulltest/ref_state_lib.py
+import ref_state_lib as rs
 
 REF = os.path.join(h.ROOT, 'reference', 'Wraith')
 # our names (Source/Presets.cpp) for the states in the order the next-preset arrow steps through them from the start-up
@@ -33,7 +33,7 @@ def section(text, name):
 
 def read(path):
     s = open(path, 'rb').read()
-    text = tgp.split(s)[1].decode('latin1')
+    text = rs.split(s)[1].decode('latin1')
     pre = text[text.index('Script state'):]
     rider, chorus, eq, rev = section(pre, 'gainRider'), section(pre, 'chorus'), section(pre, 'eq'), section(pre, 'reverb')
     sel = re.search(r'onOff = \{\s*select = (\d)', pre)

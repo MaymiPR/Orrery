@@ -6,12 +6,12 @@ the pump, so against f it traces the detector's frequency response. Reference ag
     python probe_mid_det_spectrum.py [amount 0..1] [pump dBFS ...]
     python probe_mid_det_spectrum.py [amount] --map      each pump read as the in-band (450 Hz) level giving the same reduction,
                                             each plug-in through its own curve: the detector's response in dB
-    --tune KEY=V (repeatable): our processor with a DSP constant overridden (tgp's tune, e.g. mid.cubic.8=0.996)"""
+    --tune KEY=V (repeatable): our processor with a DSP constant overridden (po_ref's tune, e.g. mid.cubic.8=0.996)"""
 import sys
 import numpy as np
-import tgp
+import po_ref
 
-FS = tgp.FS; PRE = FS
+FS = po_ref.FS; PRE = FS
 FP = 700.0; PROBE = 10 ** (-40 / 20)
 TUNE = {a.split('=')[0]: float(a.split('=')[1]) for i, a in enumerate(sys.argv) if i and sys.argv[i - 1] == '--tune'}
 FREQS = [60, 90, 120, 157, 200, 300, 450, 1000, 1500, 2000, 2400, 2700, 3000, 3500, 4000, 5000, 8000]
@@ -28,9 +28,9 @@ def gains(amt, freqs, levs, n):
     t = np.arange(n) / FS
     probe = PROBE * np.sin(2 * np.pi * FP * t)
     pumps = [np.sin(2 * np.pi * f * t) * 10 ** (l / 20) for f, l in zip(freqs, levs)] + [0 * t]
-    jobs = [dict(x=(p + s * probe).astype(np.float32), norm={**tgp.CHAR_ONLY, 'Character': amt}) for p in pumps for s in (1, -1)]
+    jobs = [dict(x=(p + s * probe).astype(np.float32), norm={**po_ref.CHAR_ONLY, 'Character': amt}) for p in pumps for s in (1, -1)]
     out = []
-    for y in (tgp.render_many(jobs, 'ref', cache=True), tgp.render_many([dict(j, tune=TUNE) for j in jobs], 'model')):
+    for y in (po_ref.render_many(jobs, 'ref', cache=True), po_ref.render_many([dict(j, tune=TUNE) for j in jobs], 'model')):
         g = [probe_gain(0.5 * (y[2 * i][0] - y[2 * i + 1][0]), n) for i in range(len(pumps))]
         out.append(20 * np.log10(np.array(g[:-1]) / g[-1]))
     return out
@@ -59,8 +59,8 @@ if __name__ == '__main__':
     probe = PROBE * np.sin(2 * np.pi * FP * t)
     for lev in levs:
         pumps = [np.sin(2 * np.pi * f * t) * 10 ** (lev / 20) for f in FREQS] + [0 * t]
-        jobs = [dict(x=(p + s * probe).astype(np.float32), norm={**tgp.CHAR_ONLY, 'Character': amt}) for p in pumps for s in (1, -1)]
-        rr = tgp.render_many(jobs, 'ref', cache=True); oo = tgp.render_many(jobs, 'model')
+        jobs = [dict(x=(p + s * probe).astype(np.float32), norm={**po_ref.CHAR_ONLY, 'Character': amt}) for p in pumps for s in (1, -1)]
+        rr = po_ref.render_many(jobs, 'ref', cache=True); oo = po_ref.render_many(jobs, 'model')
         g = lambda y, i: probe_gain(0.5 * (y[2 * i][0] - y[2 * i + 1][0]), n)
         br, bo = g(rr, len(FREQS)), g(oo, len(FREQS))
         print(f'amount {amt}, pump {lev} dBFS: probe gain re probe alone (dB)')

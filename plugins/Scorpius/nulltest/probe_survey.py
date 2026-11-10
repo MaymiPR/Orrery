@@ -4,7 +4,7 @@ distortion of 100 Hz and 1 kHz tones from -50 to +6 dBFS, and whether the two ch
     python probe_survey.py            (writes measurements/Scorpius/survey.json and prints a summary)"""
 import json, os
 import numpy as np
-import ori as o
+import sc_ref as o
 
 OUT = os.path.join(o.ROOT, 'measurements', 'Scorpius'); os.makedirs(OUT, exist_ok=True)
 CASES = {

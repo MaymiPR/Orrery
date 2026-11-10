@@ -7,10 +7,10 @@ Writes measurements/Positron/character/dyn.json."""
 import json, os
 import numpy as np
 from scipy.signal import hilbert
-import tgp
+import po_ref
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character'); os.makedirs(OUT, exist_ok=True)
-FS = tgp.FS
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character'); os.makedirs(OUT, exist_ok=True)
+FS = po_ref.FS
 PRE = 2 * FS                     # skip the start-up delay ramp
 CORE = 152                       # raw delay of the path with the limiter bypassed
 AM = 0.5
@@ -48,9 +48,9 @@ def comb(db=-60):
 
 
 def bands_jobs():
-    jobs = [dict(x=sig(comb()), norm={**tgp.CHAR_ONLY, 'Character': AM}, raw=True)]
+    jobs = [dict(x=sig(comb()), norm={**po_ref.CHAR_ONLY, 'Character': AM}, raw=True)]
     for m in MASKERS:
-        jobs.append(dict(x=sig(comb() + sine(m, SECS, -3)), norm={**tgp.CHAR_ONLY, 'Character': AM}, raw=True))
+        jobs.append(dict(x=sig(comb() + sine(m, SECS, -3)), norm={**po_ref.CHAR_ONLY, 'Character': AM}, raw=True))
     return jobs
 
 
@@ -76,7 +76,7 @@ def burst(f, hi):
 
 
 def env_jobs():
-    return [dict(x=burst(f, hi)[0], norm={**tgp.CHAR_ONLY, 'Character': AM}, raw=True) for f in ENV_F for hi in ENV_STEPS]
+    return [dict(x=burst(f, hi)[0], norm={**po_ref.CHAR_ONLY, 'Character': AM}, raw=True) for f in ENV_F for hi in ENV_STEPS]
 
 
 def gain_env(x, y, f):
@@ -126,8 +126,8 @@ def det_jobs():
     jobs = []
     for f1, f2 in DET:
         for l in DET_L:
-            jobs.append(dict(x=sig(sine(f1, 3, l)), norm={**tgp.CHAR_ONLY, 'Character': AM}, raw=True))
-            jobs.append(dict(x=sig(sine(f1, 3, l - 3.0103) + sine(f2, 3, l - 3.0103)), norm={**tgp.CHAR_ONLY, 'Character': AM}, raw=True))
+            jobs.append(dict(x=sig(sine(f1, 3, l)), norm={**po_ref.CHAR_ONLY, 'Character': AM}, raw=True))
+            jobs.append(dict(x=sig(sine(f1, 3, l - 3.0103) + sine(f2, 3, l - 3.0103)), norm={**po_ref.CHAR_ONLY, 'Character': AM}, raw=True))
     return jobs
 
 
@@ -147,13 +147,13 @@ def st_jobs():
     n = AM
     probe = sine(1200, 3, -50); loud = sine(1000, 3, -6)
     s = lambda l, r: np.stack([sig(l), sig(r)])
-    return [dict(x=s(0 * probe, probe), norm={**tgp.CHAR_ONLY, 'Character': n}, raw=True),
-            dict(x=s(loud, probe), norm={**tgp.CHAR_ONLY, 'Character': n}, raw=True),
-            dict(x=s(sine(1000, 3, -10), sine(1000, 3, -10)), norm={**tgp.CHAR_ONLY, 'Character': n}, raw=True),
-            dict(x=s(sine(1000, 3, -10), -sine(1000, 3, -10)), norm={**tgp.CHAR_ONLY, 'Character': n}, raw=True),
-            dict(x=s(sine(1000, 3, -10), 0 * probe), norm={**tgp.CHAR_ONLY, 'Character': n}, raw=True),
-            dict(x=s(sine(1000, 3, -40), -sine(1000, 3, -40)), norm={**tgp.CHAR_ONLY, 'Character': n}, raw=True),
-            dict(x=s(sine(1000, 3, -40), sine(1000, 3, -40)), norm={**tgp.CHAR_ONLY, 'Character': n}, raw=True)]
+    return [dict(x=s(0 * probe, probe), norm={**po_ref.CHAR_ONLY, 'Character': n}, raw=True),
+            dict(x=s(loud, probe), norm={**po_ref.CHAR_ONLY, 'Character': n}, raw=True),
+            dict(x=s(sine(1000, 3, -10), sine(1000, 3, -10)), norm={**po_ref.CHAR_ONLY, 'Character': n}, raw=True),
+            dict(x=s(sine(1000, 3, -10), -sine(1000, 3, -10)), norm={**po_ref.CHAR_ONLY, 'Character': n}, raw=True),
+            dict(x=s(sine(1000, 3, -10), 0 * probe), norm={**po_ref.CHAR_ONLY, 'Character': n}, raw=True),
+            dict(x=s(sine(1000, 3, -40), -sine(1000, 3, -40)), norm={**po_ref.CHAR_ONLY, 'Character': n}, raw=True),
+            dict(x=s(sine(1000, 3, -40), sine(1000, 3, -40)), norm={**po_ref.CHAR_ONLY, 'Character': n}, raw=True)]
 
 
 def st_eval(ys):
@@ -171,7 +171,7 @@ def st_eval(ys):
 
 if __name__ == '__main__':
     bj, ej, dj, sj = bands_jobs(), env_jobs(), det_jobs(), st_jobs()
-    ys = tgp.render_many(bj + ej + dj + sj, cache=True)
+    ys = po_ref.render_many(bj + ej + dj + sj, cache=True)
     o = 0
     res = {'bands': bands_eval(ys[o:o + len(bj)])}; o += len(bj)
     res['envelope'] = env_eval(ej, ys[o:o + len(ej)]); o += len(ej)

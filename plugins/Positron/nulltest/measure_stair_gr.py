@@ -5,11 +5,11 @@ target fill of the reference and of ours.
     python measure_stair_gr.py"""
 import json, os
 import numpy as np
-import tgp, charmodel as CM, charsim as C, ident as I
-from measure_high_trace2 import table_laws
+import po_ref, charmodel_lib as CM, charsim_lib as C, ident_lib as I
+from measure_high_gain_program import table_laws
 
-D = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'meters')
-FS = tgp.FS
+D = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'meters')
+FS = po_ref.FS
 
 
 def band_gr(x, band, row=8):
@@ -21,8 +21,8 @@ def band_gr(x, band, row=8):
 
 
 if __name__ == '__main__':
-    x = np.fromfile(os.path.join(tgp.ROOT, 'reference', 'stairs_bands.f32'), np.float32).astype(float)
-    steps = json.load(open(os.path.join(tgp.ROOT, 'reference', 'stairs_bands.json')))
+    x = np.fromfile(os.path.join(po_ref.ROOT, 'reference', 'stairs_bands.f32'), np.float32).astype(float)
+    steps = json.load(open(os.path.join(po_ref.ROOT, 'reference', 'stairs_bands.json')))
     films = {w: np.load(os.path.join(D, f'grtarget_stairs_{w}.npz')) for w in ('ref', 'ours')}
     grs = {b: band_gr(x, b) for b in CM.NAMES}
     rows = []

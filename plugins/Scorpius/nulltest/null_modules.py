@@ -3,7 +3,7 @@ the drum-like test signal of probe_order.py at two levels and an excerpt of a ma
     python null_modules.py [case ...]        (cases below; prints the null in dB per signal)"""
 import os, sys
 import numpy as np
-import ori as o
+import sc_ref as o
 from probe_order import drums
 
 TRACK = os.path.join(o.ROOT, 'reference', 'demo_future_house.wav')

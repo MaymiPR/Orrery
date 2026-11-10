@@ -7,9 +7,9 @@ them in a host: each stage bypassed in turn, and the limiter switched off and on
 Writes nulltest/results_track.json."""
 import json, os, sys, wave
 import numpy as np
-import tgp
+import po_ref
 
-WAV = os.path.join(tgp.ROOT, 'reference', 'demo_future_house.wav')
+WAV = os.path.join(po_ref.ROOT, 'reference', 'demo_future_house.wav')
 BLOCK = 512
 
 
@@ -28,9 +28,9 @@ def cases(fs):
         ('limiter bypassed', {'Limiter Bypass': 1}, {}, None),
         ('character bypassed', {'Character Bypass': 1}, {}, None),
         ('eq bypassed', {'EQ Bypass': 1}, {}, None),
-        ('all stages bypassed', tgp.NONE, {}, None),
-        ('limiter only', tgp.LIM_ONLY, {}, None),
-        ('character only', tgp.CHAR_ONLY, {}, None),
+        ('all stages bypassed', po_ref.NONE, {}, None),
+        ('limiter only', po_ref.LIM_ONLY, {}, None),
+        ('character only', po_ref.CHAR_ONLY, {}, None),
         ('character 200 %', {'Character': 1.0}, {}, None),
         ('limiter gain 12', {}, {'Limiter Input Gain': 12}, None),
         ('limiter switched off at 20 s, on at 40 s', {}, {}, [('Limiter Bypass', on(20), 1), ('Limiter Bypass', on(40), 0)]),
@@ -46,8 +46,8 @@ if __name__ == '__main__':
     cs = cases(fs)
     jobs = [dict(x=xp, norm=nm, params=pm, auto=[(k, s + pre, v) for k, s, v in au] if au else None) for _, nm, pm, au in cs]
     vary = '--vary' in sys.argv
-    ref = tgp.render_many(jobs, 'ref', fs=fs, block=BLOCK, cache=True, vary=vary)
-    ours = tgp.render_many(jobs, 'model' if '--model' in sys.argv else 'ours', fs=fs, block=BLOCK, vary=vary)
+    ref = po_ref.render_many(jobs, 'ref', fs=fs, block=BLOCK, cache=True, vary=vary)
+    ours = po_ref.render_many(jobs, 'model' if '--model' in sys.argv else 'ours', fs=fs, block=BLOCK, vary=vary)
     res = {}
     for (name, *_), r, o in zip(cs, ref, ours):
         a, b = r[:, pre:].astype(np.float64), o[:, pre:].astype(np.float64)

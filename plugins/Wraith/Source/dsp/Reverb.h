@@ -5,7 +5,7 @@
 #include "Biquad.h"
 
 // The reverb (MEASUREMENTS.md "Reverb"): the reference's measured room and plate responses at the nearest of
-// 44.1 / 48 / 88.2 / 96 kHz (nulltest/pack_reverb.py), left and right independent, run by zero-latency convolutions;
+// 44.1 / 48 / 88.2 / 96 kHz (scripts/pack_reverb.py), left and right independent, run by zero-latency convolutions;
 // the wet signal then passes an RBJ low-pass (Q 0.7) at the Filter frequency. Mix crossfades linearly: the caller
 // gives out = (1 - m) dry + m wet.
 namespace wr::dsp

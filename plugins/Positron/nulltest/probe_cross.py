@@ -6,9 +6,9 @@ the reference and in ours, against the same tones alone. Shows whether the bands
 import sys
 import numpy as np
 from scipy.signal import butter, sosfiltfilt
-import tgp
+import po_ref
 
-FS = tgp.FS; PRE = 2 * FS; SECS = 4
+FS = po_ref.FS; PRE = 2 * FS; SECS = 4
 FREQS = [1500.0, 2200.0, 2700.0, 3300.0, 4100.0, 5300.0, 6700.0, 8300.0, 11100.0, 14300.0]
 
 
@@ -22,12 +22,12 @@ if __name__ == '__main__':
     levels = [float(v) for v in sys.argv[2:]] or [-30.0, -18.0, -12.0, -6.0]
     n = PRE + SECS * FS; t = np.arange(n) / FS
     probes = sum(10 ** (-50 / 20) * np.sin(2 * np.pi * f * t + 1.7 * i) for i, f in enumerate(FREQS))
-    m = sosfiltfilt(butter(8, 1000.0, 'low', fs=FS, output='sos'), tgp.noise(n / FS, 0, seed=7, pink=True))
+    m = sosfiltfilt(butter(8, 1000.0, 'low', fs=FS, output='sos'), po_ref.noise(n / FS, 0, seed=7, pink=True))
     m /= np.sqrt(np.mean(m ** 2))
-    jobs = [dict(x=probes.astype(np.float32), norm={**tgp.CHAR_ONLY, 'Character': amt}, raw=True)]
+    jobs = [dict(x=probes.astype(np.float32), norm={**po_ref.CHAR_ONLY, 'Character': amt}, raw=True)]
     for L in levels:
-        jobs.append(dict(x=(probes + m * 10 ** (L / 20)).astype(np.float32), norm={**tgp.CHAR_ONLY, 'Character': amt}, raw=True))
-    r = tgp.render_many(jobs, 'ref', cache=True); o = tgp.render_many(jobs, 'model')
+        jobs.append(dict(x=(probes + m * 10 ** (L / 20)).astype(np.float32), norm={**po_ref.CHAR_ONLY, 'Character': amt}, raw=True))
+    r = po_ref.render_many(jobs, 'ref', cache=True); o = po_ref.render_many(jobs, 'model')
     a, b = PRE + FS // 2, n
     g = lambda ys: np.array([[20 * np.log10(lockin(y[0], f, a, b) / 10 ** (-50 / 20)) for f in FREQS] for y in ys])
     gr, go = g(r), g(o)

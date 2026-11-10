@@ -1,5 +1,5 @@
 // PoRender: offline renders through Positron's own processor (no plug-in loading), with every DSP constant
-// open to change. Same job format as RefRender, so nulltest/tgp.py drives both:
+// open to change. Same job format as RefRender, so nulltest/po_ref.py drives both:
 //   PoRender jobs.txt [fs=48000] [block=512] [tuning=file]
 // jobs.txt: one render per line:  in.f32 out.f32 [key=value ...]
 //   param:Name=text  norm:Name=0.5  auto:Name@sample=0.7  sc=file.f32  raw=1   (as RefRender)

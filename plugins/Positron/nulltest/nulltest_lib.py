@@ -1,6 +1,6 @@
 """Generic null-test and measurement helpers for the null-test harnesses.
 
-Everything here is numpy only. Rendering through a plug-in is done elsewhere (the harness module, ts.py, drives
+Everything here is numpy only. Rendering through a plug-in is done elsewhere (the harness module, wr_ref.py, drives
 tools/RefRender and the plug-in's renderer). Typical use:
 
     import nulltest_lib as nl

@@ -9,10 +9,10 @@ filter does, from impulses through the reverb alone.
 """
 import os, sys
 import numpy as np
-import ts as h
+import wr_ref as h
 
 REF = os.path.join(h.ROOT, 'reference', 'Wraith')
-PLATE = os.path.join(REF, 'plate.state')      # the default state with the plate selected (scripts/tgpstate.py edit)
+PLATE = os.path.join(REF, 'plate.state')      # the default state with the plate selected (scripts/nulltest/ref_state_lib.py edit)
 AT = 1000
 
 

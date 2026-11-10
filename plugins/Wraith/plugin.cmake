@@ -11,7 +11,7 @@ set(WR_SOURCES
     ${WR_DIR}/Source/ui/Controls.cpp
     ${WR_DIR}/Source/ui/Displays.cpp)
 
-# the reverb's measured responses per rate (nulltest/pack_reverb.py)
+# the reverb's measured responses per rate (scripts/pack_reverb.py)
 juce_add_binary_data(WraithIR HEADER_NAME WraithIR.h NAMESPACE WraithIR SOURCES
     ${WR_DIR}/resources/ir/reverb_44100.bin ${WR_DIR}/resources/ir/reverb_48000.bin ${WR_DIR}/resources/ir/reverb_88200.bin ${WR_DIR}/resources/ir/reverb_96000.bin)
 set_target_properties(WraithIR PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -100,7 +100,7 @@ if(ORRERY_TOOLS)
     target_link_libraries(WraithSnapshot PRIVATE OrreryShared WraithIR juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags)
 
     # Offline renders through our own processor with every DSP constant open to change (fitting, null tests), and a
-    # second copy for trying DSP changes while a fit is running with the first (nulltest/ts.py: WR_RENDER=dev)
+    # second copy for trying DSP changes while a fit is running with the first (nulltest/wr_ref.py: WR_RENDER=dev)
     foreach(t WrRender WrRenderDev)
         juce_add_console_app(${t} PRODUCT_NAME "${t}")
         target_sources(${t} PRIVATE ${WR_DIR}/tools/WrRender.cpp ${WR_SOURCES})

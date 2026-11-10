@@ -5,7 +5,7 @@ reference: loud drums -30.5 -> -47.5 dB) the rest is small (MEASUREMENTS.md 14).
 import sys
 import numpy as np
 from scipy.optimize import minimize
-import ori as o
+import sc_ref as o
 import null_modules as N
 
 FS = o.FS

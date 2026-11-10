@@ -3,7 +3,7 @@ Steady tones below the threshold (the gain then stands still): any harmonics
 in the wet path come from something nonlinear besides the gain. Compression alone, amount 1, both modes.
     python probe_comp_colour.py"""
 import numpy as np
-import ori as o
+import sc_ref as o
 
 MODES = {'a': {'ids.compression.mode': 'Mode A'}, 'b': {'ids.compression.mode': 'Mode B'}}
 P = {**o.ONLY('comp'), 'Comp Amount': 1}

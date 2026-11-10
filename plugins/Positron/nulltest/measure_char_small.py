@@ -5,10 +5,10 @@ what the band model leaves unexplained. Writes measurements/Positron/character/s
 import json, os
 import numpy as np
 from scipy.optimize import least_squares
-import tgp, plotstyle as ps
+import po_ref, plotstyle_lib as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character')
-FS = tgp.FS
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character')
+FS = po_ref.FS
 PRE = 2 * FS; N = 65536
 AMOUNTS = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0]
 XO = json.load(open(os.path.join(OUT, 'crossover_fit.json')))['LR4']
@@ -27,8 +27,8 @@ ALL = BANDS[0] + BANDS[1] + BANDS[2]
 
 if __name__ == '__main__':
     x = np.zeros(PRE + N, np.float32); x[PRE] = 10 ** (-60 / 20)
-    jobs = [dict(x=x, norm=tgp.NONE, raw=True)] + [dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': a}, raw=True) for a in AMOUNTS]
-    ys = tgp.render_many(jobs, cache=True)
+    jobs = [dict(x=x, norm=po_ref.NONE, raw=True)] + [dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': a}, raw=True) for a in AMOUNTS]
+    ys = po_ref.render_many(jobs, cache=True)
     H0 = np.fft.rfft(ys[0][0, PRE:PRE + N])
     res = dict(amounts_pct=[a * 200 for a in AMOUNTS], fit={}, freq_hz=f[sel][::16].round(2).tolist(), measured_dB={}, model_dB={})
     fg, ax = ps.fig('Character, small signal (-60 dBFS impulse) re bypassed path', 'Hz', 'dB', logx=True)

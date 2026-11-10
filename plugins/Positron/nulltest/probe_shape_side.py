@@ -7,9 +7,9 @@ shaper's range. Fits sin(k u) / k and an odd polynomial to the curve, reference 
 Prints a JSON line 'SHAPER band amount k d residual' for each plug-in."""
 import sys
 import numpy as np
-import tgp, ident as I
+import po_ref, ident_lib as I
 
-FS = tgp.FS
+FS = po_ref.FS
 
 if __name__ == '__main__':
     amt = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
@@ -23,13 +23,13 @@ if __name__ == '__main__':
     x = np.sin(2 * np.pi * f0 * t) * 10 ** (lev / 20); x[:FS // 2] = 0
     stereo = np.stack([x, -x]).astype(np.float32)
     import json, os
-    W = json.load(open(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', 'width.json')))
+    W = json.load(open(os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character', 'width.json')))
     Wb = [10 ** (W[b][node] / 20) for b in I.BANDS] if hasattr(I, 'BANDS') else [10 ** (W[b][node] / 20) for b in ('low', 'mid', 'high')]
     M = [10 ** (I.GAINS16[b][node] / 20) for b in range(3)]
     xb = I.bands(x)[:, 0]
     seg = slice(I.PRE + FS // 4, n - FS // 100)
     for who in ([only] if only else ('ref', 'model')):
-        y = tgp.render_many([dict(x=stereo, norm={**tgp.CHAR_ONLY, 'Character': amt}, raw=True)], who, cache=who == 'ref')[0]
+        y = po_ref.render_many([dict(x=stereo, norm={**po_ref.CHAR_ONLY, 'Character': amt}, raw=True)], who, cache=who == 'ref')[0]
         side = 0.5 * (y[0] - y[1])
         yh = (side - sum(M[b] * Wb[b] * xb[b] for b in range(3) if b != band)) / (M[band] * Wb[band])
         s, v = I.nl_bands(x)[band, 0][seg], (yh - xb[band] + I.nl_bands(x)[band, 0])[seg]
@@ -56,4 +56,4 @@ if __name__ == '__main__':
         edges = np.linspace(0, np.max(np.abs(s)), 9)
         r = v - g * np.sin(k * s) / k
         print('   |s| bins: ' + '  '.join(f'{edges[i + 1]:.2f}:{np.sqrt(np.mean(r[(np.abs(s) >= edges[i]) & (np.abs(s) < edges[i + 1])] ** 2)):.1e}' for i in range(8)))
-        np.save(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', f'shapeside_{who}_{amt}_{int(f0)}.npy'), np.stack([s, v]))
+        np.save(os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character', f'shapeside_{who}_{amt}_{int(f0)}.npy'), np.stack([s, v]))

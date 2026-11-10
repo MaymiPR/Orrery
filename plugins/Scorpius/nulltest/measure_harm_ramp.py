@@ -5,7 +5,7 @@ ours; with the null of ours against the reference at each held amount.
     python measure_harm_ramp.py [block]"""
 import sys
 import numpy as np
-import ori as o
+import sc_ref as o
 from probe_autom import PRE, T1, T2, cases
 from probe_switch_on import switch_at
 from probe_order import drums

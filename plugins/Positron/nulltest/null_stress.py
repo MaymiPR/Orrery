@@ -8,10 +8,10 @@ fitted nodes on purpose (12.5 % steps, odd dB values), so interpolation is teste
 Writes nulltest/results_stress.json; nulltest.py --report adds it to NULLTESTS.md."""
 import argparse, json, os
 import numpy as np
-import tgp
+import po_ref
 import nulltest as N
 
-FS = tgp.FS
+FS = po_ref.FS
 PRE = N.PRE
 
 
@@ -69,7 +69,7 @@ def groups():
     g = []
     g.append(('amount', [(f'amount {a} %, music -10', 'music -10', {'Character': amt(a)}, {}, None)
                          for a in (0, 12.5, 37.5, 62.5, 87.5, 100, 112.5, 137.5, 162.5, 187.5, 200)]))
-    g.append(('amount char-only', [(f'char only {a} %, pink -10', 'pink -10', {**tgp.CHAR_ONLY, 'Character': amt(a)}, {}, None)
+    g.append(('amount char-only', [(f'char only {a} %, pink -10', 'pink -10', {**po_ref.CHAR_ONLY, 'Character': amt(a)}, {}, None)
                                    for a in (25, 62.5, 100, 150, 200)]))
     g.append(('limiter gain', [(f'limiter {v} dB, {s}', s, {}, {'Limiter Input Gain': v}, None)
                                for s in ('music -2', 'drums -6') for v in (0, 2.5, 5, 7.5, 10, 12)]))
@@ -129,8 +129,8 @@ def run(only=None, vst3=False):
             j = dict(x=pad(sigs[s]), norm=norm, params=params)
             if auto: j['auto'] = [(k, int(round(t * fs / FS)), v) for k, t, v in auto]
             jobs.append(j)
-        ref = tgp.render_many(jobs, 'ref', fs=fs, block=block, cache=True)
-        ours = tgp.render_many(jobs, 'ours' if vst3 else 'model', fs=fs, block=block)
+        ref = po_ref.render_many(jobs, 'ref', fs=fs, block=block, cache=True)
+        ours = po_ref.render_many(jobs, 'ours' if vst3 else 'model', fs=fs, block=block)
         print(f'== {run_name}', flush=True)
         for (gname, (name, s, *_)), r, o in zip(cases, ref, ours):
             d = round(float(N.residual_db(r, o)), 2)

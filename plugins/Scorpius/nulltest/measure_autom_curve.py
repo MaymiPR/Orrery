@@ -5,7 +5,7 @@ measurements/Scorpius/autom/<case>_<block>.npz.
     python measure_autom_curve.py case [block]"""
 import os, sys
 import numpy as np
-import ori as o
+import sc_ref as o
 from probe_autom import cases, PRE, T1, T2
 from probe_order import drums
 

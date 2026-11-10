@@ -6,7 +6,7 @@ import json, os
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.signal import lfilter
-import ori as o
+import sc_ref as o
 from fit_eq import biquad
 
 D = json.load(open(os.path.join(o.ROOT, 'measurements', 'Scorpius', 'eq_tones.json')))

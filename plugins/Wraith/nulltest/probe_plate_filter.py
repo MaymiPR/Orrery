@@ -1,4 +1,4 @@
-"""The plate's Filter, from its impulse responses (capture_plate_filter.py; MEASUREMENTS.md "Reverb"):
+"""The plate's Filter, from its impulse responses (render_plate_filter.py; MEASUREMENTS.md "Reverb"):
 - run to run: the 5.2 kHz impulse twice;
 - is the Filter one fixed low-pass after the plate: each setting's response against the 20 kHz one through a fixed
   filter (the best per frequency over the whole response) and, in time, the spectrum of early and late windows re the
@@ -13,7 +13,7 @@ import os
 import numpy as np
 from scipy.signal import fftconvolve
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 FS = 48000
 REF = os.path.join(h.ROOT, 'reference', 'Wraith')

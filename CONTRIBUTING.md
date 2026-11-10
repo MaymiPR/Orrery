@@ -89,27 +89,32 @@ unsigned and the notes say so.
 | `shared/` | the static library `OrreryShared`: the UI library (theme, controls, metal knob, the host-keys hand-back `HostFocus`), the I/O level meter, the Instrument Sans font |
 | `tools/` | hosts for the reference plug-ins: offline renders (RefRender), editor films and screenshots (RefCapture), parameter lists (ParamDump), the keyboard-focus check (FocusCheck); the host test (`HostTest.cpp`) and the editor snapshot tool (`Snapshot.cpp`), built per plug-in |
 | `tests/regress/` | the render regression's cases and golden renders |
-| `scripts/` | `bump_version.py`, `release_notes.py`, `render_regress.py`, `make_site.py`, `check_repo.py`, `check.ps1`, `check.sh` |
+| `scripts/` | `bump_version.py`, `release_notes.py`, `render_regress.py`, `make_site.py`, `check_repo.py`, `check.ps1`, `check.sh`; `nulltest/ref_state_lib.py`, the reader of the originals' saved state that the harnesses import |
+| `measurements/` | the published measurement data per plug-in (`measurements/<Id>/`) |
 | `packaging/` | the installers; `plugins.txt` lists the plug-ins they hold |
 | `docs/` | the build guide, `branding/` (banners, icon, social preview, `colours.json`), `screenshots/` |
 | `.github/` | `workflows/` (Lint, CI, Build and release, Release checklist, Landing page), the issue forms, the pull request template, `RELEASE_CHECKLIST.md`, `dependabot.yml`, CODEOWNERS |
 | `local.example.yaml` | the keys of `local.yaml` (git-ignored): the references' VST3 files and names, the interpreters, the tool folders |
 | `requirements.txt`, `requirements-train.txt` | the Python packages of the scripts; the second adds PyTorch for Scorpius's learned blocks |
 
-Reference renders, measurement data (`measurements/`) and anything taken from the original plug-ins stay out of the
-repository (`.gitignore`); only the write-ups are published.
+`measurements/<Id>/` holds each plug-in's published measurement data: measured responses, fitted values and the
+null tests' results as JSON, with the approval recorded in `.provenance` and in each MEASUREMENTS.md (2026-11-09).
+Reference renders, plots, logs, raw captures and anything taken from the original plug-ins stay out of the
+repository (`.gitignore`).
 
 ## Null tests
 
 Each plug-in's `nulltest/` folder renders the same signals through the original and through ours and reports the
 residual; its README lists the scripts by role. It needs Windows, Python 3.12 or newer with the packages in
 `requirements.txt` (`requirements-train.txt` adds torch for the learned blocks), the original plug-in installed and
-named in `local.yaml` (`<Id>.ref_vst3` and `<Id>.ref_name` per plug-in), and the tools built (`-DORRERY_TOOLS=ON`).
+named in `local.yaml` (`<Id>.ref_vst3` and `<Id>.ref_name` per plug-in), and the tools built (`-DORRERY_TOOLS=ON`). Each
+harness is `nulltest/<ab>_ref.py` (`po_ref.py`, `sc_ref.py`, `wr_ref.py`); helper modules end in `_lib.py`, and the
+scripts that write under `Source/` or `resources/` sit in `plugins/<Id>/scripts/`.
 
 | Plug-in | Entry points |
 |---|---|
 | Positron | `first_null.py` (the self-check of the harness, the hosts and the build), `nulltest.py` (every case; `--vst3` for the built binary; `--report` writes NULLTESTS.md), `null_stress.py` (the stress grid), `null_track.py` (a music file of one's own) |
-| Scorpius | `first_null.py` (the self-check), `nulltest.py` (runs `null_chain.py`, presets and settings; `null_modules.py`, module by module; `null_quiet.py`, quiet material), `probe_autom.py` (automation) |
+| Scorpius | `first_null.py` (the self-check), `nulltest.py` (every case of `null_chain.py`, `null_quiet.py` and `null_modules.py`; `ours` for the built binary; `--report` writes NULLTESTS.md), `probe_autom.py` (automation) |
 | Wraith | `first_null.py` (the self-check of the harness, the hosts and the build), `nulltest.py` (every case; `--vst3`; `--report` writes NULLTESTS.md) |
 
 The results are in each plug-in's NULLTESTS.md.
@@ -155,5 +160,4 @@ suite's first name, Orrery Suite, which the suite carried until it took the repo
 
 ## Deviations from the standard
 
-- Scorpius's NULLTESTS.md is assembled from the tables of `null_chain.py`, `null_modules.py` and `null_quiet.py`
-  (its `nulltest.py` runs the three); Positron's and Wraith's `nulltest.py --report` write theirs.
+None.

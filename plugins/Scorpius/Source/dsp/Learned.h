@@ -6,7 +6,7 @@
 
 // A learned module (nulltest/train_gru.py): y = Post(u + W GRU(u)), u = Pre(x). Pre a short FIR, the GRU a small
 // recurrent network (PyTorch's equations), Post a long FIR (Convolver.h). The weights are ours, trained on the
-// reference's input and output (LearnedModels.h, written by nulltest/export_models.py).
+// reference's input and output (LearnedModels.h, written by scripts/export_models.py).
 namespace sc::dsp
 {
 struct LearnedWeights

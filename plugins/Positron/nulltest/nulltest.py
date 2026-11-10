@@ -1,4 +1,4 @@
-"""Null tests: the same signals and settings through the reference (Cradle The God Particle) and through
+"""Null tests: the same signals and settings through the reference and through
 Positron; the residual (reference - ours) in dB re the reference's output. Both renders are latency-compensated by
 each plug-in's reported latency, so a latency mismatch shows up as residual too.
 
@@ -8,15 +8,15 @@ each plug-in's reported latency, so a latency mismatch shows up as residual too.
 Writes nulltest/results.json and prints a table; NULLTESTS.md reports it."""
 import argparse, json, os
 import numpy as np
-import tgp
+import po_ref
 
-FS = tgp.FS
+FS = po_ref.FS
 PRE = 2 * FS                    # the reference's start-up delay ramp (MEASUREMENTS.md); excluded from the residual
 SECS = 6
 
 
 def sig_noise(db=-18, pink=True, seed=11):
-    return tgp.noise(SECS, db, seed=seed, pink=pink)
+    return po_ref.noise(SECS, db, seed=seed, pink=pink)
 
 
 def sig_sweep(db=-12, f0=20, f1=20000):
@@ -50,7 +50,7 @@ def sig_music(db=-10, seed=5):
     f = notes[(t / 0.75).astype(int) % 4]
     bass = np.sin(2 * np.pi * np.cumsum(f) / FS) * 0.5
     chord = sum(np.sin(2 * np.pi * f * k * t) / k for f in (220, 277.2, 329.6) for k in range(1, 8)) * 0.08
-    bed = tgp.noise(SECS, -30, seed=seed, pink=True)
+    bed = po_ref.noise(SECS, -30, seed=seed, pink=True)
     d = sig_drums(-3, seed)
     l = bass + chord + bed + d * 0.8; r = bass + chord * 0.8 + np.roll(bed, 37) + d * 0.8
     m = max(np.max(np.abs(l)), np.max(np.abs(r)))
@@ -61,21 +61,21 @@ SIGNALS = {
     'pink -18': lambda: sig_noise(-18), 'pink -6': lambda: sig_noise(-6), 'sweep -12': lambda: sig_sweep(-12),
     'drums -6': lambda: sig_drums(-6), 'music -10': lambda: sig_music(-10), 'music -2': lambda: sig_music(-2),
 }
-N = tgp.NONE
+N = po_ref.NONE
 CASES = [
     # name, signal, normalised params, displayed params
     ('path: all stages bypassed', 'pink -18', N, {}),
-    ('eq: low +6 mid -4 high +3 (eq only)', 'pink -18', tgp.EQ_ONLY, {'EQ Low Gain': 6, 'EQ Mid Gain': -4, 'EQ High Gain': 3}),
-    ('eq: sweep, low -6 high +6 (eq only)', 'sweep -12', tgp.EQ_ONLY, {'EQ Low Gain': -6, 'EQ High Gain': 6}),
-    ('lim: pink -6, gain 5 (limiter only)', 'pink -6', tgp.LIM_ONLY, {}),
-    ('lim: drums -6, gain 12 (limiter only)', 'drums -6', tgp.LIM_ONLY, {'Limiter Input Gain': 12}),
-    ('lim: music -2, gain 5 (limiter only)', 'music -2', tgp.LIM_ONLY, {}),
-    ('char: pink -18, 100 % (character only)', 'pink -18', tgp.CHAR_ONLY, {}),
-    ('char: pink -6, 100 % (character only)', 'pink -6', tgp.CHAR_ONLY, {}),
-    ('char: music -10, 50 %', 'music -10', {**tgp.CHAR_ONLY, 'Character': 0.25}, {}),
-    ('char: music -10, 100 %', 'music -10', tgp.CHAR_ONLY, {}),
-    ('char: music -10, 200 %', 'music -10', {**tgp.CHAR_ONLY, 'Character': 1.0}, {}),
-    ('char: drums -6, 100 %', 'drums -6', tgp.CHAR_ONLY, {}),
+    ('eq: low +6 mid -4 high +3 (eq only)', 'pink -18', po_ref.EQ_ONLY, {'EQ Low Gain': 6, 'EQ Mid Gain': -4, 'EQ High Gain': 3}),
+    ('eq: sweep, low -6 high +6 (eq only)', 'sweep -12', po_ref.EQ_ONLY, {'EQ Low Gain': -6, 'EQ High Gain': 6}),
+    ('lim: pink -6, gain 5 (limiter only)', 'pink -6', po_ref.LIM_ONLY, {}),
+    ('lim: drums -6, gain 12 (limiter only)', 'drums -6', po_ref.LIM_ONLY, {'Limiter Input Gain': 12}),
+    ('lim: music -2, gain 5 (limiter only)', 'music -2', po_ref.LIM_ONLY, {}),
+    ('char: pink -18, 100 % (character only)', 'pink -18', po_ref.CHAR_ONLY, {}),
+    ('char: pink -6, 100 % (character only)', 'pink -6', po_ref.CHAR_ONLY, {}),
+    ('char: music -10, 50 %', 'music -10', {**po_ref.CHAR_ONLY, 'Character': 0.25}, {}),
+    ('char: music -10, 100 %', 'music -10', po_ref.CHAR_ONLY, {}),
+    ('char: music -10, 200 %', 'music -10', {**po_ref.CHAR_ONLY, 'Character': 1.0}, {}),
+    ('char: drums -6, 100 %', 'drums -6', po_ref.CHAR_ONLY, {}),
     ('full: music -10, defaults', 'music -10', {}, {}),
     ('full: music -2, defaults', 'music -2', {}, {}),
     ('full: drums -6, defaults', 'drums -6', {}, {}),
@@ -94,12 +94,12 @@ def run(only=None, vst3=False):
     sigs = {k: f() for k, f in SIGNALS.items()}
     pad = lambda x: np.concatenate([np.zeros((2, PRE) if x.ndim == 2 else PRE, np.float32), x], axis=-1)
     jobs = [dict(x=pad(sigs[s]), norm=nm, params=pm) for _, s, nm, pm in cases]
-    ref = tgp.render_many(jobs, 'ref', cache=True)
-    ours = tgp.render_many(jobs, 'ours' if vst3 else 'model')
+    ref = po_ref.render_many(jobs, 'ref', cache=True)
+    ours = po_ref.render_many(jobs, 'ours' if vst3 else 'model')
     res = {}
     for (name, s, nm, pm), r, o in zip(cases, ref, ours):
-        res[name] = dict(residual_dB=round(float(residual_db(r, o)), 2), ref_rms_dBFS=round(tgp.rms_db(r[:, PRE:]), 2),
-                         ours_rms_dBFS=round(tgp.rms_db(o[:, PRE:]), 2))
+        res[name] = dict(residual_dB=round(float(residual_db(r, o)), 2), ref_rms_dBFS=round(po_ref.rms_db(r[:, PRE:]), 2),
+                         ours_rms_dBFS=round(po_ref.rms_db(o[:, PRE:]), 2))
         print(f'{res[name]["residual_dB"]:8.2f} dB   {name}   (rms ref {res[name]["ref_rms_dBFS"]}, ours {res[name]["ours_rms_dBFS"]})')
     return res
 
@@ -238,7 +238,7 @@ if __name__ == '__main__':
     ap.add_argument('--before', help='with --report: an earlier results file, e.g. results_1.1.1.json, as a column')
     a = ap.parse_args()
     if a.report:
-        open(os.path.join(tgp.PLUGIN, 'NULLTESTS.md'), 'w', newline='\n').write('\n'.join(report(a.before)))
+        open(os.path.join(po_ref.PLUGIN, 'NULLTESTS.md'), 'w', newline='\n').write('\n'.join(report(a.before)))
         raise SystemExit
     res = run(a.only, a.vst3)
     if a.only is None:

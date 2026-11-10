@@ -4,7 +4,7 @@ for any probe: checks that laws fitted at one tone frequency per band hold elsew
     python compare_prediction.py <freq Hz> <node>      static tone steps at that frequency (ident_signals levels)"""
 import json, sys
 import numpy as np
-import tgp, ident as I, ident_signals as S, fit_bandlaw as F
+import po_ref, ident_lib as I, ident_signals_lib as S, fit_bandlaw as F
 
 NAMES = ['low', 'mid', 'high']
 
@@ -23,10 +23,10 @@ if __name__ == '__main__':
     f, node = float(sys.argv[1]), int(sys.argv[2])
     table = json.load(open(F.OUT))
     x = S.tone_segments(f, [(S.STATIC_SECS, l) for l in S.STATIC_LEVELS])
-    y = tgp.render_many([dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': node / 8}, raw=True)], cache=True)[0][0]
+    y = po_ref.render_many([dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': node / 8}, raw=True)], cache=True)[0][0]
     e = predict(x, node, table) - y
     for si, l in enumerate(S.STATIC_LEVELS):
-        s = slice(S.PRE + int(si * S.STATIC_SECS * tgp.FS) + tgp.FS, S.PRE + int((si + 1) * S.STATIC_SECS * tgp.FS))
+        s = slice(S.PRE + int(si * S.STATIC_SECS * po_ref.FS) + po_ref.FS, S.PRE + int((si + 1) * S.STATIC_SECS * po_ref.FS))
         g_ref = np.std(y[s]) / np.std(x[s])
         g_mod = np.std((e + y)[s]) / np.std(x[s])
         print(f'{l:4d} dBFS  residual {10 * np.log10(np.sum(e[s] ** 2) / np.sum(y[s] ** 2)):6.1f} dB   gain ref {20*np.log10(g_ref):7.3f}  model {20*np.log10(g_mod):7.3f} dB')

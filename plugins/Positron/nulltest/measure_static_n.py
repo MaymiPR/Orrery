@@ -6,12 +6,12 @@ its last half second. Reference against ours; tone, two tones and band noise (a 
 import os, sys
 import numpy as np
 from scipy.optimize import minimize_scalar
-import tgp, ident as I
+import po_ref, ident_lib as I
 
-FS = tgp.FS
+FS = po_ref.FS
 LEVELS = list(range(-24, 7))
 SECS = 1.5
-D = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character')
+D = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character')
 
 
 def shaper(amt):
@@ -56,9 +56,9 @@ if __name__ == '__main__':
     for kind in ('tone', 'twotone', 'noise'):
         x, n = staircase(kind, f0)
         xb = I.bands(x)[:, 0]; nl = I.nl_bands(x)[:, 0]
-        j = dict(x=np.stack([x, x]).astype(np.float32), norm={**tgp.CHAR_ONLY, 'Character': amt}, raw=True)
+        j = dict(x=np.stack([x, x]).astype(np.float32), norm={**po_ref.CHAR_ONLY, 'Character': amt}, raw=True)
         for who in ('ref', 'model'):
-            y = tgp.render_many([j], who, cache=who == 'ref')[0][0]
+            y = po_ref.render_many([j], who, cache=who == 'ref')[0][0]
             yh = y - M[0] * xb[0] - M[1] * xb[1] - M[2] * (xb[2] - nl[2])
             ns = []
             for i in range(len(LEVELS)):

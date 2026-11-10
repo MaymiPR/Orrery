@@ -14,7 +14,7 @@ Checks (PASS / FAIL, the thresholds are the ones every project reached):
 """
 import argparse, sys
 import numpy as np
-import ori as h
+import sc_ref as h
 import nulltest_lib as nl
 
 

@@ -23,13 +23,19 @@ __pycache__/
 Thumbs.db
 
 # Kept out of the repository: anything taken from the original plug-ins (screenshots, extracted resources), every
-# reference render, every result file and the measurement data (measurements/: data, plots, logs, trained models).
-# The text write-ups (RESEARCH.md, MEASUREMENTS.md) are published.
+# reference render and every result file. measurements/<Id>/ holds the published measurement data (CONTRIBUTING.md,
+# Layout); plots, logs, raw captures and trained models stay local.
 reference/
-measurements/
+measurements/**/*.png
+measurements/**/*.log
+measurements/**/*.npy
+measurements/**/*.npz
+measurements/**/*.pt
+measurements/**/*.raw
+measurements/**/*.pcm
 **/nulltest/renders/
 **/nulltest/reference_renders/
-**/nulltest/results*.json
+plugins/*/nulltest/results*.json
 **/__pycache__/
 
 # Signing material never enters the repository (it lives in GitHub's Actions secrets)

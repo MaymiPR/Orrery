@@ -52,7 +52,7 @@ public:
             for (int q = 0; q < kBandParams; ++q) p[q] = tune->band[b][k][q] + (tune->band[b][k + 1][q] - tune->band[b][k][q]) * f;
             auto& s = st[b];
             s.makeup = std::pow (10.0, p[bpMakeup] / 20.0);
-            // the shaper is sin (k u) / k (identified per cycle: u - c u^3 + 0.3 c^2 u^5 ..., nulltest/ident.py);
+            // the shaper is sin (k u) / k (identified per cycle: u - c u^3 + 0.3 c^2 u^5 ..., nulltest/ident_lib.py);
             // the tables keep c = k^2 / 6, its cubic coefficient
             s.drive = std::sqrt (std::max (0.0, 6.0 * p[bpCubic]));
             s.width = std::pow (10.0, p[bpWidth] / 20.0);

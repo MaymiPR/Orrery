@@ -1,6 +1,6 @@
 """One band's law at one amount node fitted against the reference on program material and probes together (the probe
 fits of fit_bandlaw.py alone have near-equivalent minima that differ on music). The whole section is modelled in
-Python (charmodel.py, identical to the plug-in to -120 dB); the other two bands are fixed, each signal weighs the same.
+Python (charmodel_lib.py, identical to the plug-in to -120 dB); the other two bands are fixed, each signal weighs the same.
 
     python fit_music.py low 2 [start law files ... | broad] [--truepeak] [--shaper]     writes the best into
     measurements/Positron/character/bandlaw_music.json (bandlaw_music_tp.json with --truepeak)
@@ -27,9 +27,9 @@ start 'header': the law in the plug-in's table (Source/dsp/CharacterTable.h)"""
 import json, os, sys
 import numpy as np
 from scipy.optimize import least_squares
-import tgp, charsim as C, ident as I, nulltest as N, stress as S, ident_signals as IS, charmodel as M, fit_bandlaw as F
+import po_ref, charsim_lib as C, ident_lib as I, nulltest as N, null_stress as S, ident_signals_lib as IS, charmodel_lib as M, fit_bandlaw as F
 
-D = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character')
+D = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character')
 OUT = os.path.join(D, ('bandlaw_music_tp' if '--truepeak' in sys.argv else 'bandlaw_music') + ('_rel' if '--relative' in sys.argv else '')
                    + ('_loud' if '--loud' in sys.argv else '') + ('_shp' if '--shaper' in sys.argv else '')
                    + ('_static' if '--static' in sys.argv else '') + ('_track' if '--track' in sys.argv else '')
@@ -69,7 +69,7 @@ def signals(band):
         import null_track as T
         x, fs = T.load(T.WAV)
         x = resample_poly(x, 160, 147, axis=1).astype(np.float32) if fs == 44100 else x
-        progs += [pad(x[:, int(t * tgp.FS):int(t * tgp.FS) + N.SECS * tgp.FS]) for t in (30, 44)]
+        progs += [pad(x[:, int(t * po_ref.FS):int(t * po_ref.FS) + N.SECS * po_ref.FS]) for t in (30, 44)]
     if '--steps' in sys.argv:
         import measure_mid_release as R
         progs += [R.step_signal(a, b, 700.0) for a, b in ((0, -45), (-20, -45), (-45, 0), (-30, 0), (-12, -24))]
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     table = json.load(open(os.path.join(D, 'bandlaw_final.json' if SHAPER else 'bandlaw_sd.json'))); broad = json.load(open(os.path.join(D, 'fit_char.json')))
     if os.path.exists(OUT): table.update(json.load(open(OUT)))       # laws already fitted this way take precedence
     xs = signals(band)
-    refs = tgp.render_many([dict(x=x.astype(np.float32), norm={**tgp.CHAR_ONLY, 'Character': node / 8}, raw=True) for x in xs], 'ref', cache=True)
+    refs = po_ref.render_many([dict(x=x.astype(np.float32), norm={**po_ref.CHAR_ONLY, 'Character': node / 8}, raw=True) for x in xs], 'ref', cache=True)
     laws = other_laws(band, node, table, broad)
     if '--fixed' in sys.argv:
         ft = json.load(open(os.path.join(D, sys.argv[sys.argv.index('--fixed') + 1])))
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     best = None
     for sf in starts:
         if sf == 'header':        # the plug-in's table
-            from measure_high_trace3 import header_laws
+            from measure_high_gain_noise import header_laws
             st = header_laws(int(round(node * 2)))[band]
         elif sf == 'broad':         # the broadband fit (fit_char.json)
             row = broad[band][int(node)]

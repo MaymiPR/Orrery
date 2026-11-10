@@ -1,5 +1,5 @@
 // WrRender: offline renders through Wraith's own processor (no plug-in loading), with every DSP constant
-// open to change. Same job format as RefRender, so nulltest/ts.py drives both:
+// open to change. Same job format as RefRender, so nulltest/wr_ref.py drives both:
 //   WrRender jobs.txt [fs=48000] [block=512] [tuning=file]
 // jobs.txt: one render per line:  in.f32 out.f32 [key=value ...]
 //   param:Name=text  norm:Name=0.5  auto:Name@sample=0.7  raw=1   (as RefRender)

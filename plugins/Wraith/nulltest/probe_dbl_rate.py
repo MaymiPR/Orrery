@@ -10,7 +10,7 @@ import json, sys
 import numpy as np
 from scipy.optimize import least_squares
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 HOP, UP = 240, 16
 

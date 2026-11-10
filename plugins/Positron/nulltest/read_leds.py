@@ -2,7 +2,7 @@
 bottom LED at y 248; columns x 25 / 61 input, 821 / 857 output). Returns (frames, channels, 40) codes:
 0 off, 1 green (#00824B), 2 mint (#8EDBC4)."""
 import numpy as np
-from filmtools import Film
+from film_lib import Film
 
 COLS = {'in': (25, 61), 'out': (821, 857)}
 

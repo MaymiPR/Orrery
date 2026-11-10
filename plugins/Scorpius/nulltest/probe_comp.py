@@ -4,7 +4,7 @@ from level steps. Writes measurements/Scorpius/comp.json.
     python probe_comp.py"""
 import json, os
 import numpy as np
-import ori as o
+import sc_ref as o
 
 OUT = os.path.join(o.ROOT, 'measurements', 'Scorpius'); os.makedirs(OUT, exist_ok=True)
 MODES = {'a': {'ids.compression.mode': 'Mode A'}, 'b': {'ids.compression.mode': 'Mode B'}}

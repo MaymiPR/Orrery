@@ -8,7 +8,7 @@ filters' group delay calls for.
 import os
 import numpy as np
 from scipy.optimize import least_squares
-import ts as h
+import wr_ref as h
 
 FS, PRE, N = 48000, 24, 4096
 D = os.path.join(h.ROOT, 'measurements', 'Wraith')

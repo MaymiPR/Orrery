@@ -1,14 +1,14 @@
 """What the high band's detector hears: a quiet 16 kHz probe (-40 dBFS) rides along with a steady sine pump at
-frequency f; the probe's gain (measure_high_trace.py's inverted-probe method) is the band's gain reduction caused by the pump,
+frequency f; the probe's gain (measure_high_gain_probe.py's inverted-probe method) is the band's gain reduction caused by the pump,
 so the gain reduction against f traces the detector's frequency response. Reference against ours.
 
     python probe_det_spectrum.py [amount 0..1] [pump dBFS]"""
 import sys
 import numpy as np
-import tgp
-from measure_high_trace import FP, PROBE, gain_trace
+import po_ref
+from measure_high_gain_probe import FP, PROBE, gain_trace
 
-FS = tgp.FS; PRE = FS
+FS = po_ref.FS; PRE = FS
 FREQS = [1000, 1500, 2000, 2400, 2700, 3000, 3500, 4000, 5000, 6000, 8000, 11000, 13000]
 
 if __name__ == '__main__':
@@ -17,8 +17,8 @@ if __name__ == '__main__':
     n = PRE + 2 * FS; t = np.arange(n) / FS
     probe = PROBE * np.sin(2 * np.pi * FP * t)
     pumps = [np.sin(2 * np.pi * f * t) * 10 ** (lev / 20) for f in FREQS] + [0 * t]
-    jobs = [dict(x=(p + s * probe).astype(np.float32), norm={**tgp.CHAR_ONLY, 'Character': amt}) for p in pumps for s in (1, -1)]
-    rr = tgp.render_many(jobs, 'ref', cache=True); oo = tgp.render_many(jobs, 'model')
+    jobs = [dict(x=(p + s * probe).astype(np.float32), norm={**po_ref.CHAR_ONLY, 'Character': amt}) for p in pumps for s in (1, -1)]
+    rr = po_ref.render_many(jobs, 'ref', cache=True); oo = po_ref.render_many(jobs, 'model')
     seg = slice(PRE + FS // 2, n - FS // 4)
     g = lambda y, i: np.median(gain_trace(0.5 * (y[2 * i][0] - y[2 * i + 1][0]), n)[seg])
     br, bo = g(rr, len(FREQS)), g(oo, len(FREQS))

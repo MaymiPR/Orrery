@@ -10,7 +10,7 @@ os.environ.setdefault('WR_RENDER', 'dev')
 import argparse, json
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 import fit_char as fc
 
 PARAMS = [('riderAttackScale', 1.0, 0.1, 20.0, True), ('riderReleaseMs', 100.0, 5.0, 3000.0, True),

@@ -11,14 +11,14 @@ measurements/Positron/character/fit_char.json and Source/dsp/CharacterTable.h (t
 import json, os, sys
 import numpy as np
 from scipy.optimize import minimize
-import tgp
+import po_ref
 
-FS = tgp.FS
+FS = po_ref.FS
 PRE = 2 * FS
 BANDS = {'low': 70.0, 'mid': 700.0, 'high': 8000.0}
 FREE = ['mix', 'cubic', 'thresh', 'ratio', 'knee', 'attack', 'release']   # make-up: the identified small-signal gain
-OUT_JSON = os.environ.get('FIT_CHAR_JSON', os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', 'fit_char.json'))
-HEADER = os.path.join(tgp.PLUGIN, 'Source', 'dsp', 'CharacterTable.h')
+OUT_JSON = os.environ.get('FIT_CHAR_JSON', os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character', 'fit_char.json'))
+HEADER = os.path.join(po_ref.PLUGIN, 'Source', 'dsp', 'CharacterTable.h')
 DEFAULTS = {'low': dict(mix=0.7, cubic=0.9, thresh=-30, ratio=2.0, knee=20, attack=10, release=300, gainAttack=5, gainRelease=50, attack2=200, release2=3000, slowOffset=-3),
             'mid': dict(mix=0.79, cubic=0.87, thresh=-23, ratio=1.7, knee=35, attack=190, release=90, gainAttack=5, gainRelease=50, attack2=200, release2=3000, slowOffset=-3),
             'high': dict(mix=0.8, cubic=0.0, thresh=-13, ratio=1.8, knee=1, attack=1.5, release=170, gainAttack=5, gainRelease=50, attack2=200, release2=3000, slowOffset=-3)}
@@ -73,7 +73,7 @@ def fit(band, node, start, refs, xs, maxfev=260):
         if FEEDBACK is not None: d[f'{band}.feedback'] = FEEDBACK
         return d
     def render(p):
-        return tgp.render_many([dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': amount}, raw=True, tune=tune(p)) for x in xs], 'model')
+        return po_ref.render_many([dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': amount}, raw=True, tune=tune(p)) for x in xs], 'model')
     def cost(p):
         extra = dict(zip(FREE[7:], p[7:]))
         if p[0] < 0 or p[0] > 1 or p[3] < 1 or p[4] < 0 or p[5] <= 0.01 or p[6] <= 0.1: return 1e3
@@ -136,7 +136,7 @@ if __name__ == '__main__':
         if only_band and band != only_band: continue
         xs = signals(band)
         nodes = [only_node] if only_node is not None else list(range(9))
-        allrefs = tgp.render_many([dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': k / 8}, raw=True) for k in nodes for x in xs], cache=True)
+        allrefs = po_ref.render_many([dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': k / 8}, raw=True) for k in nodes for x in xs], cache=True)
         refs = [allrefs[i * len(xs):(i + 1) * len(xs)] for i in range(len(nodes))]
         table.setdefault(band, [None] * 9)
         prev = None

@@ -1,15 +1,15 @@
 """Gain-reduction meters of the reference, from a RefCapture film (default settings, 100 % UI scale) of
 reference/gr_meter_test.f32 (tone bursts per band, see gr_meter_test.json):
-  RefCapture "<TGP.vst3>" "The God Particle" film.raw in=reference/gr_meter_test.f32
+  RefCapture "<reference.vst3>" "<reference name>" film.raw in=reference/gr_meter_test.f32
   python measure_meters.py film.raw
 Counts the lit bars of the three band meters per frame (33 bars, 1 px wide on a 4 px pitch, growing left from
 x 700 at y 86 / 151 / 216). The numeric readouts beside them hold the deepest GR since the start (read from the
 frames by eye: see MEASUREMENTS.md). Writes measurements/Positron/meters/gr_bars.json and a plot."""
 import json, os, sys
 import numpy as np
-import tgp, plotstyle as ps
+import po_ref, plotstyle_lib as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'meters'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'meters'); os.makedirs(OUT, exist_ok=True)
 W, H = 888, 359
 COLS = np.array([572 + 4 * k for k in range(33)])
 ROWS = {'high': 90, 'mid': 155, 'low': 220}
@@ -25,7 +25,7 @@ if __name__ == '__main__':
         for b, y in ROWS.items():
             on = f[y, COLS, 1] > 110                         # mint #8EDBC4 bars on black
             lit[b].append(dict(count=int(on.sum()), deepest=int(33 - np.argmax(on)) if on.any() else 0))
-    seg = json.load(open(os.path.join(tgp.ROOT, 'reference', 'gr_meter_test.json')))
+    seg = json.load(open(os.path.join(po_ref.ROOT, 'reference', 'gr_meter_test.json')))
     res = dict(times_s=ts.round(4).tolist(), segments=seg,
                bars={b: [v['count'] for v in lit[b]] for b in ROWS}, deepest_bar={b: [v['deepest'] for v in lit[b]] for b in ROWS})
     json.dump(res, open(os.path.join(OUT, 'gr_bars.json'), 'w'))

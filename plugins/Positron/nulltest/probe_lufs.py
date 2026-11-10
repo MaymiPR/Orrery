@@ -4,15 +4,15 @@ silence after each part, so the window and the decay show. Also the expected sho
 K-weighting, 3 s window) of the signal on one channel and on both.
 
     python probe_lufs.py                         writes renders/work/lufs_probe.f32 (mono float32 48 kHz) and .json
-    RefCapture "<TGP.vst3>" "The God Particle" film.raw in=<that file> rows=0,0.32
+    RefCapture "<reference.vst3>" "<reference name>" film.raw in=<that file> rows=0,0.32
     python probe_lufs.py --expected              per segment: the expected short-term LUFS at its end"""
 import json, os, sys
 import numpy as np
 from scipy.signal import lfilter
-import tgp
+import po_ref
 
-FS = tgp.FS
-OUT = os.path.join(tgp.WORK, 'lufs_probe')
+FS = po_ref.FS
+OUT = os.path.join(po_ref.WORK, 'lufs_probe')
 
 
 def kweight(x):
@@ -33,7 +33,7 @@ def short_term(x, channels=2):
 def signal():
     t = lambda s: np.arange(int(s * FS)) / FS
     tone = lambda f, s, db: 10 ** (db / 20) * np.sin(2 * np.pi * f * t(s))
-    pink = lambda s, db, seed: tgp.noise(s, db, seed=seed, pink=True)
+    pink = lambda s, db, seed: po_ref.noise(s, db, seed=seed, pink=True)
     sil = lambda s: np.zeros(int(s * FS))
     segs = [('silence', sil(2)), ('1 kHz -20', tone(1000, 5, -20)), ('silence', sil(4)), ('pink -20', pink(5, -20, 1)),
             ('silence', sil(4)), ('100 Hz -20', tone(100, 5, -20)), ('silence', sil(4)), ('10 kHz -20', tone(10000, 5, -20)),
@@ -53,6 +53,6 @@ if __name__ == '__main__':
             i = int((m['start'] + m['secs']) * FS) - 1
             print(f"{m['label']:12s} ends at {m['start'] + m['secs']:5.1f} s: short-term {st1[i]:7.2f} LUFS (one channel), {st2[i]:7.2f} (both)")
         raise SystemExit
-    os.makedirs(tgp.WORK, exist_ok=True)
+    os.makedirs(po_ref.WORK, exist_ok=True)
     x.tofile(OUT + '.f32'); json.dump(meta, open(OUT + '.json', 'w'), indent=1)
     print(OUT + '.f32', f'{len(x) / FS:.1f} s')

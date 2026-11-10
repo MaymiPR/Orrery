@@ -36,7 +36,7 @@ Root files: `README.md` (purpose, contents, quick start, links), `LICENSE` (AGPL
 | Bundle and CLAP id | `com.<suiteid>.<pluginid>` in lower case | com.examplesuite.theplugin |
 | Preset extension | the plug-in name without The, lower case, no spaces, at most 8 characters | `.plugin` |
 | Release files | `<SuiteId>-<version>-<OS>[-<Format>].<ext>` | ExampleSuite-1.2.0-Windows-Setup.exe |
-| Harness module | the reference product's initials in lower case; for a one-word name its first two letters (three when two make a Python keyword) | `tgp.py` |
+| Harness module | the reference product's initials in lower case; for a one-word name its first two letters (three when two make a Python keyword) | `po_ref.py` |
 | Null-test scripts | lower_snake; `nulltest.py` and `first_null.py`; others start with their purpose (`probe_`, `measure_`, `fit_`, `train_`, `render_`, `check_`) and name a plug-in by its id | `probe_release.py` |
 | Documents | lower-kebab under `docs/` (`BUILDING.md` excepted); root and plug-in documents in upper case | `docs/null-testing.md` |
 | Branding and screenshots | `docs/branding/<suiteid>-*`; `docs/screenshots/<id>.png`, `<id>-<feature>.png`, ids in lower case; a view of the whole suite takes the suite id | `examplesuite-banner-light.svg` |

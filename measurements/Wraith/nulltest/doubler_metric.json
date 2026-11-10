@@ -1,0 +1,44 @@
+{
+ "pink -18, Stereo 0": {
+  "spectrum_max_db": 1.9,
+  "spectrum_rms_db": 0.6,
+  "corr_ref": 1.0,
+  "corr_ours": 1.0,
+  "level_diff_db": 0.11
+ },
+ "pink -18, Stereo 0.5": {
+  "spectrum_max_db": 1.9,
+  "spectrum_rms_db": 0.6,
+  "corr_ref": 0.977,
+  "corr_ours": 0.987,
+  "level_diff_db": 0.09
+ },
+ "pink -18, Stereo 1": {
+  "spectrum_max_db": 1.9,
+  "spectrum_rms_db": 0.6,
+  "corr_ref": 0.912,
+  "corr_ours": 0.949,
+  "level_diff_db": 0.03
+ },
+ "music -10, Stereo 0": {
+  "spectrum_max_db": 1.19,
+  "spectrum_rms_db": 0.44,
+  "corr_ref": 1.0,
+  "corr_ours": 1.0,
+  "level_diff_db": -0.05
+ },
+ "music -10, Stereo 0.5": {
+  "spectrum_max_db": 1.19,
+  "spectrum_rms_db": 0.44,
+  "corr_ref": 0.997,
+  "corr_ours": 0.996,
+  "level_diff_db": -0.05
+ },
+ "music -10, Stereo 1": {
+  "spectrum_max_db": 1.19,
+  "spectrum_rms_db": 0.44,
+  "corr_ref": 0.988,
+  "corr_ours": 0.983,
+  "level_diff_db": -0.04
+ }
+}

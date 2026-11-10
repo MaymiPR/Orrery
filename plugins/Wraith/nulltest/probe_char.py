@@ -6,7 +6,7 @@
 import sys
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 FS = 48000
 BANDS = (31, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000, 20000)

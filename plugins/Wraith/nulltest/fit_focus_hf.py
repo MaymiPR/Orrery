@@ -3,12 +3,12 @@ that shape the top of the stage's response (a broad low-pass and a narrow cut, f
 do not carry over to other rates: at 44.1 kHz the stage's response is 0.3 to 0.6 dB higher at 10 to 15 kHz with 6 to 8
 degrees more phase than ours, at 88.2 and 96 kHz 1 to 2 dB lower. They are refitted per rate to the stage's complex
 response there (side-channel clicks, probe_side.py eq), every other section fixed, and stored per rate in
-renders/focus_eq2_rates.json for gen_focus_eq.py (Character.h uses the nearest rate in the table).
+renders/focus_eq2_rates.json for make_focus_eq.py (Character.h uses the nearest rate in the table).
 
 With all sections (MEASUREMENTS.md 4.2): at 44.1, 88.2 and 96 kHz every section from 80 Hz up and the four all-passes are
 refitted per rate (--all --ap), the model's level per Focus value held to the 48 kHz model's (--level, the EQ sits
 before the detector), its gain real (--real), the bins weighted as pink noise is (--pink), over the whole band
-(--wide, up to 0.48 fs). One run per rate, merged with merge_focus_rates.py.
+(--wide, up to 0.48 fs). One run per rate, merged with focus_rates_lib.py.
 
     python fit_focus_hf.py [44100 48000 88200 96000]
     python fit_focus_hf.py --all --ap --level --real --wide --pink 96000 focus_eq2_rates_q96.json

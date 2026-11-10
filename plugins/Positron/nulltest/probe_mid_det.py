@@ -1,15 +1,15 @@
 """Experiment: a first-order highpass in front of the mid band's detector only (0 dB at 700 Hz), no law refitted,
-the character section in Python (charmodel.py with the plug-in's table) against the reference on program signals.
+the character section in Python (charmodel_lib.py with the plug-in's table) against the reference on program signals.
 
     python probe_mid_det.py [amount 0..1] fc ...          residual per signal (dB) for each corner, 0 = none
 (fc/2: a second-order Butterworth highpass instead, also 0 dB at 700 Hz)"""
 import sys
 import numpy as np
 from scipy.signal import lfilter
-import tgp, nulltest as N, stress as S, charmodel as CM, ident as I, charsim as C
-from measure_high_trace3 import header_laws
+import po_ref, nulltest as N, null_stress as S, charmodel_lib as CM, ident_lib as I, charsim_lib as C
+from measure_high_gain_noise import header_laws
 
-FS = tgp.FS
+FS = po_ref.FS
 
 
 def hp(x, fc, f0=700.0, order=1):
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     row = int(round(amt * 16)); laws = header_laws(row)
     pad = lambda x: np.concatenate([np.zeros((2, N.PRE), np.float32), np.vstack([x, x]) if x.ndim == 1 else x], -1)
     xs = {k: pad(f()) for k, f in SIGS.items()}
-    refs = tgp.render_many([dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': amt}, raw=True) for x in xs.values()], 'ref', cache=True)
+    refs = po_ref.render_many([dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': amt}, raw=True) for x in xs.values()], 'ref', cache=True)
     print('fc (Hz)  ' + '  '.join(f'{k:>9}' for k in xs))
     for fc in fcs:
         out = []

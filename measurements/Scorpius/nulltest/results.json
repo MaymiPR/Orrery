@@ -1,0 +1,236 @@
+{
+ "presets": {
+  "default": {
+   "drums": -29.7,
+   "drums -12": -36.61,
+   "track": -25.81,
+   "track -10": -33.86
+  },
+  "colour c": {
+   "drums": -32.61,
+   "drums -12": -40.35,
+   "track": -24.87,
+   "track -10": -37.04
+  },
+  "no compression": {
+   "drums": -29.78,
+   "drums -12": -36.61,
+   "track": -25.84,
+   "track -10": -33.65
+  },
+  "loud path": {
+   "drums": -29.7,
+   "drums -12": -34.94,
+   "track": -25.76,
+   "track -10": -33.16
+  },
+  "deep low end": {
+   "drums": -29.49,
+   "drums -12": -35.45,
+   "track": -25.98,
+   "track -10": -33.64
+  },
+  "all parallel": {
+   "drums": -29.71,
+   "drums -12": -36.66,
+   "track": -25.62,
+   "track -10": -33.78
+  },
+  "grit only": {
+   "drums": -32.88,
+   "drums -12": -36.6,
+   "track": -33.38,
+   "track -10": -35.12
+  },
+  "all off, 48 kHz": {
+   "drums": -283.85,
+   "drums -12": -271.85,
+   "track": -289.59,
+   "track -10": -279.59
+  },
+  "default with the drive off (the rest of the chain)": {
+   "drums": -48.17,
+   "drums -12": -51.23,
+   "track": -44.77,
+   "track -10": -49.54
+  },
+  "all off, 44.1 kHz": {
+   "drums": -51.48,
+   "drums -12": -51.48,
+   "track": -63.66,
+   "track -10": -63.66
+  },
+  "all off, 88.2 kHz": {
+   "drums": -109.19,
+   "drums -12": -109.19,
+   "track": -109.67,
+   "track -10": -109.67
+  },
+  "all off, 96 kHz": {
+   "drums": -89.73,
+   "drums -12": -89.73,
+   "track": -92.23,
+   "track -10": -92.23
+  },
+  "all off, 176.4 kHz": {
+   "drums": -73.08,
+   "drums -12": -73.08,
+   "track": -73.25,
+   "track -10": -73.25
+  },
+  "all off, 192 kHz": {
+   "drums": -86.15,
+   "drums -12": -86.15,
+   "track": -86.43,
+   "track -10": -86.43
+  },
+  "default, 88.2 kHz": {
+   "drums": -26.29,
+   "drums -12": -36.09,
+   "track": -22.41,
+   "track -10": -32.71
+  },
+  "default, 96 kHz": {
+   "drums": -27.64,
+   "drums -12": -36.43,
+   "track": -23.04,
+   "track -10": -32.99
+  },
+  "default, 176.4 kHz": {
+   "drums": -25.95,
+   "drums -12": -35.84,
+   "track": -24.13,
+   "track -10": -33.16
+  },
+  "default, 192 kHz": {
+   "drums": -29.05,
+   "drums -12": -36.68,
+   "track": -24.7,
+   "track -10": -33.58
+  }
+ },
+ "presets_44k": {
+  "default": {
+   "drums": -29.52,
+   "drums -12": -36.53,
+   "track": -25.49,
+   "track -10": -33.78
+  },
+  "colour c": {
+   "drums": -32.65,
+   "drums -12": -40.19,
+   "track": -24.77,
+   "track -10": -36.85
+  },
+  "no compression": {
+   "drums": -29.6,
+   "drums -12": -36.51,
+   "track": -25.55,
+   "track -10": -33.57
+  },
+  "loud path": {
+   "drums": -29.51,
+   "drums -12": -34.85,
+   "track": -25.44,
+   "track -10": -33.1
+  },
+  "deep low end": {
+   "drums": -29.44,
+   "drums -12": -35.44,
+   "track": -25.79,
+   "track -10": -33.6
+  },
+  "all parallel": {
+   "drums": -29.58,
+   "drums -12": -36.6,
+   "track": -25.32,
+   "track -10": -33.69
+  },
+  "grit only": {
+   "drums": -33.13,
+   "drums -12": -36.72,
+   "track": -33.37,
+   "track -10": -35.14
+  },
+  "all off": {
+   "drums": -51.48,
+   "drums -12": -51.48,
+   "track": -63.66,
+   "track -10": -63.66
+  }
+ },
+ "quiet": {
+  "default": {
+   "track -60": -32.26,
+   "track -66": -28.52,
+   "drums -62": -26.61,
+   "drums -70": -25.36,
+   "pink -72": -34.26,
+   "pink -78": -29.39
+  },
+  "drive alone": {
+   "track -60": -30.74,
+   "track -66": -28.6,
+   "drums -62": -31.3,
+   "drums -70": -18.84,
+   "pink -72": -32.56,
+   "pink -78": -29.51
+  }
+ },
+ "modules": {
+  "eq 1k 6": {
+   "drums": -66.87,
+   "drums -12": -65.95,
+   "track": -62.63,
+   "track -10": -62.91
+  },
+  "eq 1k 3": {
+   "drums": -57.89,
+   "drums -12": -57.98,
+   "track": -54.14,
+   "track -10": -54.14
+  },
+  "eq 40 6": {
+   "drums": -57.22,
+   "drums -12": -56.93,
+   "track": -58.84,
+   "track -10": -58.69
+  },
+  "eq 100 6": {
+   "drums": -59.01,
+   "drums -12": -58.83,
+   "track": -55.28,
+   "track -10": -58.09
+  },
+  "eq 3k 6": {
+   "drums": -66.28,
+   "drums -12": -66.36,
+   "track": -58.94,
+   "track -10": -62.45
+  },
+  "eq 10k 6": {
+   "drums": -59.05,
+   "drums -12": -59.04,
+   "track": -59.0,
+   "track -10": -59.09
+  },
+  "eq all 4": {
+   "drums": -47.69,
+   "drums -12": -47.92,
+   "track": -46.53,
+   "track -10": -46.19
+  },
+  "comp a": {
+   "drums": -47.75,
+   "drums -12": -57.11,
+   "track": -58.54,
+   "track -10": -64.33
+  },
+  "comp b": {
+   "drums": -52.31,
+   "drums -12": -59.52,
+   "track": -55.38,
+   "track -10": -59.85
+  }
+ }
+}

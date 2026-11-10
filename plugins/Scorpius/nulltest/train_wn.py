@@ -2,19 +2,19 @@
 filters (PyTorch; on the GPU when there is one):
     u = Pre(x);  v = u + WaveNet(u);  y = Post(v)
 Pre a short causal FIR (starts as a unit impulse), Post a long causal FIR (starts as the measured small-signal impulse
-response), the WaveNet learning what the filters cannot (its output starts at zero). Trained on capture_nn.py's
+response), the WaveNet learning what the filters cannot (its output starts at zero). Trained on render_training.py's
 material up to `maxpeak` dBFS (the reference's own behaviour is erratic far above full scale), validated by nulls on
 the held-out pieces. Writes measurements/Scorpius/nn/<case>_wn.pt.
     python train_wn.py <case> [steps] [channels] [layers]"""
 import os, sys, time
 import numpy as np
 import torch
-import ori as o
+import sc_ref as o
 from train_wh import fftconv, NN, IR, load
 
 FS = 48000
 KPRE, KPOST, SEG, BATCH = int(os.environ.get("KPRE", 64)), int(os.environ.get("KPOST", 8192)), 4096, 16
-POSTZERO = os.environ.get("POSTZERO") == "1"   # the Post filter starts at zero (a residual target: prep_comp.py's _r cases)
+POSTZERO = os.environ.get("POSTZERO") == "1"   # the Post filter starts at zero (a residual target: train_comp_input.py's _r cases)
 STACK = int(os.environ.get("STACK", 12))
 # FEAT: time constants (ms) of slow envelopes of the input, one-pole averages of |x|, given to the network as extra
 # inputs (memory far beyond its receptive field, cheap to compute in the plug-in), e.g. FEAT=10,50,200,1000
@@ -25,7 +25,7 @@ FEAT = [float(v) for v in os.environ.get("FEAT", "").split(",") if v]
 COND = [(c.split(':')[0], float(c.split(':')[1])) for c in os.environ.get("COND", "").split(",") if c]
 EQUIV = float(os.environ.get("EQUIV", 0))   # a capture at amount EQUIV: target its fully wet equivalent (no extra input)
 BYPASS = os.environ.get("BYPASS") == "1"
-# XCOND: the capture's dry input ('xraw', prep_comp.py) as an extra input beside the model's own (compression: the
+# XCOND: the capture's dry input ('xraw', train_comp_input.py) as an extra input beside the model's own (compression: the
 # network hears the signal before our gain too, so it can correct the gain's timing as well as learn the colour)
 XCOND = os.environ.get("XCOND") == "1"
 # the layer's shape (NAM's WaveNets: kernel 3, the input mixed into every layer, tanh without a gate)
@@ -165,7 +165,7 @@ def evaluate(model, xs, ys, valid, keep, all_=False, F=None):
 def irname_of(case):
     if case == 'lift': return 'lift_1.0'
     if case == 'grit' or case.startswith('harm'): return None
-    if case.startswith('comp'): return case[:6]          # (prep_comp.py's linear estimate)
+    if case.startswith('comp'): return case[:6]          # (train_comp_input.py's linear estimate)
     return f'drive_{case[6]}_hp{1 if case.endswith("_hp") else 0}'
 
 

@@ -9,7 +9,7 @@ only.
 import argparse, json
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 FS = 48000
 LEVELS = list(np.arange(-60.0, 1.0, 2.0))

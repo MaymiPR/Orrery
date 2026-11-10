@@ -5,7 +5,7 @@ peak, whether the response is minimum phase.
     python measure_linear.py [case ...]"""
 import os, sys
 import numpy as np
-import ori as o
+import sc_ref as o
 
 IR = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'ir'); os.makedirs(IR, exist_ok=True)
 N = 16384

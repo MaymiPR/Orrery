@@ -4,16 +4,16 @@ import json, os
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.signal import lfilter
-import tgp
+import po_ref
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'core'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'core'); os.makedirs(OUT, exist_ok=True)
 
 if __name__ == '__main__':
     res = {}
     for fs in (44100, 48000, 88200, 96000, 192000):
         pre = 2 * fs; n = 4096
         x = np.zeros(pre + n, np.float32); x[pre] = 0.01
-        ys = tgp.render_many([dict(x=x, norm=tgp.NONE, raw=True), dict(x=x, norm=tgp.LIM_ONLY, params={'Limiter Input Gain': 0}, raw=True),
+        ys = po_ref.render_many([dict(x=x, norm=po_ref.NONE, raw=True), dict(x=x, norm=po_ref.LIM_ONLY, params={'Limiter Input Gain': 0}, raw=True),
                               dict(x=x, norm={}, raw=True)], fs=fs, cache=True)
         h = ys[0][0, pre:pre + n] / 0.01
         k = int(np.argmax(np.abs(h)))
@@ -27,7 +27,7 @@ if __name__ == '__main__':
             if best is None or s.cost < best[2]: best = (D, s.x[0], s.cost)
         hl = ys[1][0, pre:pre + n] / 0.01 / 10 ** (-0.1 / 20)
         lag = int(np.argmax(np.correlate(hl[:2000], h[:2000], 'full'))) - 1999
-        lat = tgp.latency(fs=fs)
+        lat = po_ref.latency(fs=fs)
         res[str(fs)] = dict(reported_latency=lat, core_delay=best[0], allpass_a=round(float(best[1]), 5), fit_rms=float(np.sqrt(best[2] * 2 / (k + 200))),
                             limiter_extra=lag, peak_all_on=int(np.argmax(np.abs(ys[2][0, pre:pre + n]))))
         print(fs, res[str(fs)])

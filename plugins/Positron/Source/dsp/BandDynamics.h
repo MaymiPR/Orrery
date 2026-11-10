@@ -5,7 +5,7 @@
 
 // One character band's gain computer: detector (mean-square or peak, attack / release, optional slow second
 // detector), soft-knee static curve, optional smoothing of the reduction, parallel mix. Gives the gain n applied to
-// the band before its shaper. Shared by Character.h and tools/charsim.cpp (the fitting library).
+// the band before its shaper. Shared by Character.h and tools/CharSim.cpp (the fitting library).
 namespace po::dsp
 {
 struct BandDynamics

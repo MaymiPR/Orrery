@@ -3,8 +3,8 @@ Source/dsp/LinearFits.h, for the linear parts that are not textbook filters.
     python fit_linear_vf.py"""
 import os
 import numpy as np
-import ori as o
-from vecfit import fit_sections, parallel_response
+import sc_ref as o
+from vecfit_lib import fit_sections, parallel_response
 
 FS = 48000
 IR = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'ir')

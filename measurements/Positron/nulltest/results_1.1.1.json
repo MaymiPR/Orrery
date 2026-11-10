@@ -1,0 +1,82 @@
+{
+ "path: all stages bypassed": {
+  "residual_dB": -85.41,
+  "ref_rms_dBFS": -18.0,
+  "ours_rms_dBFS": -18.0
+ },
+ "eq: low +6 mid -4 high +3 (eq only)": {
+  "residual_dB": -87.26,
+  "ref_rms_dBFS": -13.77,
+  "ours_rms_dBFS": -13.77
+ },
+ "eq: sweep, low -6 high +6 (eq only)": {
+  "residual_dB": -79.39,
+  "ref_rms_dBFS": -14.99,
+  "ours_rms_dBFS": -14.99
+ },
+ "lim: pink -6, gain 5 (limiter only)": {
+  "residual_dB": -54.82,
+  "ref_rms_dBFS": -6.26,
+  "ours_rms_dBFS": -6.26
+ },
+ "lim: drums -6, gain 12 (limiter only)": {
+  "residual_dB": -78.42,
+  "ref_rms_dBFS": -14.67,
+  "ours_rms_dBFS": -14.67
+ },
+ "lim: music -2, gain 5 (limiter only)": {
+  "residual_dB": -77.65,
+  "ref_rms_dBFS": -6.91,
+  "ours_rms_dBFS": -6.91
+ },
+ "char: pink -18, 100 % (character only)": {
+  "residual_dB": -55.09,
+  "ref_rms_dBFS": -16.12,
+  "ours_rms_dBFS": -16.13
+ },
+ "char: pink -6, 100 % (character only)": {
+  "residual_dB": -42.41,
+  "ref_rms_dBFS": -6.94,
+  "ours_rms_dBFS": -6.98
+ },
+ "char: music -10, 50 %": {
+  "residual_dB": -78.9,
+  "ref_rms_dBFS": -18.5,
+  "ours_rms_dBFS": -18.5
+ },
+ "char: music -10, 100 %": {
+  "residual_dB": -74.03,
+  "ref_rms_dBFS": -17.34,
+  "ours_rms_dBFS": -17.34
+ },
+ "char: music -10, 200 %": {
+  "residual_dB": -63.05,
+  "ref_rms_dBFS": -16.12,
+  "ours_rms_dBFS": -16.12
+ },
+ "char: drums -6, 100 %": {
+  "residual_dB": -63.75,
+  "ref_rms_dBFS": -23.79,
+  "ours_rms_dBFS": -23.79
+ },
+ "full: music -10, defaults": {
+  "residual_dB": -74.03,
+  "ref_rms_dBFS": -12.44,
+  "ours_rms_dBFS": -12.44
+ },
+ "full: music -2, defaults": {
+  "residual_dB": -56.42,
+  "ref_rms_dBFS": -5.74,
+  "ours_rms_dBFS": -5.74
+ },
+ "full: drums -6, defaults": {
+  "residual_dB": -63.77,
+  "ref_rms_dBFS": -18.9,
+  "ours_rms_dBFS": -18.9
+ },
+ "full: music -10, 200 %, gain 10, eq +3/-2/+4, in -3 out +2": {
+  "residual_dB": -64.71,
+  "ref_rms_dBFS": -4.65,
+  "ours_rms_dBFS": -4.65
+ }
+}

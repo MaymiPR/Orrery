@@ -10,9 +10,9 @@ also gives the per-rate delays in Engine.cpp).
 import os, sys
 import numpy as np
 from scipy.signal import lfilter
-import tgp
+import po_ref
 
-FS = tgp.FS
+FS = po_ref.FS
 PRE = 2 * FS
 N = 4096
 CORE = 151.27917                                  # the fixed delay at 48 kHz (Tuning.h coreDelay)
@@ -50,8 +50,8 @@ def simulate(stages, k, fs=FS):
 
 def refs():
     imp = np.zeros(PRE + 32768, np.float32); imp[PRE] = 1e-3
-    jobs = [dict(x=imp, norm=tgp.NONE, raw=True, salt=f'os{k}') for k in (2, 4, 8)]
-    return {k: np.fft.rfft(y[0, PRE:PRE + N] / 1e-3) for k, y in zip((2, 4, 8), tgp.render_many(jobs, cache=True))}
+    jobs = [dict(x=imp, norm=po_ref.NONE, raw=True, salt=f'os{k}') for k in (2, 4, 8)]
+    return {k: np.fft.rfft(y[0, PRE:PRE + N] / 1e-3) for k, y in zip((2, 4, 8), po_ref.render_many(jobs, cache=True))}
 
 
 def report(R, edge, depth, quiet=False):

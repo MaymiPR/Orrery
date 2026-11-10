@@ -2,7 +2,7 @@
 value against the reference (drums at -12 dBFS: below the soft clip's reach, so the gain alone counts)."""
 import numpy as np
 from scipy.optimize import minimize_scalar
-import ori as o
+import sc_ref as o
 from probe_order import drums
 
 x = drums() * 10 ** (-12 / 20)

@@ -1,10 +1,10 @@
 """Automation against the reference: a parameter jumps at 1 s and back at 2 s (host blocks of 512 and 64 samples);
 the null over the whole render and over 0.15 s windows around each jump, to see whether our smoothing and its timing
-match (The God Particle's framework applies parameters per 128-sample chunk, MEASUREMENTS.md there).
+match (Positron's reference applies parameters per 128-sample chunk, MEASUREMENTS.md there).
     TUNE='{"switchMs": 0}' python probe_autom.py [case ...]"""
 import json, os, sys
 import numpy as np
-import ori as o
+import sc_ref as o
 from probe_order import drums
 
 PRE = 4800

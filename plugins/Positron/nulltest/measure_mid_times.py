@@ -7,8 +7,8 @@ a one-pole in the power domain, every step gives the same tau.
 import sys
 import numpy as np
 from scipy.optimize import least_squares
-import measure_mid_release as R, midrel2 as R2
-from measure_high_trace3 import header_laws
+import measure_mid_release as R, measure_mid_release_speed as R2
+from measure_high_gain_noise import header_laws
 
 FS = R.FS
 STEPS = [(0, -20), (0, -30), (0, -45), (-12, -24), (-20, -45), (-6, -18),

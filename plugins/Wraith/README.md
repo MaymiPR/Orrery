@@ -61,7 +61,7 @@ Every case: [NULLTESTS.md](NULLTESTS.md).
   (`ctest` after a build).
 - `nulltest/`: the null tests against an installed copy of the original (Windows, Python 3.12 or newer with the root
   `requirements.txt`; not in CI). `nulltest.py` runs every case and writes NULLTESTS.md, `first_null.py` checks the
-  hosts and our VST3 against our renderer, `ts.py` is the render harness. The `probe_*.py` and `fit_*.py` scripts are
-  the measurements and fits that MEASUREMENTS.md cites; `record_plate.py` and `pack_reverb.py` make the reverb
+  hosts and our VST3 against our renderer, `wr_ref.py` is the render harness. The `probe_*.py` and `fit_*.py` scripts are
+  the measurements and fits that MEASUREMENTS.md cites; `render_plate.py` and `pack_reverb.py` make the reverb
   responses in `ir/`. Reference renders, captures and measurement data stay local (git-ignored).
 - `tools/`: WrRender (our processor offline, every DSP constant open to change) and the editor snapshot.

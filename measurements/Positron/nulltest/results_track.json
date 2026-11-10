@@ -1,0 +1,68 @@
+{
+ "defaults": {
+  "residual_dB": -49.56,
+  "worst_second_dB": -41.01,
+  "worst_at_s": 0,
+  "best_lag": 0
+ },
+ "limiter bypassed": {
+  "residual_dB": -53.07,
+  "worst_second_dB": -47.7,
+  "worst_at_s": 14,
+  "best_lag": 0
+ },
+ "character bypassed": {
+  "residual_dB": -60.79,
+  "worst_second_dB": -49.04,
+  "worst_at_s": 50,
+  "best_lag": 0
+ },
+ "eq bypassed": {
+  "residual_dB": -49.56,
+  "worst_second_dB": -41.01,
+  "worst_at_s": 0,
+  "best_lag": 0
+ },
+ "all stages bypassed": {
+  "residual_dB": -123.38,
+  "worst_second_dB": -115.86,
+  "worst_at_s": 67,
+  "best_lag": 0
+ },
+ "limiter only": {
+  "residual_dB": -60.79,
+  "worst_second_dB": -49.04,
+  "worst_at_s": 50,
+  "best_lag": 0
+ },
+ "character only": {
+  "residual_dB": -53.07,
+  "worst_second_dB": -47.7,
+  "worst_at_s": 14,
+  "best_lag": 0
+ },
+ "character 200 %": {
+  "residual_dB": -42.98,
+  "worst_second_dB": -38.36,
+  "worst_at_s": 60,
+  "best_lag": 0
+ },
+ "limiter gain 12": {
+  "residual_dB": -49.98,
+  "worst_second_dB": -41.62,
+  "worst_at_s": 4,
+  "best_lag": 0
+ },
+ "limiter switched off at 20 s, on at 40 s": {
+  "residual_dB": -49.93,
+  "worst_second_dB": -41.01,
+  "worst_at_s": 0,
+  "best_lag": 0
+ },
+ "character switched off at 20 s, on at 40 s": {
+  "residual_dB": -50.98,
+  "worst_second_dB": -41.01,
+  "worst_at_s": 0,
+  "best_lag": 0
+ }
+}

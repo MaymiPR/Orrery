@@ -4,7 +4,7 @@ on level steps, drums and the track, the error measured on the parallel's contri
 import sys
 import numpy as np
 from scipy.optimize import minimize
-import ori as o
+import sc_ref as o
 import null_modules as N
 
 FS = o.FS

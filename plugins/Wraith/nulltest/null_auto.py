@@ -6,7 +6,7 @@ processor (MEASUREMENTS.md "Smoothing"). Prints the residual over the second aft
 import argparse
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 AT = 47 * 512
 

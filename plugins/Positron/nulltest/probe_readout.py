@@ -5,10 +5,10 @@
            inter-sample peak first of all, while the peak readout is still empty (sample or true peak)
 Writes reference/readout_probe<N>.f32 (mono float32 48 kHz, RefCapture's in=) and .json (segments: label, start, secs).
   python probe_readout.py [1|2]
-  RefCapture "<TGP.vst3>" "The God Particle" film.raw in=reference/readout_probe2.f32"""
+  RefCapture "<reference.vst3>" "<reference name>" film.raw in=reference/readout_probe2.f32"""
 import json, os, sys
 import numpy as np
-import tgp
+import po_ref
 
 FS = 48000
 
@@ -76,6 +76,6 @@ if __name__ == '__main__':
         seg.append(dict(label=label, start=round(t, 4), secs=len(x) / FS))
         out.append(x); t += len(x) / FS
     x = np.concatenate(out).astype(np.float32)
-    x.tofile(os.path.join(tgp.ROOT, 'reference', name + '.f32'))
-    json.dump(seg, open(os.path.join(tgp.ROOT, 'reference', name + '.json'), 'w'), indent=1)
+    x.tofile(os.path.join(po_ref.ROOT, 'reference', name + '.f32'))
+    json.dump(seg, open(os.path.join(po_ref.ROOT, 'reference', name + '.json'), 'w'), indent=1)
     print(f'{name}: {len(x) / FS:.1f} s, {len(seg)} segments')

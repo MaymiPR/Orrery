@@ -4,7 +4,7 @@ the reference at amount 1 on program material and tone steps (Nelder-Mead on the
 import sys
 import numpy as np
 from scipy.optimize import minimize
-import ori as o
+import sc_ref as o
 import null_modules as N
 
 FS = 48000

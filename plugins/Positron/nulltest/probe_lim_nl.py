@@ -6,7 +6,7 @@ raw bursts (content up to Nyquist).
     python probe_lim_nl.py"""
 import numpy as np
 from scipy.signal import resample_poly
-import tgp, limpy, limpulse as P, limident as LI
+import po_ref, limiter_lib, probe_lim_pulse as P, probe_lim_interp as LI
 
 
 def kinds(seed=11):
@@ -74,8 +74,8 @@ def upsampled(x, L, taps=None):
 if __name__ == '__main__':
     x, at = LI.pulses(); raw = kinds()
     xin = P.limiter_input(x)
-    j = dict(x=np.stack([x, x]).astype(np.float32), norm=tgp.LIM_ONLY, params={'Limiter Input Gain': 0})
-    y = tgp.render_many([j], 'ref', cache=True)[0][0]; ym = tgp.render_many([j], 'model')[0][0]
+    j = dict(x=np.stack([x, x]).astype(np.float32), norm=po_ref.LIM_ONLY, params={'Limiter Input Gain': 0})
+    y = po_ref.render_many([j], 'ref', cache=True)[0][0]; ym = po_ref.render_many([j], 'model')[0][0]
     ref = P.read(xin, y, at); ours = P.read(xin, ym, at)
     sc = 1.00014     # limLevelScale
     k24 = np.array([max(1.0, seg_max(table_levels(xin[a - 40:a + 340], kaiser_sinc(24, 12, 16)) * sc, 40)) for a in at])

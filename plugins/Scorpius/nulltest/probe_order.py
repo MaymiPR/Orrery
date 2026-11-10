@@ -3,7 +3,7 @@ the other (each alone), and B then A. The order that nulls is the chain's; a par
 against a tap after each module. Pink noise with drum-like bursts, loud enough to drive every module.
     python probe_order.py"""
 import numpy as np
-import ori as o
+import sc_ref as o
 
 
 def drums(secs=4.0, seed=5):

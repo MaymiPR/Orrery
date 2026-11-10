@@ -5,7 +5,7 @@
 """
 import argparse
 import numpy as np
-import ts as h
+import wr_ref as h
 
 FS = 48000
 AT = 47 * 512        # a block boundary
