@@ -1,6 +1,6 @@
 # Wraith
 
-Part of [Orrery Suite](../../README.md). A recreation of Cradle's The Spirit (v1.0.3), the vocal chain made with
+Part of [Orrery](../../README.md). A recreation of Cradle's The Spirit (v1.0.3), the vocal chain made with
 producer Louis Bell: its controls, look and sound, null-tested against the original. Named for the spirit's other,
 quieter kind.
 
@@ -59,9 +59,15 @@ Every case: [NULLTESTS.md](NULLTESTS.md).
 
 - `tests/WraithTests.cpp`: unit tests of the processor, the parameters and their tapers, the presets and the state
   (`ctest` after a build).
+- `WraithHostTest` (the suite's `tools/HostTest.cpp`, under `ctest`): the built VST3 hosted as a DAW hosts it, with
+  the saved state of each release that changed a parameter in `tests/data/`.
 - `nulltest/`: the null tests against an installed copy of the original (Windows, Python 3.12 or newer with the root
   `requirements.txt`; not in CI). `nulltest.py` runs every case and writes NULLTESTS.md, `first_null.py` checks the
   hosts and our VST3 against our renderer, `wr_ref.py` is the render harness. The `probe_*.py` and `fit_*.py` scripts are
-  the measurements and fits that MEASUREMENTS.md cites; `render_plate.py` and `pack_reverb.py` make the reverb
-  responses in `ir/`. Reference renders, captures and measurement data stay local (git-ignored).
-- `tools/`: WrRender (our processor offline, every DSP constant open to change) and the editor snapshot.
+  the measurements and fits that MEASUREMENTS.md cites; `render_plate.py` records the plate. Reference renders and
+  captures stay local (git-ignored); the measurement data is published in
+  [`measurements/Wraith/`](../../measurements/Wraith/).
+- `scripts/`: `make_focus_eq.py` (writes `Source/dsp/FocusEq.h`) and `pack_reverb.py` (writes the reverb responses
+  in `resources/ir/`).
+- `tools/`: WrRender (our processor offline, every DSP constant open to change) and Wraith's own editor snapshot (it
+  also drives clicks and drags for the behaviour checks).

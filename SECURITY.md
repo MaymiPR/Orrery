@@ -1,6 +1,6 @@
 # Security
 
-The Orrery Suite plug-ins read their own preset files (`.positron`, `.scorpius`, `.wraith`) and the state a host saves with a
+The Orrery plug-ins read their own preset files (`.positron`, `.scorpius`, `.wraith`) and the state a host saves with a
 project, so a crafted file that crashes them or does worse is a security bug.
 
 Please report one privately with GitHub's **Report a vulnerability** button (Security tab > Advisories), not in a

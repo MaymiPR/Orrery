@@ -401,7 +401,7 @@ How each part of Scorpius was made:
 - Fitted or learned from the original's output: the EQ, sub, expander, compression's gain law, the rate converters
   and the linear filters as identified laws and constants; the drive (per colour), harmonics, lift and grit as small
   networks, and compression's gain correction, trained on captures of its output, with our own weights.
-- Redrawn: the editor, laid out from measured positions and sizes and drawn in Orrery Suite's own look (its knobs,
+- Redrawn: the editor, laid out from measured positions and sizes and drawn in Orrery's own look (its knobs,
   fader caps, meters, boxes and plate); the visualiser's stripe and glass in both particle styles drawn in code from
   measured tokens with our own shading.
 - Shipped on recorded approval: the original's factory preset values, under our own names.
