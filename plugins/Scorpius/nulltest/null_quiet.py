@@ -3,7 +3,7 @@
 material" of NULLTESTS.md.
     python null_quiet.py [model|ours]"""
 import sys
-import ori as o
+import sc_ref as o
 import null_modules as N
 
 if __name__ == '__main__':

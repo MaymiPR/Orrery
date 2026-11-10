@@ -1,17 +1,17 @@
-"""The mid band's nonlinear stage, as the reference applies it (probe_cross2.py mid / midlo, taken while ours had the plain
+"""The mid band's nonlinear stage, as the reference applies it (probe_band_path.py mid / midlo, taken while ours had the plain
 Linkwitz-Riley edge of ident.nl_firs): the complex ratio of the reference's path to ours, saved for ident.nl_firs.
-With --null: the character-only nulls through charmodel.py (the plug-in's laws) with the plain edge, the measured
+With --null: the character-only nulls through charmodel_lib.py (the plug-in's laws) with the plain edge, the measured
 upper side (ident.nl_firs) and both sides (the low side from xprobe_midlo.npz too, smoothed over five probes).
 
     python probe_mid_edge.py --save             measurements/Positron/character/mid_ratio.npz from xprobe_mid_plain.npz
-(probe_cross2.py mid's output while the plug-in had the plain edge, renamed: with the measured path in the plug-in a new
-probe_cross2.py run reads a ratio of 1)
+(probe_band_path.py mid's output while the plug-in had the plain edge, renamed: with the measured path in the plug-in a new
+probe_band_path.py run reads a ratio of 1)
     python probe_mid_edge.py --null"""
 import os, sys
 import numpy as np
-import tgp, ident as I
+import po_ref, ident_lib as I
 
-D = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character')
+D = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character')
 
 
 def probe_ratio(name):
@@ -26,11 +26,11 @@ if __name__ == '__main__':
         np.savez(I.MID_RATIO, fh=fh, rh=rh / rh[0])
         print('saved', I.MID_RATIO)
     if '--null' in sys.argv:
-        import nulltest as N, charmodel as CM
-        from measure_high_trace3 import header_laws
+        import nulltest as N, charmodel_lib as CM
+        from measure_high_gain_noise import header_laws
         plain = I.nl_firs(ratio=False)[1]
         upper = I.nl_firs()[1]
-        nf = 1 << 16; f = np.fft.rfftfreq(nf, 1 / tgp.FS)
+        nf = 1 << 16; f = np.fft.rfftfreq(nf, 1 / po_ref.FS)
         fl, rl = probe_ratio('xprobe_midlo.npz'); rl = rl / rl[-1]
         sm = lambda v: np.convolve(np.pad(v, 2, mode='edge'), np.ones(5) / 5, 'valid')
         lm, lph = sm(20 * np.log10(np.abs(rl))), sm(np.unwrap(np.angle(rl)))
@@ -45,7 +45,7 @@ if __name__ == '__main__':
         print(f'{"":45s} {"plain":>8s} {"upper":>8s} {"both":>8s}')
         for name, s, nm, pm in cases:
             amt = nm.get('Character', 0.5)
-            x = st(pad(sigs[s])); ref = tgp.render_many([dict(x=pad(sigs[s]), norm=nm, params=pm, raw=True)], 'ref', cache=True)[0]
+            x = st(pad(sigs[s])); ref = po_ref.render_many([dict(x=pad(sigs[s]), norm=nm, params=pm, raw=True)], 'ref', cache=True)[0]
             laws = header_laws(int(round(amt * 16)))
             row = []
             for h in (plain, upper, both):

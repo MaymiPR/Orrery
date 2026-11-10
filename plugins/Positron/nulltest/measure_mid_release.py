@@ -1,6 +1,6 @@
 """The mid band's gain n(t) after level steps of a steady tone, reference against ours: does the release (and the
 attack) keep one speed at every depth, or does it change with the level or the reduction? The low and high bands'
-outputs (charmodel.py with the plug-in's table) are taken off the output, the rest is inverted through the mid shaper
+outputs (charmodel_lib.py with the plug-in's table) are taken off the output, the rest is inverted through the mid shaper
 (measure_high_trace2.invert) and read as the band gain in dB, one median per cycle.
 
     python measure_mid_release.py [amount 0..1] [freq] [--band high]     default 0.5 (100 %), 700 Hz, the mid band
@@ -8,11 +8,11 @@ Prints the reduction (dB) at fixed times after each step, ref and ours, and the 
 of the change."""
 import sys
 import numpy as np
-import tgp, nulltest as N, ident as I, charmodel as CM
-from measure_high_trace2 import invert
-from measure_high_trace3 import header_laws
+import po_ref, nulltest as N, ident_lib as I, charmodel_lib as CM
+from measure_high_gain_program import invert
+from measure_high_gain_noise import header_laws
 
-FS = tgp.FS
+FS = po_ref.FS
 BAND = 1
 FREQ = 700.0
 EXTRA = {}            # law overrides for our side (experiments), {'high': {'fallRate': 46}}
@@ -33,8 +33,8 @@ def step_signal(a, b, f):
 def gains(xs, amt, ref):
     row = int(round(amt * 16)); laws = header_laws(row)
     for b, e in EXTRA.items(): laws[b] = dict(laws[b], **e)
-    jobs = [dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': amt}, raw=True) for x in xs]
-    rs = tgp.render_many(jobs, 'ref', cache=True) if ref else None
+    jobs = [dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': amt}, raw=True) for x in xs]
+    rs = po_ref.render_many(jobs, 'ref', cache=True) if ref else None
     out = []
     for i, x in enumerate(xs):
         xb, sb = CM.prep(x)

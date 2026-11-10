@@ -7,15 +7,15 @@ band signals x_b (BandFilters.h), so a least-squares fit per channel gives both 
 with it before). Writes measurements/Positron/character/width.json: {band: [side - mid dB at 0, 12.5, ..., 200 %]}."""
 import json, os
 import numpy as np
-import tgp, ident as I
+import po_ref, ident_lib as I
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', 'width.json')
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character', 'width.json')
 
 if __name__ == '__main__':
     rng = np.random.default_rng(5)
-    n, pre = 4 * tgp.FS, 2 * tgp.FS
+    n, pre = 4 * po_ref.FS, 2 * po_ref.FS
     x = np.concatenate([np.zeros(pre), rng.standard_normal(n) * 10 ** (-50 / 20)]).astype(np.float32)
-    ys = tgp.render_many([dict(x=np.stack([x, 0 * x]), norm={**tgp.CHAR_ONLY, 'Character': k / 16}, raw=True) for k in range(17)], cache=True)
+    ys = po_ref.render_many([dict(x=np.stack([x, 0 * x]), norm={**po_ref.CHAR_ONLY, 'Character': k / 16}, raw=True) for k in range(17)], cache=True)
     A = I.bands(x[pre:])[:, 0].T
     res = {b: [] for b in ('low', 'mid', 'high')}
     for k, y in enumerate(ys):

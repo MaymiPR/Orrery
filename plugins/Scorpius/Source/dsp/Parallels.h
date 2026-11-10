@@ -8,12 +8,12 @@
 // The parallels (MEASUREMENTS.md 1, 11): four paths fed from the end of the chain, each adding its own contribution
 // to it, scaled by its fader's taper w = (e^(2.188 L) - 1) / (e^2.188 - 1) (MEASUREMENTS.md 5).
 //   - sub: the lows doubled, through a 6th-order Butterworth low-pass at 140 Hz and high-pass at 15 Hz
-//     (nulltest/fit_sub3.py);
+//     (nulltest/fit_sub_parallel.py);
 //   - loud: upward compression, the gain read from a table against a fast detector on the mid signal; its
 //     contribution is (gain - 1) x (nulltest/fit_loud.py).
 //   - low: a subharmonic synthesizer, an octave below the bass: a square wave that flips at each falling zero
 //     crossing of the low-passed input (half its frequency), times that input's peak envelope, through a 4th-order
-//     low-pass at 46 Hz, then v + a v^2 (its DC kept) and a soft limit (nulltest/fit_low2.py).
+//     low-pass at 46 Hz, then v + a v^2 (its DC kept) and a soft limit (nulltest/fit_low_parallel.py).
 //   - grit: a learned model (LearnedModules.h).
 namespace sc::dsp
 {

@@ -3,14 +3,14 @@ side-chain bursts. Gain on the main tone with the side-chain quiet vs loud, INT 
 signal still drives the dynamics in EXT. Writes measurements/Positron/sidechain/sidechain.json."""
 import json, os, sys
 import numpy as np
-import tgp
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'scripts'))   # scripts/tgpstate.py
-import tgpstate
+import po_ref
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'scripts', 'nulltest'))   # scripts/nulltest/ref_state_lib.py
+import ref_state_lib
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'sidechain'); os.makedirs(OUT, exist_ok=True)
-FS = tgp.FS
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'sidechain'); os.makedirs(OUT, exist_ok=True)
+FS = po_ref.FS
 PRE = 2 * FS
-REF = os.path.join(tgp.ROOT, 'reference')
+REF = os.path.join(po_ref.ROOT, 'reference')
 
 
 def lockin(y, f, a, b):
@@ -21,12 +21,12 @@ def lockin(y, f, a, b):
 if __name__ == '__main__':
     s = open(os.path.join(REF, 'state_default.bin'), 'rb').read()
     ext = os.path.join(REF, 'state_sidechain_ext.bin')
-    open(ext, 'wb').write(tgpstate.edit(s, b'sidechain = 0', b'sidechain = 1'))
+    open(ext, 'wb').write(ref_state_lib.edit(s, b'sidechain = 0', b'sidechain = 1'))
     intl = os.path.join(REF, 'state_default.bin')
     n = PRE + 6 * FS
     sil = np.zeros(n)
-    burst = lambda f: np.concatenate([np.zeros(PRE + 2 * FS), tgp.tone(f, 2, -3), np.zeros(2 * FS)])
-    main = lambda db: np.concatenate([np.zeros(PRE), tgp.tone(1000, 6, db)])
+    burst = lambda f: np.concatenate([np.zeros(PRE + 2 * FS), po_ref.tone(f, 2, -3), np.zeros(2 * FS)])
+    main = lambda db: np.concatenate([np.zeros(PRE), po_ref.tone(1000, 6, db)])
     cases = {
         'EXT, main -40, sc 1.1 kHz -3': (ext, main(-40), burst(1100)),
         'INT, main -40, sc 1.1 kHz -3': (intl, main(-40), burst(1100)),
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         'EXT, main -40, sc silent': (ext, main(-40), sil),
     }
     jobs = [dict(x=x, sc=sc, state=st, raw=True) for st, x, sc in cases.values()]
-    ys = tgp.render_many(jobs, cache=True)
+    ys = po_ref.render_many(jobs, cache=True)
     res = {}
     for (k, (st, x, sc)), y in zip(cases.items(), ys):
         lvl = -40 if 'main -40' in k else -20

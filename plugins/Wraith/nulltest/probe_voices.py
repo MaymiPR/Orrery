@@ -8,7 +8,7 @@ import sys
 import numpy as np
 from scipy.signal import resample_poly
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 FS = 48000
 CENTER, DEPTH, RATE = 7.58, 1.505, 0.5

@@ -6,13 +6,13 @@ H = G^T B gives the three band responses B directly. Compared with ours (the sam
     python measure_band_rates.py --write 44100 88200 96000 192000    Source/dsp/BandFiltersRates.h from the saved ones"""
 import os, sys
 import numpy as np
-import tgp, ident as I
+import po_ref, ident_lib as I
 
 def bands_at(fs, plugin):
     pre = 2 * fs
     L = int(1024 * fs / 48000) + 256
     x = np.zeros(pre + 4 * L, np.float32); x[pre] = 10 ** (-60 / 20)
-    ys = tgp.render_many([dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': k / 8}, raw=True) for k in range(9)], plugin, fs=fs, cache=(plugin == 'ref'))
+    ys = po_ref.render_many([dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': k / 8}, raw=True) for k in range(9)], plugin, fs=fs, cache=(plugin == 'ref'))
     H = np.array([y[0, pre:pre + L] / 1e-3 for y in ys])
     G = 10 ** (np.array(I.GAINS) / 20)                 # (3, 9)
     B, *_ = np.linalg.lstsq(G.T, H, rcond=None)
@@ -26,7 +26,7 @@ def write(rates):
              'struct BandFilterSet { double rate; int taps, nlTaps; const double* ir[3]; const double* nl[3]; };']
     sets = []
     for fs in rates:
-        B = np.load(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', f'bands_{fs}.npy'))
+        B = np.load(os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character', f'bands_{fs}.npy'))
         n = int(np.max(np.where(np.abs(B) > 1e-10)[1])) + 1
         nl = I.nl_firs(int(1024 * fs / 48000), fs, B[:, :n])
         for b in range(3):
@@ -37,7 +37,7 @@ def write(rates):
                 lines.append('};')
         sets.append(f'    {{ {fs}.0, {n}, {len(nl[0])}, {{ bandIr{fs}_0, bandIr{fs}_1, bandIr{fs}_2 }}, {{ bandNl{fs}_0, bandNl{fs}_1, bandNl{fs}_2 }} }},')
     lines += [f'inline constexpr BandFilterSet bandFilterSets[{len(sets)}] {{'] + sets + ['};', '}', '']
-    open(os.path.join(tgp.PLUGIN, 'Source', 'dsp', 'BandFiltersRates.h'), 'w').write('\n'.join(lines))
+    open(os.path.join(po_ref.PLUGIN, 'Source', 'dsp', 'BandFiltersRates.h'), 'w').write('\n'.join(lines))
 
 
 if __name__ == '__main__':
@@ -45,7 +45,7 @@ if __name__ == '__main__':
         write([int(a) for a in sys.argv[2:]]); raise SystemExit
     for fs in [int(a) for a in sys.argv[1:]]:
         Br, er = bands_at(fs, 'ref'); Bo, eo = bands_at(fs, 'model')
-        np.save(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', f'bands_{fs}.npy'), Br)
+        np.save(os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character', f'bands_{fs}.npy'), Br)
         print(f'{fs} Hz: rank-3 fit error ref {er:.2e}, ours {eo:.2e}; sum peak at {np.argmax(np.abs(Br.sum(0)))}')
         for b in range(3):
             d = Br[b] - Bo[b]

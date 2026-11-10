@@ -11,7 +11,7 @@ Writes <film>.readouts.json (per frame: time and the eight values (in, out) x (L
 where unknown) and, if there are unknowns, <film>.unknown.png and <film>.unknown.json."""
 import json, os, sys
 import numpy as np
-from filmtools import Film
+from film_lib import Film
 
 # the readout boxes: 40 px wide centred on each LED column, 16 px tall from y 44.5 (peak) and 67.5 (RMS)
 CENTRES = {'in': (28.75, 65.25), 'out': (796 + 28.75, 796 + 65.25)}

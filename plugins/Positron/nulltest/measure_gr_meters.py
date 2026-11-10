@@ -5,7 +5,7 @@ of the target (green channel at the middle of its upper half). Input target: fil
     python measure_gr_meters.py film.raw -> measurements/Positron/meters/grtarget_<name>.npz"""
 import os, sys
 import numpy as np
-from filmtools import Film
+from film_lib import Film
 
 METER_Y = (86, 151, 216)
 TARGET_X = (681, 621, 653)

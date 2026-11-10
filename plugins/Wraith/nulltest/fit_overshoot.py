@@ -12,7 +12,7 @@ is reported beside it.
 import argparse, json, os
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 import fit_char as fc
 
 FS = 48000

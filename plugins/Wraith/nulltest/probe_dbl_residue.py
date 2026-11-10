@@ -11,7 +11,7 @@ Four tests on the reference, beside our processor:
 import sys
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 FS = 48000
 P = {'Doubler Mix': 1.0, 'Doubler Stereo': 1.0}

@@ -7,7 +7,7 @@ Prints the difference in dB below the output in windows after the switch, for th
     python probe_switch_on.py [module drive|harm|comp|lift] [block] [drive colour a|b|c]"""
 import json, os, sys
 import numpy as np
-import ori as o
+import sc_ref as o
 from probe_autom import PRE, T1, T2, cases
 from probe_order import drums
 

@@ -8,7 +8,7 @@ which of them sets the chain's null.
 """
 import os, sys
 import numpy as np
-import nulltest as nt, nulltest_lib as nl, ts as h
+import nulltest as nt, nulltest_lib as nl, wr_ref as h
 
 FS = 48000
 

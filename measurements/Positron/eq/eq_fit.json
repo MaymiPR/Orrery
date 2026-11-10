@@ -1,0 +1,38 @@
+{
+ "low/rbj": {
+  "f0": 180.0,
+  "q": 0.7,
+  "max_mag_err_dB": 0.0,
+  "rms": 0.0
+ },
+ "low/svf": {
+  "f0": 180.0,
+  "q": 0.7,
+  "max_mag_err_dB": 0.0,
+  "rms": 0.0
+ },
+ "mid/rbj": {
+  "f0": 637.0,
+  "q": 0.5,
+  "max_mag_err_dB": 0.0,
+  "rms": 0.0
+ },
+ "mid/svf": {
+  "f0": 637.0,
+  "q": 0.5,
+  "max_mag_err_dB": 0.0,
+  "rms": 0.0
+ },
+ "high/rbj": {
+  "f0": 9999.534,
+  "q": 0.7,
+  "max_mag_err_dB": 0.0,
+  "rms": 0.0
+ },
+ "high/svf": {
+  "f0": 9999.534,
+  "q": 0.7,
+  "max_mag_err_dB": 0.0,
+  "rms": 0.0
+ }
+}

@@ -3,7 +3,7 @@
 the settings page (measure_oversampling.set_factor) and restores 1x."""
 import json, os
 import numpy as np
-import tgp
+import po_ref
 from measure_oversampling import set_factor
 
 RATES = (44100, 88200, 96000)
@@ -13,7 +13,7 @@ N = 32768
 def jobs(fs, k):
     pre = 2 * fs
     imp = np.zeros(pre + N, np.float32); imp[pre] = 1e-3
-    return [dict(x=imp, norm=tgp.NONE, raw=True, salt=f'os{k}')]
+    return [dict(x=imp, norm=po_ref.NONE, raw=True, salt=f'os{k}')]
 
 
 if __name__ == '__main__':
@@ -22,10 +22,10 @@ if __name__ == '__main__':
         for k in (1, 2, 4, 8):
             set_factor(k)
             for fs in RATES:
-                lat[f'{fs} {k}x'] = tgp.latency(fs=fs)
-                tgp.render_many(jobs(fs, k), fs=fs, cache=True)
+                lat[f'{fs} {k}x'] = po_ref.latency(fs=fs)
+                po_ref.render_many(jobs(fs, k), fs=fs, cache=True)
                 print(fs, k, lat[f'{fs} {k}x'], flush=True)
     finally:
         set_factor(1)
-    print('restored 1x; latency', tgp.latency())
-    json.dump(lat, open(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'oversampling', 'latency_rates.json'), 'w'), indent=1)
+    print('restored 1x; latency', po_ref.latency())
+    json.dump(lat, open(os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'oversampling', 'latency_rates.json'), 'w'), indent=1)

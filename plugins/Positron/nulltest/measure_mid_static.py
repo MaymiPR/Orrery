@@ -6,9 +6,9 @@ drive, which separates them.
     python measure_mid_static.py [amount 0..1] [freq]"""
 import sys
 import numpy as np
-import tgp
+import po_ref
 
-FS = tgp.FS; PRE = 2 * FS; STEP = int(1.5 * FS)
+FS = po_ref.FS; PRE = 2 * FS; STEP = int(1.5 * FS)
 LEVELS = np.arange(-44, 5, 2.0)
 
 
@@ -23,8 +23,8 @@ if __name__ == '__main__':
     n = PRE + STEP * len(LEVELS); t = np.arange(n) / FS
     a = np.zeros(n); a[PRE:] = np.repeat(10 ** (LEVELS / 20), STEP)
     x = (a * np.sin(2 * np.pi * f0 * t)).astype(np.float32)
-    j = dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': amt}, raw=True)
-    r = tgp.render_many([j], 'ref', cache=True)[0][0]; o = tgp.render_many([j], 'model')[0][0]
+    j = dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': amt}, raw=True)
+    r = po_ref.render_many([j], 'ref', cache=True)[0][0]; o = po_ref.render_many([j], 'model')[0][0]
     print(f'{amt * 200:.0f} %, {f0:.0f} Hz:  level   H1 ref (dB re in)   ours-ref (dB)   H3/H1 ref (dB)  ours-ref (dB)')
     for i, L in enumerate(LEVELS):
         s0, s1 = PRE + i * STEP + STEP // 2, PRE + (i + 1) * STEP

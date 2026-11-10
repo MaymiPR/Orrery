@@ -10,7 +10,7 @@ filters' magnitude ratio |H_ref / H_ours| (times one constant, g k's ratio). Als
 import argparse, json
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 FS = 48000
 FREQS = [30, 50, 70, 100, 150, 200, 300, 400, 500, 700, 1000, 1500, 2000, 3000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000]

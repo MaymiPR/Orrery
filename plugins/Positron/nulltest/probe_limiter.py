@@ -3,9 +3,9 @@ gain measurable at every sample (DC passes the core path's all-pass unchanged), 
 (single ones, and pairs at set spacings) show how the gain ramps toward and away from peaks. The gain is the output
 over the input as it reaches the limiter (the core path is exactly a fixed delay plus all-pass, MEASUREMENTS.md 1)."""
 import numpy as np
-import tgp
+import po_ref
 
-FS = tgp.FS
+FS = po_ref.FS
 PRE = 2 * FS
 PILOT = 0.01
 WIDTH = 9
@@ -45,12 +45,12 @@ def env(plugin='ref', tune=None):
     """detector level (1 / gain) at every sample, and the limiter's input level, both aligned with the output"""
     x = signal()
     params = {'Limiter Input Gain': 0}
-    j = [dict(x=x, norm=tgp.LIM_ONLY, params=params), dict(x=x / 1000, norm=tgp.LIM_ONLY, params=params)]
+    j = [dict(x=x, norm=po_ref.LIM_ONLY, params=params), dict(x=x / 1000, norm=po_ref.LIM_ONLY, params=params)]
     if plugin == 'model':
         j = [dict(jj, tune=tune or {}) for jj in j]
-        y, q = tgp.render_many(j, 'model')
+        y, q = po_ref.render_many(j, 'model')
     else:
-        y, q = tgp.render_many(j, cache=True)
+        y, q = po_ref.render_many(j, cache=True)
     q = q[0] * 1000 / TRIM
     e = q / y[0] * TRIM
     return e, np.maximum(1.0, np.abs(q))
@@ -76,10 +76,10 @@ def train_signal():
 def train_env(plugin='ref', tune=None):
     x, spans = train_signal()
     params = {'Limiter Input Gain': 0}
-    j = [dict(x=x, norm=tgp.LIM_ONLY, params=params), dict(x=x / 1000, norm=tgp.LIM_ONLY, params=params)]
+    j = [dict(x=x, norm=po_ref.LIM_ONLY, params=params), dict(x=x / 1000, norm=po_ref.LIM_ONLY, params=params)]
     if plugin == 'model':
-        y, q = tgp.render_many([dict(jj, tune=tune or {}) for jj in j], 'model')
+        y, q = po_ref.render_many([dict(jj, tune=tune or {}) for jj in j], 'model')
     else:
-        y, q = tgp.render_many(j, cache=True)
+        y, q = po_ref.render_many(j, cache=True)
     q = q[0] * 1000 / TRIM
     return q / y[0] * TRIM, spans

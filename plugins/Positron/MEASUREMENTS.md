@@ -11,8 +11,8 @@ results are in [NULLTESTS.md](NULLTESTS.md), cited here by case name; the contro
 | Reference | Cradle The God Particle 1.2.4, VST3, Windows |
 | Offline host | `tools/RefRender.cpp`: a JUCE VST3 host; renders float32 files at a fixed rate and block size, sets parameters by displayed or normalised value, automates one at a block boundary, loads a saved state, feeds a stereo side-chain (the bus is kept active for jobs with side-chain audio); a fresh instance per job; `raw=1` skips latency compensation |
 | Editor host | `tools/RefCapture.cpp`: opens the editor and plays audio in real time; films it (a frame about every 27 ms) or clicks and drags in it; used for the meters and to switch the global oversampling setting |
-| Harness | `nulltest/tgp.py`: `render_many(jobs)`, stage presets (`EQ_ONLY`, `CHAR_ONLY`, `LIM_ONLY`, `NONE`), test signals, an on-disk render cache |
-| Scripts | one per topic (`nulltest/measure_*.py`, `fit_*.py`, `plot_char.py` and the probes each section names), writing JSON and plots to `measurements/<topic>/` |
+| Harness | `nulltest/po_ref.py`: `render_many(jobs)`, stage presets (`EQ_ONLY`, `CHAR_ONLY`, `LIM_ONLY`, `NONE`), test signals, an on-disk render cache |
+| Scripts | one per topic (`nulltest/measure_*.py`, `fit_*.py`, `read_char_plots.py` and the probes each section names), writing JSON and plots to `measurements/<topic>/` |
 | Rate, block | 48 kHz, block 512 (64 for the smoothing probes) |
 | Oversampling | 1x, the original's default, unless a section says otherwise |
 | Pre-roll | 2 s: after loading, the original's internal delay ramps from 54 to 152 samples over about 0.25 s |
@@ -174,7 +174,7 @@ shaper (3.9). What shows it:
 `fit_character.py` fits mix, the shaper, threshold, ratio, knee, attack and release per band and amount node to
 tone staircases and bursts; `charsim.dll` (built from BandDynamics.h) is the gain computer the fits call.
 
-### 3.9 The shaper is a sine; the band laws (`nulltest/ident.py`, `fit_bandlaw.py`, `fit_music.py`)
+### 3.9 The shaper is a sine; the band laws (`nulltest/ident_lib.py`, `fit_bandlaw.py`, `fit_music.py`)
 
 The crossover is known exactly, so the three band signals the original processes can be computed for any input, and
 a band's own output is the original's output less the other two bands.
@@ -186,7 +186,7 @@ a band's own output is the original's output less the other two bands.
 
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|
-| Memory | none: the harmonics' phases are within 0.1° of the sine's at 300 and 700 Hz | `ident.py` | exact |
+| Memory | none: the harmonics' phases are within 0.1° of the sine's at 300 and 700 Hz | `ident_lib.py` | exact |
 | Rate | the processing rate, no oversampling: a 7 kHz tone aliases the same way in both plug-ins (its 5th harmonic at 13 kHz, -81 dB) | tone | exact |
 | Mid drive k at 100 % | 2.46 at every level, read on a mid-band tone with L and R in anti-phase (not compressed, so the shaper alone); past k · u = π/2 the output folds over | anti-phase tone | measured |
 | Dry share d | 1 - amount / 100 % in the low and mid bands (low 0.73 / 0.47 / 0.23 / 0, mid 0.76 / 0.50 / 0.22 / 0 at 25 / 50 / 75 / 100 %); the drive rises only slowly below 100 % and faster above | `fit_bandlaw.py --shapedry` | at 50 % the low band's H5 is -41 dBc at +4 dBFS where a sine of the fitted drive gives -49; against H3 squared it is 0.62 to 0.73 where a pure sine gives 0.3 |
@@ -210,7 +210,7 @@ per step (`compare_prediction.py`), so the detectors hear the same FIR band sign
 
 **Band laws from program material** (`fit_music.py`): each band and node fitted against the original on music,
 drums, a bass-heavy mix, pink noise and the probes at once, through a Python model of the whole section
-(`charmodel.py`, identical to the plug-in to -120 dB). Every start converges to the same law, and the laws come out
+(`charmodel_lib.py`, identical to the plug-in to -120 dB). Every start converges to the same law, and the laws come out
 the same at every amount:
 
 | Band | Threshold | Knee | Ratio | Attack / release | What moves with the amount |
@@ -304,7 +304,7 @@ A sine, two tones and band noise at the same RMS through each band:
   and 6 to 16 kHz 0.11 to 0.18 dB quieter: the original's detector has a steeper low edge than its shaper, about
   0.6 dB at 4 kHz. Not modelled (Declined changes).
 
-### 3.14 The shapers read directly (`nulltest/probe_shape_side.py`, `compare_h3.py`, `probe_shape_mid.py`)
+### 3.14 The shapers read directly (`nulltest/probe_shape_side.py`, `compare_third_harmonic.py`, `probe_shape_mid.py`)
 
 A tone with L and R in anti-phase is not compressed (3.10), so a band's side output is its shaper alone: plotted
 sample by sample against the band signal, it is the shaper's curve. Tones sit where the plug-in reads back its own
@@ -316,7 +316,7 @@ settings exactly: 9 kHz (high band), 800 Hz (mid), 25 Hz (low).
 | High band k | rises linearly with the amount: 1.40 at 12.5 %, 1.865 at 100 %, then more slowly to 2.34 at 200 % | `probe_shape_side.py` | measured |
 | High band d | falls smoothly from 0.89 at 12.5 % to -0.037 at 100 % and stays near -0.04 above | `probe_shape_side.py` | measured |
 | Mid and low bands | below 100 % the program-fitted laws match (k within 1 to 2 %, d within 0.01); above 100 % the mid k reads 3 to 4 % lower than the fitted one, with d = -0.01; the fitted values are kept (Declined changes) | `probe_shape_side.py` | measured |
-| Mid and side shaping (γ) | the shaper's distortion, (1 - d) · (sin(k · u) / k - u), reaches the output's mid 1 + γ times as strong as its side; γ grows by 0.0019 per 12.5 % step to 0.0153 at 100 %, peaks at 0.0177 at 137.5 % and is 0.0142 at 200 % | `compare_h3.py`, `probe_shape_mid.py`; BandParam `shapeMid` | in the mid band the in/anti ratio matches to 0.1 to 0.4 % |
+| Mid and side shaping (γ) | the shaper's distortion, (1 - d) · (sin(k · u) / k - u), reaches the output's mid 1 + γ times as strong as its side; γ grows by 0.0019 per 12.5 % step to 0.0153 at 100 %, peaks at 0.0177 at 137.5 % and is 0.0142 at 200 % | `compare_third_harmonic.py`, `probe_shape_mid.py`; BandParam `shapeMid` | in the mid band the in/anti ratio matches to 0.1 to 0.4 % |
 
 What shows γ: below the threshold a high-band tone in phase has a 3rd harmonic 1.53 % stronger than the same tone in
 anti-phase (100 %), at every level from -30 to -15 dBFS, with the same fundamental; a left-only tone splits the
@@ -337,16 +337,16 @@ fits better.
   frame); the difference is in how fast the detector moves, at 44.1 and 48 kHz alike and with the irregular host
   blocks FL Studio sends. The band holds most of the section's residual there (84 %, -34 dB relative to the band,
   before the refits of 3.15 and 3.17).
-- The gain trace on loud drums (`measure_high_trace2.py`) is the check for the start and depth of compression through each hit.
+- The gain trace on loud drums (`measure_high_gain_program.py`) is the check for the start and depth of compression through each hit.
 
-### 3.15 What the mid band's gain acts on above its band (`nulltest/probe_cross.py`, `probe_cross2.py`, `probe_mid_edge.py`)
+### 3.15 What the mid band's gain acts on above its band (`nulltest/probe_cross.py`, `probe_band_path.py`, `probe_mid_edge.py`)
 
 Quiet tones above 1.5 kHz under a loud masker below 1 kHz turn the original down by nothing between 4 and 8 kHz
 (`probe_cross.py`; a mid gain applied to the whole steep-edged band of 3.11 turns them down 0.05 to 0.15 dB), and on pink
 noise at -18 dBFS the original's high-band gain sits a steady 0.03 dB above such a model's while neither compresses
-(`measure_high_trace3.py`): the mid band's gain reaches less far up than its nonlinear stage's input.
+(`measure_high_gain_noise.py`): the mid band's gain reaches less far up than its nonlinear stage's input.
 
-Probe (`probe_cross2.py`): quiet tones (-50 dBFS, 60 frequencies from 0.9 to 18 kHz, too quiet to move any detector) under
+Probe (`probe_band_path.py`): quiet tones (-50 dBFS, 60 frequencies from 0.9 to 18 kHz, too quiet to move any detector) under
 a loud in-band masker (pink noise, 250 to 700 Hz, -6 dBFS RMS), and the masker alone. Each tone's complex change (with
 the masker, less alone, less the masker's own output) is the band's gain change times the response of the path the
 gain is applied through. Normalised at 900 Hz; the plug-in reads its own path to within 0.05 dB this way.
@@ -429,7 +429,7 @@ NULLTESTS.md: "defaults, sweep -6", "defaults, drums -1", the mastered track. Th
 
 ### 3.18 The mid band on loud material (`nulltest/probe_mid_det_spectrum.py`, `probe_mid_det.py`, `fit_music.py`)
 
-The mid band reduces loud pink noise a steady 0.04 dB more than the original (`measure_high_trace3.py --band mid`; pink noise at
+The mid band reduces loud pink noise a steady 0.04 dB more than the original (`measure_high_gain_noise.py --band mid`; pink noise at
 -6 dBFS, "char: pink -6, 100 %"), and its fitted drive sits 2 % above the measured one (3.15).
 
 **What the detector hears** (`probe_mid_det_spectrum.py --map`: a 700 Hz probe at -40 dBFS rides on a steady sine pump; the
@@ -524,7 +524,7 @@ near-ties), so they were chosen by the mean.
 | 96 kHz | 12, 14.5 | -56.7 |
 | 192 kHz | 10, 16 | -55.4 |
 
-**The level estimate against the original's readings** (`nulltest/probe_lim_pulse.py`, `probe_lim_interp.py`, `limpy.py`, `probe_lim_nl.py`):
+**The level estimate against the original's readings** (`nulltest/probe_lim_pulse.py`, `probe_lim_interp.py`, `limiter_lib.py`, `probe_lim_nl.py`):
 an isolated pulse above the ceiling is planned to exactly its level, so at its loudest point output / input =
 trim / level. On 3873 isolated pulses (1084 of them raw bursts 2 to 6 samples long):
 
@@ -748,6 +748,14 @@ NULLTESTS.md, "Oversampling".
 |---|---|
 | External side-chain (EXT) | 60 s of music renders 43 % slower at 1x and 81 % slower at 4x than in INT (a second band split and oversampler); INT unchanged |
 
+## Scripts
+
+Each value above names the script that measured or fitted it. `measure_high_gain_probe.py` (a probe tone),
+`measure_high_gain_program.py` (program material) and `measure_high_gain_noise.py` (noise) read the high band's gain
+trace three ways; `measure_mid_release_speed.py` turns `measure_mid_release.py`'s traces into release speeds;
+`probe_band_path.py` reads the response a band's gain is applied to; `compare_third_harmonic.py` compares the cubic term
+in and out of phase. `scripts/make_character_table.py` writes `Source/dsp/CharacterTable.h`.
+
 ## Provenance
 
 How each part of Positron was made:
@@ -761,4 +769,11 @@ How each part of Positron was made:
 - Redrawn: the editor, drawn in code from measured positions, sizes and colours with our own shading: the knobs and
   their shadows, the glass of the visualiser (bands of measured geometry), the plate and its grille.
 - Shipped on recorded approval: nothing.
+- Published measurement data (approval recorded 2026-11-09): [`measurements/Positron/`](../../measurements/Positron/),
+  measured responses and fitted values of our own: the latency and core delay per rate (`core/`), the EQ responses and
+  fit (`eq/`), the limiter's measured curves and fit (`limiter/`), oversampling and side-chain responses, parameter
+  smoothing, the gain-reduction meters, the character section's crossover, static, small-signal and dynamic curves, band
+  laws, widths and shaper tables (`character/`, the inputs of `scripts/make_character_table.py`), and the null tests'
+  results (`nulltest/`, the data behind NULLTESTS.md). It holds no render of the original and no file the original or a
+  host wrote.
 - None of the original's code, artwork, preset files, fonts or other files ships with Positron.

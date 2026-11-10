@@ -30,7 +30,7 @@
 // A learned module as a small WaveNet (nulltest/train_wn.py): y = Post(u + WaveNet(u)), u = Pre(x). Pre a short FIR,
 // the WaveNet dilated causal convolutions (kernel 2) with gated activations, residual and skip connections, Post a
 // long FIR (Convolver.h). The weights are ours, trained on the reference's input and output (written into
-// LearnedModels.h by nulltest/export_models.py).
+// LearnedModels.h by scripts/export_models.py).
 // No layer feeds back on itself, so the network runs a block at a time, layer by layer, each loop over time (the
 // loops vectorise); each layer keeps its last `dilation` inputs for the next block. The two matrix products run in
 // tiles of 4 or 2 outputs by 8 samples held in registers (V4; with AVX, by 16 samples in 8-wide registers), each

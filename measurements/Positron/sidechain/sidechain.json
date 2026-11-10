@@ -1,0 +1,37 @@
+{
+ "EXT, main -40, sc 1.1 kHz -3": {
+  "gain_before_dB": 8.441,
+  "gain_during_sc_burst_dB": 8.441,
+  "gain_after_dB": 8.441
+ },
+ "INT, main -40, sc 1.1 kHz -3": {
+  "gain_before_dB": 8.441,
+  "gain_during_sc_burst_dB": 8.441,
+  "gain_after_dB": 8.441
+ },
+ "EXT, main -40, sc 8 kHz -3": {
+  "gain_before_dB": 8.441,
+  "gain_during_sc_burst_dB": 8.441,
+  "gain_after_dB": 8.441
+ },
+ "EXT, main -40, sc 60 Hz -3": {
+  "gain_before_dB": 8.441,
+  "gain_during_sc_burst_dB": 8.441,
+  "gain_after_dB": 8.441
+ },
+ "EXT, main -20, sc silent": {
+  "gain_before_dB": 8.382,
+  "gain_during_sc_burst_dB": 8.382,
+  "gain_after_dB": 8.382
+ },
+ "INT, main -20, sc silent": {
+  "gain_before_dB": 6.741,
+  "gain_during_sc_burst_dB": 6.741,
+  "gain_after_dB": 6.741
+ },
+ "EXT, main -40, sc silent": {
+  "gain_before_dB": 8.441,
+  "gain_during_sc_burst_dB": 8.441,
+  "gain_after_dB": 8.441
+ }
+}

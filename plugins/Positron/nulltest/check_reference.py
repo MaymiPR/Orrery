@@ -5,7 +5,7 @@ render that disagrees with two agreeing fresh ones is replaced.
     python check_reference.py [--stress] [--fix]"""
 import os, sys
 import numpy as np
-import tgp, nulltest as N
+import po_ref, nulltest as N
 
 
 def diff_db(a, b):
@@ -14,8 +14,8 @@ def diff_db(a, b):
 
 
 def check(jobs, names, fix=False):
-    cached = tgp.render_many(jobs, 'ref', cache=True)
-    f1 = tgp.render_many(jobs, 'ref'); f2 = tgp.render_many(jobs, 'ref')
+    cached = po_ref.render_many(jobs, 'ref', cache=True)
+    f1 = po_ref.render_many(jobs, 'ref'); f2 = po_ref.render_many(jobs, 'ref')
     bad = 0
     for nm, j, c, a, b in zip(names, jobs, cached, f1, f2):
         d12, d1c = diff_db(a, b), diff_db(a, c)
@@ -23,8 +23,8 @@ def check(jobs, names, fix=False):
         bad += bool(flag)
         print(f'{d12:8.1f} {d1c:8.1f}   {nm}{flag}')
         if flag and fix and d12 < -150:
-            k = tgp._key(j, 'ref', tgp.FS, 512)
-            np.save(os.path.join(tgp.CACHE, k + '.npy'), a); print('      cache replaced')
+            k = po_ref._key(j, 'ref', po_ref.FS, 512)
+            np.save(os.path.join(po_ref.CACHE, k + '.npy'), a); print('      cache replaced')
     return bad
 
 

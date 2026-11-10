@@ -8,7 +8,7 @@ at full wet, for several Stereo settings. Writes renders/doubler_metric.json for
 import json, os, sys
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 FS = 48000
 THIRDS = 1000 * 2.0 ** (np.arange(-15, 14) / 3.0)        # 31.5 Hz ... 20 kHz

@@ -16,6 +16,11 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 - **Suite name:** the suite is called Orrery, its repository's name: the installers are
   `Orrery-<version>-<OS>` files and the About menus and Wraith's plate say Orrery. The plug-ins keep their codes,
   bundle IDs, parameter IDs, company name and install folders, so saved projects, presets and installs are unchanged.
+- **Measurement data:** each plug-in's measured responses, fitted values and null-test results are published as JSON in
+  `measurements/<Id>/`.
+- **Null-test scripts:** the harnesses are `po_ref.py`, `sc_ref.py` and `wr_ref.py`, the helpers end in `_lib.py`, the
+  scripts that write a plug-in's sources sit in `plugins/<Id>/scripts/`, and Scorpius's NULLTESTS.md is written by
+  `nulltest.py --report` like the others.
 
 ## 1.2.1 (2026-11-04)
 

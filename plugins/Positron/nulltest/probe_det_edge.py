@@ -1,15 +1,17 @@
 """Does the high band's detector hear a steeper low edge than its shaper? (measure_static_n.py at 3 - 16 kHz: against 8 kHz,
 ours hears 4 kHz 0.44 dB, 4.5 kHz 0.26 dB louder than the reference, and 6 - 16 kHz 0.15 dB quieter.) The character
-section in Python (charmodel.py) with an extra highpass in front of the high band's detector only, normalised to 0 dB
+section in Python (charmodel_lib.py) with an extra highpass in front of the high band's detector only, normalised to 0 dB
 at 8 kHz, scored against the reference on program material, character only, 100 %.
 
     python probe_det_edge.py [fc,Q ...]          (Q 0: first order)"""
 import sys
 import numpy as np
 from scipy.signal import butter, sosfilt, resample_poly, iirfilter
-import tgp, nulltest as N, ident as I, charmodel as CM, charsim as C, make_table as MT, track as T
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'scripts'))   # make_character_table.py
+import po_ref, nulltest as N, ident_lib as I, charmodel_lib as CM, charsim_lib as C, make_character_table as MT, null_track as T
 
-FS = tgp.FS
+FS = po_ref.FS
 
 
 def hp(fc, q):
@@ -34,7 +36,7 @@ if __name__ == '__main__':
     pad = lambda x: np.concatenate([np.zeros((2, N.PRE), np.float32), (np.vstack([x, x]) if x.ndim == 1 else x).astype(np.float32)], -1)
     sigs = {'track 30': pad(xt[:, 30 * FS:36 * FS]), 'track 50': pad(xt[:, 50 * FS:56 * FS]), 'track 10': pad(xt[:, 10 * FS:16 * FS]),
             'drums -1': pad(N.sig_drums(-1)), 'pink -6': pad(N.sig_noise(-6)), 'music -10': pad(N.sig_music(-10))}
-    refs = tgp.render_many([dict(x=x, norm=tgp.CHAR_ONLY, raw=True) for x in sigs.values()], 'ref', cache=True)
+    refs = po_ref.render_many([dict(x=x, norm=po_ref.CHAR_ONLY, raw=True) for x in sigs.values()], 'ref', cache=True)
     pre = {k: CM.prep(x) for k, x in sigs.items()}
     fixed = {k: sum(CM.band(xb[b], sb[b], laws[CM.NAMES[b]], I.GAINS16[b][row], CM.WIDTH[CM.NAMES[b]][row]) for b in (0, 1)) for k, (xb, sb) in pre.items()}
     hl = laws['high']; p = {kk: v for kk, v in hl.items() if kk in C.NAMES}

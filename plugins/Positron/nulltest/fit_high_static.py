@@ -7,8 +7,8 @@ no slow second detector. Prints the fitted law and the curve's error, ref agains
 import sys
 import numpy as np
 from scipy.optimize import least_squares
-import tgp, ident as I, charmodel as CM, charsim as C, hirel as H
-from measure_high_trace3 import header_laws
+import po_ref, ident_lib as I, charmodel_lib as CM, charsim_lib as C, measure_high_release as H
+from measure_high_gain_noise import header_laws
 
 if __name__ == '__main__':
     amt = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5

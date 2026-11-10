@@ -11,7 +11,7 @@ Data to measurements/Wraith/char.
 import os, sys
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 OUT = os.path.join(h.ROOT, 'measurements', 'Wraith', 'char')
 FOCUS = [-50, -30, -10, 0, 8, 20, 35, 50]

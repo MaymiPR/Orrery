@@ -4,7 +4,7 @@ import os, itertools
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.signal import butter, sosfreqz
-import ori as o
+import sc_ref as o
 from fit_eqrbj import rbj, H
 from fit_eqbands import f, z
 

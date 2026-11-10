@@ -7,7 +7,7 @@
 // A learned module as a stacked LSTM (nulltest/train_gru.py, CELL=lstm): y = Post(skip u + W LSTM(u)), u = Pre(x).
 // Pre a short FIR, the LSTM PyTorch's equations (gates i, f, g, o), Post a long FIR (Convolver.h); skip 0 is the
 // network alone (SKIP=0), and with one-tap filters of 1 (PURE=1) y = W LSTM(x). The weights are ours, trained on the
-// reference's input and output (written into LearnedModels.h by nulltest/export_models.py).
+// reference's input and output (written into LearnedModels.h by scripts/export_models.py).
 namespace sc::dsp
 {
 struct LSTMWeights

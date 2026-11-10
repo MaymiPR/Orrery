@@ -5,9 +5,9 @@ import json, os
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.signal import freqz
-import tgp
+import po_ref
 
-FS = tgp.FS
+FS = po_ref.FS
 PRE = 2 * FS; N = 65536
 f = np.fft.rfftfreq(N, 1 / FS)
 sel = (f > 10) & (f < 23000)
@@ -15,11 +15,11 @@ sel = (f > 10) & (f < 23000)
 
 def measure(params):
     x = np.zeros(PRE + N, np.float32); x[PRE] = 0.01
-    return x, dict(x=x, norm=tgp.EQ_ONLY, params=params, raw=True)
+    return x, dict(x=x, norm=po_ref.EQ_ONLY, params=params, raw=True)
 
 
 jobs = [measure({})[1]] + [measure({b: g})[1] for b in ('EQ Low Gain', 'EQ Mid Gain', 'EQ High Gain') for g in (-6, 6)]
-ys = tgp.render_many(jobs)
+ys = po_ref.render_many(jobs)
 H0 = np.fft.rfft(ys[0][0, PRE:PRE + N])
 meas = {}
 i = 1
@@ -82,4 +82,4 @@ for kind in ('low', 'mid', 'high'):
         out[f'{kind}/{name}'] = dict(f0=round(float(r.x[0]), 3), q=round(float(r.x[1]), 5),
                                      max_mag_err_dB=round(float(np.max(np.abs(mag))), 4), rms=round(float(np.sqrt(np.mean(r.fun ** 2))), 5))
         print(kind, name, out[f'{kind}/{name}'])
-json.dump(out, open(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'eq', 'eq_fit.json'), 'w'), indent=1)
+json.dump(out, open(os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'eq', 'eq_fit.json'), 'w'), indent=1)

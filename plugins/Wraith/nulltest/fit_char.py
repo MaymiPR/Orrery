@@ -9,7 +9,7 @@ renders in one WrRender run.
 import argparse, json, os, sys, time
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 FS = 48000
 # name, start, low, high, log scale

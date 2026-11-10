@@ -5,16 +5,16 @@ parameter stepped at an offset inside a host block, only the stage it belongs to
     python null_steps.py [name ...]"""
 import sys
 import numpy as np
-import tgp
+import po_ref
 
-FS = tgp.FS
+FS = po_ref.FS
 PRE = 2 * FS
 B = 512
 W = 16
 
 
 def pink(secs=4.0, db=-30):
-    return tgp.noise(secs, db, seed=31, pink=True)
+    return po_ref.noise(secs, db, seed=31, pink=True)
 
 
 TONE = {'eq low +6': 60.0, 'eq high -6': 12000.0, 'eq bypass on': 12000.0}     # lock-in frequency per step (else 1 kHz)
@@ -28,8 +28,8 @@ def tone_resp(name, offset=200, tune=None, db=-30, span=(-256, 1536)):
     x = (10 ** (db / 20) * np.sin(2 * np.pi * f * t)).astype(np.float32); x[:PRE // 2] = 0
     at = PRE + FS + offset - (PRE + FS) % B
     j = dict(x=x, norm=norm, params=params, auto=[(k, at, v)])
-    r = tgp.render_many([j], 'ref', cache=True)[0][0]
-    o = tgp.render_many([dict(j, tune=tune or {})], 'model')[0][0]
+    r = po_ref.render_many([j], 'ref', cache=True)[0][0]
+    o = po_ref.render_many([dict(j, tune=tune or {})], 'model')[0][0]
     P = max(16, int(round(FS / f)))
     ref0 = None; out = []
     for y in (r, o):
@@ -42,15 +42,15 @@ def tone_resp(name, offset=200, tune=None, db=-30, span=(-256, 1536)):
 
 
 STEPS = {   # name: (stage preset, start params, (param, normalised value after))
-    'input gain +12': ({**tgp.NONE}, {'Input Gain': 0}, ('Input Gain', 1.0)),
-    'output gain -12': ({**tgp.NONE}, {'Output Gain': 0}, ('Output Gain', 0.0)),
-    'eq low +6': (tgp.EQ_ONLY, {}, ('EQ Low Gain', 1.0)),
-    'eq high -6': (tgp.EQ_ONLY, {}, ('EQ High Gain', 0.0)),
-    'eq bypass on': (tgp.EQ_ONLY, {'EQ High Gain': 6}, ('EQ Bypass', 1.0)),
-    'amount 100 -> 200': (tgp.CHAR_ONLY, {}, ('Character', 1.0)),
-    'amount 100 -> 0': (tgp.CHAR_ONLY, {}, ('Character', 0.0)),
-    'limiter gain 5 -> 12': (tgp.LIM_ONLY, {}, ('Limiter Input Gain', 1.0)),
-    'char bypass on': (tgp.CHAR_ONLY, {}, ('Character Bypass', 1.0)),
+    'input gain +12': ({**po_ref.NONE}, {'Input Gain': 0}, ('Input Gain', 1.0)),
+    'output gain -12': ({**po_ref.NONE}, {'Output Gain': 0}, ('Output Gain', 0.0)),
+    'eq low +6': (po_ref.EQ_ONLY, {}, ('EQ Low Gain', 1.0)),
+    'eq high -6': (po_ref.EQ_ONLY, {}, ('EQ High Gain', 0.0)),
+    'eq bypass on': (po_ref.EQ_ONLY, {'EQ High Gain': 6}, ('EQ Bypass', 1.0)),
+    'amount 100 -> 200': (po_ref.CHAR_ONLY, {}, ('Character', 1.0)),
+    'amount 100 -> 0': (po_ref.CHAR_ONLY, {}, ('Character', 0.0)),
+    'limiter gain 5 -> 12': (po_ref.LIM_ONLY, {}, ('Limiter Input Gain', 1.0)),
+    'char bypass on': (po_ref.CHAR_ONLY, {}, ('Character Bypass', 1.0)),
 }
 
 
@@ -61,8 +61,8 @@ def response(name, offset=200, tune=None):
     j = dict(x=x, norm=norm, params=params, auto=[(k, at, v)])
     after = dict(norm); after[k] = v
     jobs = [j, dict(x=x, norm=after, params=params)] if k in ('EQ Bypass', 'Character Bypass') else [j]
-    r = tgp.render_many(jobs, 'ref', cache=True)
-    o = tgp.render_many([dict(jj, tune=tune or {}) for jj in jobs], 'model')
+    r = po_ref.render_many(jobs, 'ref', cache=True)
+    o = po_ref.render_many([dict(jj, tune=tune or {}) for jj in jobs], 'model')
     def gains(y):
         e = np.array([np.sqrt(np.mean(y[0][a:a + W] ** 2)) for a in range(at - 256, at + 1024, W)])
         return 20 * np.log10(e / np.sqrt(np.mean(y[0][at - 4096:at - 256] ** 2)))

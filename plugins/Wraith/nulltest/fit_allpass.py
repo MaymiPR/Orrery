@@ -1,5 +1,5 @@
 """Character stage: the fixed phase part (MEASUREMENTS.md "Character"). The measured response divided by the fitted
-Focus EQ cascade (fit_focus_eq2.py) leaves a phase that does not depend on Focus; it is fitted here with a delay and
+Focus EQ cascade (fit_focus_eq.py) leaves a phase that does not depend on Focus; it is fitted here with a delay and
 second-order all-passes, and the whole model is checked in the complex domain.
 
     python fit_allpass.py [--n 4]
@@ -7,8 +7,8 @@ second-order all-passes, and the whole model is checked in the complex domain.
 import argparse, json
 import numpy as np
 from scipy.optimize import least_squares
-from fit_focus_eq2 import model_db, FS
-from fit_focus_eq import DATA
+from fit_focus_eq import model_db, FS
+from focus_eq_lib import load
 
 
 def ap2(fr, q, z):
@@ -19,7 +19,7 @@ def ap2(fr, q, z):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--n', type=int, default=4); ap.add_argument('--joint', action='store_true'); a = ap.parse_args()
-    d = np.load(DATA); f_all = d['f']
+    d = load(); f_all = d['f']
     sel = np.unique(np.round(np.geomspace(60, 22000, 400) / (f_all[1] - f_all[0])).astype(int))
     f = f_all[sel]; z = np.exp(-1j * 2 * np.pi * f / FS)
     m = json.load(open('renders/focus_eq2.json'))
@@ -51,8 +51,8 @@ def main():
 
 def joint():
     """refine the magnitude sections, the all-passes and the delay together on the complex error (30 Hz to 22 kHz)"""
-    from fit_focus_eq2 import pack, unpack, bounds
-    d = np.load(DATA); f_all = d['f']
+    from fit_focus_eq import pack, unpack, bounds
+    d = load(); f_all = d['f']
     sel = np.unique(np.round(np.geomspace(30, 22000, 500) / (f_all[1] - f_all[0])).astype(int))
     f = f_all[sel]; z = np.exp(-1j * 2 * np.pi * f / FS)
     m = json.load(open('renders/focus_eq2.json'))

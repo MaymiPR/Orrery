@@ -6,11 +6,11 @@ the band was compressed before? measure_mid_release.py's gain traces (8 kHz, --b
 Prints, per case, the detector level every 10 ms after the drop and its slope (dB/s), ref and ours."""
 import sys
 import numpy as np
-import tgp, nulltest as N
-import measure_mid_release as R, midrel2 as R2
-from measure_high_trace3 import header_laws
+import po_ref, nulltest as N
+import measure_mid_release as R, measure_mid_release_speed as R2
+from measure_high_gain_noise import header_laws
 
-FS = tgp.FS
+FS = po_ref.FS
 CASES = [(0, 3.0), (-3, 3.0), (-6, 3.0), (-9, 3.0), (0, 1.0), (0, 0.3), (0, 0.1), (0, 0.03)]
 AFTER = 1.0
 

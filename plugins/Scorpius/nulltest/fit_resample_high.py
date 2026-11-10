@@ -6,7 +6,7 @@ reference's measured delay, fitted on drums and the track with every module off 
 import numpy as np
 import scipy.signal as sg
 from scipy.optimize import minimize
-import ori as o
+import sc_ref as o
 import null_modules as N
 
 sig = N.signals()

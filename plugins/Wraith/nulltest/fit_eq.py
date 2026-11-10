@@ -6,7 +6,7 @@ shelves (MEASUREMENTS.md "EQ"). Prints f0 and Q per shelf and rate and the time-
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.signal import lfilter
-import ts as h
+import wr_ref as h
 
 RATES = (44100, 48000, 88200, 96000)
 CASES = [('EQ Low Gain', g) for g in (12.0, 6.0, -12.0)] + [('EQ High Gain', g) for g in (12.0, 6.0, -12.0)]

@@ -11,7 +11,7 @@ import os, sys
 import numpy as np
 import nulltest_lib as nl
 from probe_side import gain_traj
-import ts as h
+import wr_ref as h
 
 FS = 48000
 FREQS = [40, 60, 100, 150, 200, 300, 500, 700, 1000, 1500, 2000, 3000, 5000, 7000, 10000, 14000]

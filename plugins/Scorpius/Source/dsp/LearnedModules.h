@@ -52,7 +52,7 @@ private:
 
 // Harmonics: the reference runs a fully wet process here and mixes it with the dry signal by the
 // amount, a little under linearly (the measured weights), its processing changing a little with the amount too; ours
-// is learned at amounts 0.25, 0.5, 0.75 and 1 (capture_nn.py harm80 / harm50 ..., train_wn.py EQUIV: the fully wet
+// is learned at amounts 0.25, 0.5, 0.75 and 1 (render_training.py harm80 / harm50 ..., train_wn.py EQUIV: the fully wet
 // equivalent of each), the two models either side of the amount interpolated and mixed in by the same weights.
 class Harmonics
 {

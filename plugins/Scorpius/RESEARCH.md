@@ -5,7 +5,7 @@ Cradle's **Orion**, a drum-bus processor made with mix engineer Jaycen Joshua. I
 [MEASUREMENTS.md](MEASUREMENTS.md).
 
 Local sources are an installed copy of the original. Nothing from it (images, scripts, fonts, presets, renders,
-screenshots) is in this repository: those files stay in the git-ignored `reference/orion/` folder. Behaviour is found
+screenshots) is in this repository: those files stay in the git-ignored `reference/scorpius/` folder. Behaviour is found
 by measuring the plug-in from the outside.
 
 ## Sources
@@ -18,9 +18,9 @@ by measuring the plug-in from the outside.
 | **W4** | [What is Orion?](https://support.cradle.app/hc/en-us/articles/30831901369876-What-is-Orion) | positioning, relation to The God Particle |
 | **W5** | [KVR product page](https://www.kvraudio.com/product/orion-by-cradle) (secondary) | listing, reviews |
 | **L1** | The installed plug-in (VST3) and the version information it carries | version 1.2.1, VST 3.7.8 SDK, category Fx; built in January 2025 |
-| **L2** | `tools/ParamDump` run on L1 (`reference/orion/params_{48k,41pt,44k,96k}.txt`) | every host parameter: names, ranges, defaults, display text; buses, latency, editor size |
-| **L3** | The plug-in's default saved state, from L2 (read with `scripts/tgpstate.py`) | the preset structure, including settings the host cannot see |
-| **L5** | Screenshots of the editor at 100 % and 200 % (`tools/RefCapture`, 50 Hz tone bursts; `reference/orion/editor_*.png`), menus and settings page (`ui_*.png`), every factory preset (`preset_*.png`, `presets_dump.txt`); RefCapture films at 200 % | the 1.2.1 layout, 888 × 403 px; every preset's settings; the animations |
+| **L2** | `tools/ParamDump` run on L1 (`reference/scorpius/params_{48k,41pt,44k,96k}.txt`) | every host parameter: names, ranges, defaults, display text; buses, latency, editor size |
+| **L3** | The plug-in's default saved state, from L2 (read with `scripts/nulltest/ref_state_lib.py`) | the preset structure, including settings the host cannot see |
+| **L5** | Screenshots of the editor at 100 % and 200 % (`tools/RefCapture`, 50 Hz tone bursts; `reference/scorpius/editor_*.png`), menus and settings page (`ui_*.png`), every factory preset (`preset_*.png`, `presets_dump.txt`); RefCapture films at 200 % | the 1.2.1 layout, 888 × 403 px; every preset's settings; the animations |
 | **L7** | The maker's installer | 1.2.2 is current; 1.2.1 measured (VST3 and AAX installed) |
 
 ## Product facts (W1, W2, W3, W4, W5)
@@ -122,8 +122,8 @@ Layout at 100 % (888 × 403), version 1.2.1:
 
 ### Layout (200 % captures)
 
-The editor was measured on 200 % captures (the saved state's UI scale set to 200 % with `nulltest/refstate.py`) with
-`tools/measure_ui.py` (filled boxes, outlines, silver regions and their centres) and `tools/measure_text.py` (every
+The editor was measured on 200 % captures (the saved state's UI scale set to 200 % with `nulltest/refstate_lib.py`) with
+`tools/measure_ui.py` (filled boxes, outlines, silver regions and their centres) and `tools/measure_ui.py --text` (every
 word's box), and compared region by region with Scorpius's snapshots (`tools/compare_ui.py`, `ScorpiusSnapshot`).
 
 | Element | Measured |

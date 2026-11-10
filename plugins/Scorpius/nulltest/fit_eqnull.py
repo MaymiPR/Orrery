@@ -2,7 +2,7 @@
 the reference on loud program material (null_modules.py's signals), all bands at +6 one at a time."""
 import numpy as np
 from scipy.optimize import minimize
-import ori as o
+import sc_ref as o
 import null_modules as N
 
 sig = N.signals()

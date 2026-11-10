@@ -1,6 +1,6 @@
-"""Measures the parallels' fader cap of the reference (Orion at 200 %): a measuring tool, it writes no shipped file.
+"""Measures the parallels' fader cap of the reference (at 200 %): a measuring tool, it writes no shipped file.
 
-    python fit_fadercap.py [reference.png]      (default: reference/orion/ui200_idle.png, the sub fader at level 0)
+    python fit_fadercap.py [reference.png]      (default: reference/scorpius/ui200_idle.png, the sub fader at level 0)
 
 It prints the geometry and a few greys as tokens; the cap's size is what the editor uses (Source/ui/Controls.h, where
 the suite's own cap is drawn; an earlier drawing of ours shaded it from these greys); its tables are never copied
@@ -24,7 +24,7 @@ from scipy.optimize import minimize
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
-SRC = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'reference', 'orion', 'ui200_idle.png')
+SRC = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'reference', 'scorpius', 'ui200_idle.png')
 X0, Y0 = 1228, 440                                   # crop around the sub fader's cap (capture pixels)
 c = np.asarray(Image.open(SRC).convert('L')).astype(float)[Y0:Y0 + 70, X0:X0 + 92]
 H, W = c.shape

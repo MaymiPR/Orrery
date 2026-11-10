@@ -11,7 +11,7 @@ namespace wr::dsp
 {
 namespace
 {
-// the responses for one rate (nulltest/pack_reverb.py): per reverb a length, then L and R interleaved as 16-bit floats
+// the responses for one rate (scripts/pack_reverb.py): per reverb a length, then L and R interleaved as 16-bit floats
 struct Packed { double fs; const char* data; int size; };
 
 float half (uint16 h)

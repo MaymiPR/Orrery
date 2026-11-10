@@ -4,18 +4,18 @@ small-signal response, aliasing of the character's harmonics and its static gain
 end. Writes measurements/Positron/oversampling/oversampling.json and plots."""
 import json, os, subprocess, sys
 import numpy as np
-import tgp, plotstyle as ps
+import po_ref, plotstyle_lib as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'oversampling'); os.makedirs(OUT, exist_ok=True)
-FS = tgp.FS
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'oversampling'); os.makedirs(OUT, exist_ok=True)
+FS = po_ref.FS
 PRE = 2 * FS; N = 32768
-CAP = os.path.join(tgp.ROOT, 'build', 'RefCapture_artefacts', 'Release', 'RefCapture.exe')
+CAP = os.path.join(po_ref.ROOT, 'build', 'RefCapture_artefacts', 'Release', 'RefCapture.exe')
 BUTTON_X = {1: 474.9, 2: 516.8, 4: 558.7, 8: 600.5}      # oversampling buttons on the settings page (design px, y 113)
 
 
 def set_factor(k):
-    shot = os.path.join(tgp.WORK, f'os_{k}.raw'); os.makedirs(tgp.WORK, exist_ok=True)
-    path, name = tgp.PLUGINS['ref']
+    shot = os.path.join(po_ref.WORK, f'os_{k}.raw'); os.makedirs(po_ref.WORK, exist_ok=True)
+    path, name = po_ref.PLUGINS['ref']
     r = subprocess.run([CAP, path, name, shot, 'design=888', 'drag=874,15.5,0,0,click', f'drag={BUTTON_X[k]},113,0,0,click'],
                        capture_output=True, text=True, timeout=120)
     if 'clicked' not in r.stdout: raise RuntimeError('settings click failed:\n' + r.stdout + r.stderr)
@@ -29,13 +29,13 @@ def lockin(y, f, a, b):
 def jobs_for(k):
     imp = np.zeros(PRE + N, np.float32); imp[PRE] = 10 ** (-60 / 20)
     s = f'os{k}'
-    hot = np.concatenate([np.zeros(PRE), tgp.tone(9000, 3, -3)])
-    mid = np.concatenate([np.zeros(PRE), tgp.tone(1000, 3, -6)])
-    return [dict(x=imp, norm=tgp.NONE, raw=True, salt=s),
-            dict(x=imp, norm=tgp.EQ_ONLY, params={'EQ High Gain': 6}, raw=True, salt=s),
-            dict(x=imp, norm=tgp.CHAR_ONLY, raw=True, salt=s),
-            dict(x=hot, norm={**tgp.CHAR_ONLY, 'Character': 1.0}, raw=True, salt=s),
-            dict(x=mid, norm=tgp.CHAR_ONLY, raw=True, salt=s),
+    hot = np.concatenate([np.zeros(PRE), po_ref.tone(9000, 3, -3)])
+    mid = np.concatenate([np.zeros(PRE), po_ref.tone(1000, 3, -6)])
+    return [dict(x=imp, norm=po_ref.NONE, raw=True, salt=s),
+            dict(x=imp, norm=po_ref.EQ_ONLY, params={'EQ High Gain': 6}, raw=True, salt=s),
+            dict(x=imp, norm=po_ref.CHAR_ONLY, raw=True, salt=s),
+            dict(x=hot, norm={**po_ref.CHAR_ONLY, 'Character': 1.0}, raw=True, salt=s),
+            dict(x=mid, norm=po_ref.CHAR_ONLY, raw=True, salt=s),
             dict(x=imp, norm={}, raw=True, salt=s)]
 
 
@@ -45,8 +45,8 @@ if __name__ == '__main__':
     try:
         for k in factors:
             set_factor(k)
-            lat = tgp.latency()
-            ys = tgp.render_many(jobs_for(k), cache=True)
+            lat = po_ref.latency()
+            ys = po_ref.render_many(jobs_for(k), cache=True)
             f = np.fft.rfftfreq(N, 1 / FS)
             hn = ys[0][0, PRE:PRE + N]; Hn = np.fft.rfft(hn)
             He = np.fft.rfft(ys[1][0, PRE:PRE + N]) / Hn; Hc = np.fft.rfft(ys[2][0, PRE:PRE + N]) / Hn
@@ -68,7 +68,7 @@ if __name__ == '__main__':
             print(k, json.dumps(res[f'{k}x']))
     finally:
         set_factor(1)
-    print('restored 1x; latency', tgp.latency())
+    print('restored 1x; latency', po_ref.latency())
     json.dump(res, open(os.path.join(OUT, 'oversampling.json'), 'w'), indent=1)
     fg, ax = ps.fig('Bypassed path (all stages off): magnitude vs oversampling', 'Hz', 'dB', logx=True)
     for k in factors:

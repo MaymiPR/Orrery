@@ -54,13 +54,13 @@ struct Tuning
 
     // parallels (Parallels.h): each path's weight (its power times its fader's taper) moves linearly over this time
     double parRampMs = 2.0;
-    // sub: gain x 6th-order Butterworth low-pass x high-pass (nulltest/fit_sub3.py)
+    // sub: gain x 6th-order Butterworth low-pass x high-pass (nulltest/fit_sub_parallel.py)
     double subGain = 1.995, subLowPassHz = 140.207, subHighPassHz = 15.003;
     // loud: the gain (dB) at detector levels -72, -66, ..., +12 dBFS, the detector's attack, release and RMS share
     double loudCurve[15] { 8.994, 7.202, 6.544, 5.723, 5.030, 4.409, 3.839, 3.332, 2.879, 2.479, 1.845, 0.903, 0.473, -0.3, 0.197 };   // (nulltest/fit_loud.py)
     double loudAttackMs = 0.0031, loudReleaseMs = 9.938, loudRms = 0.0008;   // (timing: nulltest/fit_loud_timing.py)
     // low: the detector low-pass (Hz, order), the flip-flop's hysteresis, its envelope (attack / release, ms), gain, the
-    // output low-pass (Hz, order), the square term after it and the soft limit (nulltest/fit_low2.py)
+    // output low-pass (Hz, order), the square term after it and the soft limit (nulltest/fit_low_parallel.py)
     double lowDetHz = 216.7, lowDetOrder = 6, lowHysteresis = 1.0e-7, lowAttackMs = 0.05347, lowReleaseMs = 49.633,
            lowGain = 0.89365, lowOutHz = 46.4, lowOutOrder = 4, lowSquare = 0.90778, lowCeiling = 1.37852;
 

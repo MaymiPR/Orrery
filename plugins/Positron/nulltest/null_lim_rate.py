@@ -4,7 +4,7 @@ constant changed at a time (window, release, reach, slow envelope), to find what
     python null_lim_rate.py [fs] [key=v1,v2,... ...]"""
 import sys
 import numpy as np
-import tgp, nulltest as N, track as T
+import po_ref, nulltest as N, null_track as T
 
 if __name__ == '__main__':
     fs = int(sys.argv[1]) if len(sys.argv) > 1 and '=' not in sys.argv[1] else 44100
@@ -15,9 +15,9 @@ if __name__ == '__main__':
     pre = 2 * fs
     pad = lambda x: np.concatenate([np.zeros((2, pre), np.float32), (np.vstack([x, x]) if x.ndim == 1 else x).astype(np.float32)], axis=1)
     sigs = [pad(N.sig_drums(-1)), pad(N.sig_noise(-6)), pad(xt[:, 30 * fst:36 * fst])]
-    ref = tgp.render_many([dict(x=x, norm=tgp.LIM_ONLY) for x in sigs], 'ref', fs=fs, cache=True)
+    ref = po_ref.render_many([dict(x=x, norm=po_ref.LIM_ONLY) for x in sigs], 'ref', fs=fs, cache=True)
     def score(tune):
-        ours = tgp.render_many([dict(x=x, norm=tgp.LIM_ONLY, tune=tune) for x in sigs], 'model', fs=fs)
+        ours = po_ref.render_many([dict(x=x, norm=po_ref.LIM_ONLY, tune=tune) for x in sigs], 'model', fs=fs)
         return [10 * np.log10(np.sum((r[:, pre:] - o[:, pre:]) ** 2) / np.sum(r[:, pre:] ** 2)) for r, o in zip(ref, ours)]
     print('now        ' + ' '.join(f'{v:7.2f}' for v in score({})) + '   (drums -1, pink -6, track)', flush=True)
     for sc in scans:

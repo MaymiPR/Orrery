@@ -4,10 +4,10 @@
 Writes measurements/Positron/smoothing/smoothing.json and a plot."""
 import json, os
 import numpy as np
-import tgp, plotstyle as ps
+import po_ref, plotstyle_lib as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'smoothing'); os.makedirs(OUT, exist_ok=True)
-FS = tgp.FS
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'smoothing'); os.makedirs(OUT, exist_ok=True)
+FS = po_ref.FS
 PRE = 2 * FS
 AT = PRE + 2 * FS
 DUR = 5.0
@@ -15,16 +15,16 @@ LIM_DEFAULT = 0.494206
 
 # name, stage preset, fixed params (normalised), automated parameter, from, to, tone Hz, tone dBFS
 CASES = [
-    ('Input Gain 0 -> +12 dB', tgp.NONE, {}, 'Input Gain', 0.5, 1.0, 1000, -40),
-    ('Output Gain 0 -> -12 dB', tgp.NONE, {}, 'Output Gain', 0.5, 0.0, 1000, -40),
-    ('EQ Mid Gain 0 -> +6 dB', tgp.EQ_ONLY, {}, 'EQ Mid Gain', 0.5, 1.0, 637, -40),
-    ('EQ Low Gain 0 -> -6 dB', tgp.EQ_ONLY, {}, 'EQ Low Gain', 0.5, 0.0, 60, -40),
-    ('Character 100 -> 200 %', tgp.CHAR_ONLY, {}, 'Character', 0.5, 1.0, 1000, -60),
-    ('Character 100 -> 0 %', tgp.CHAR_ONLY, {}, 'Character', 0.5, 0.0, 1000, -60),
-    ('Limiter Input Gain 5 -> 12 dB', tgp.LIM_ONLY, {}, 'Limiter Input Gain', LIM_DEFAULT, 1.0, 1000, -40),
+    ('Input Gain 0 -> +12 dB', po_ref.NONE, {}, 'Input Gain', 0.5, 1.0, 1000, -40),
+    ('Output Gain 0 -> -12 dB', po_ref.NONE, {}, 'Output Gain', 0.5, 0.0, 1000, -40),
+    ('EQ Mid Gain 0 -> +6 dB', po_ref.EQ_ONLY, {}, 'EQ Mid Gain', 0.5, 1.0, 637, -40),
+    ('EQ Low Gain 0 -> -6 dB', po_ref.EQ_ONLY, {}, 'EQ Low Gain', 0.5, 0.0, 60, -40),
+    ('Character 100 -> 200 %', po_ref.CHAR_ONLY, {}, 'Character', 0.5, 1.0, 1000, -60),
+    ('Character 100 -> 0 %', po_ref.CHAR_ONLY, {}, 'Character', 0.5, 0.0, 1000, -60),
+    ('Limiter Input Gain 5 -> 12 dB', po_ref.LIM_ONLY, {}, 'Limiter Input Gain', LIM_DEFAULT, 1.0, 1000, -40),
     ('EQ Bypass on (EQ Mid +6)', {'Character Bypass': 1, 'Limiter Bypass': 1, 'EQ Mid Gain': 1.0}, {}, 'EQ Bypass', 0.0, 1.0, 637, -40),
-    ('Character Bypass on (100 %)', tgp.CHAR_ONLY, {}, 'Character Bypass', 0.0, 1.0, 1000, -60),
-    ('Limiter Bypass on (5 dB)', tgp.LIM_ONLY, {}, 'Limiter Bypass', 0.0, 1.0, 1000, -40),
+    ('Character Bypass on (100 %)', po_ref.CHAR_ONLY, {}, 'Character Bypass', 0.0, 1.0, 1000, -60),
+    ('Limiter Bypass on (5 dB)', po_ref.LIM_ONLY, {}, 'Limiter Bypass', 0.0, 1.0, 1000, -40),
     ('Bypass on (defaults)', {}, {}, 'Bypass', 0.0, 1.0, 1000, -60),
 ]
 
@@ -38,11 +38,11 @@ def demod(y, f):
 if __name__ == '__main__':
     jobs = []
     for name, preset, fixed, p, a, b, f, l in CASES:
-        x = np.concatenate([np.zeros(PRE), tgp.tone(f, DUR, l)])
+        x = np.concatenate([np.zeros(PRE), po_ref.tone(f, DUR, l)])
         norm = {**preset, **fixed, p: a}
         jobs.append(dict(x=x, norm=norm, raw=True))
         jobs.append(dict(x=x, norm=norm, auto=[(p, AT, b)], raw=True))
-    ys = tgp.render_many(jobs, block=64, cache=True)
+    ys = po_ref.render_many(jobs, block=64, cache=True)
     res = {}
     fg, ax = ps.fig('Parameter smoothing: gain change on a steady tone after a jump', 'ms after the change', 'dB re final change', size=(10, 5))
     for i, (name, preset, fixed, p, a, b, f, l) in enumerate(CASES):

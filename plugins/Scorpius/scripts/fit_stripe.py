@@ -2,10 +2,10 @@
 tool: it writes no shipped file. Its numbers become tokens of the analytic glow in Source/ui/StripeGlow.h (a profile
 down the stripe of our own shape, a bell along it per channel); no table of it is copied into the source.
 
-    python fit_stripe.py orion.raw                 measures the glow, prints its tokens
-    python fit_stripe.py orion.raw ours.raw        prints the statistics the particles were matched on, for both
+    python fit_stripe.py ref.raw                 measures the glow, prints its tokens
+    python fit_stripe.py ref.raw ours.raw        prints the statistics the particles were matched on, for both
 
-The films: tools/RefCapture at 200 % (Orion's state with prefs.uiScaling=2, nulltest/refstate.py; ours with
+The films: tools/RefCapture at 200 % (the reference's state with prefs.uiScaling=2, nulltest/refstate_lib.py; ours with
 uiScale="2.0"), rows=0.66,0.775 (the stripe's band), in= the probe signal below (1 kHz tone, mono float32 48 kHz):
 1.5 s silence, then with 1.5 s of silence after each: -60 dB 2 s then -10 dB 2 s; -10 then -60; -60 1.5 s, 0.3 s gap,
 -10 1.5 s; -55, -50, -45, -40, -35 dB 1.5 s each; -60 then -40 2 s each; -60 1 s, a 0.2 s rise to -10, -10 1.8 s.
@@ -19,7 +19,7 @@ from scipy.optimize import least_squares
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, '..', '..', 'Positron', 'nulltest'))
-from filmtools import Film  # noqa: E402
+from film_lib import Film  # noqa: E402
 
 WINDOWS = [(3.8, 5.4), (7.2, 9.5), (14.6, 15.7), (26.5, 27.7), (29.5, 30.7), (34.5, 36.2), (39.0, 40.7)]
 STOPS = [5.5, 9.0, 11.0, 15.8, 18.8, 21.8, 24.8, 27.8, 30.8, 36.3, 40.8]   # where the tone stops or drops

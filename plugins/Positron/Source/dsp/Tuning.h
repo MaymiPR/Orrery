@@ -97,7 +97,7 @@ struct Tuning
 
     void setDefaults()
     {
-        // fitted per band and amount node to the reference (nulltest/make_table.py -> CharacterTable.h)
+        // fitted per band and amount node to the reference (scripts/make_character_table.py -> CharacterTable.h)
         for (int b = 0; b < 3; ++b)
         {
             detectorPeak[b] = characterDetectorPeak[b];

@@ -1,0 +1,110 @@
+{
+ "2x, defaults, music -10": {
+  "residual_dB": -66.7,
+  "reference_latency": 189
+ },
+ "2x, defaults, drums -6": {
+  "residual_dB": -62.27,
+  "reference_latency": 189
+ },
+ "2x, defaults, pink -18": {
+  "residual_dB": -62.12,
+  "reference_latency": 189
+ },
+ "2x, defaults, music -10 at 44.1 kHz": {
+  "residual_dB": -72.88,
+  "reference_latency": 179
+ },
+ "2x, defaults, drums -6 at 44.1 kHz": {
+  "residual_dB": -63.16,
+  "reference_latency": 179
+ },
+ "2x, defaults, pink -18 at 44.1 kHz": {
+  "residual_dB": -62.44,
+  "reference_latency": 179
+ },
+ "2x, defaults, music -10 at 96 kHz": {
+  "residual_dB": -67.46,
+  "reference_latency": 357
+ },
+ "2x, defaults, drums -6 at 96 kHz": {
+  "residual_dB": -57.38,
+  "reference_latency": 357
+ },
+ "2x, defaults, pink -18 at 96 kHz": {
+  "residual_dB": -62.75,
+  "reference_latency": 357
+ },
+ "4x, defaults, music -10": {
+  "residual_dB": -64.3,
+  "reference_latency": 189
+ },
+ "4x, defaults, drums -6": {
+  "residual_dB": -60.09,
+  "reference_latency": 189
+ },
+ "4x, defaults, pink -18": {
+  "residual_dB": -59.42,
+  "reference_latency": 189
+ },
+ "4x, defaults, music -10 at 44.1 kHz": {
+  "residual_dB": -66.35,
+  "reference_latency": 179
+ },
+ "4x, defaults, drums -6 at 44.1 kHz": {
+  "residual_dB": -62.75,
+  "reference_latency": 179
+ },
+ "4x, defaults, pink -18 at 44.1 kHz": {
+  "residual_dB": -60.11,
+  "reference_latency": 179
+ },
+ "4x, defaults, music -10 at 96 kHz": {
+  "residual_dB": -67.87,
+  "reference_latency": 357
+ },
+ "4x, defaults, drums -6 at 96 kHz": {
+  "residual_dB": -56.91,
+  "reference_latency": 357
+ },
+ "4x, defaults, pink -18 at 96 kHz": {
+  "residual_dB": -63.44,
+  "reference_latency": 357
+ },
+ "8x, defaults, music -10": {
+  "residual_dB": -64.86,
+  "reference_latency": 189
+ },
+ "8x, defaults, drums -6": {
+  "residual_dB": -59.82,
+  "reference_latency": 189
+ },
+ "8x, defaults, pink -18": {
+  "residual_dB": -59.5,
+  "reference_latency": 189
+ },
+ "8x, defaults, music -10 at 44.1 kHz": {
+  "residual_dB": -65.07,
+  "reference_latency": 179
+ },
+ "8x, defaults, drums -6 at 44.1 kHz": {
+  "residual_dB": -61.62,
+  "reference_latency": 179
+ },
+ "8x, defaults, pink -18 at 44.1 kHz": {
+  "residual_dB": -59.4,
+  "reference_latency": 179
+ },
+ "8x, defaults, music -10 at 96 kHz": {
+  "residual_dB": -66.71,
+  "reference_latency": 357
+ },
+ "8x, defaults, drums -6 at 96 kHz": {
+  "residual_dB": -56.02,
+  "reference_latency": 357
+ },
+ "8x, defaults, pink -18 at 96 kHz": {
+  "residual_dB": -58.89,
+  "reference_latency": 357
+ }
+}

@@ -10,8 +10,8 @@ editor are in [RESEARCH.md](RESEARCH.md).
 |---|---|
 | Reference | Cradle Orion 1.2.1, VST3, Windows |
 | Offline host | `tools/RefRender.cpp` (shared with Positron): renders float32 files at a fixed rate and block size, sets parameters by displayed value, loads a saved state; `settle=ms` runs the message loop after the parameters are set |
-| Harness | `nulltest/ori.py`: `render_many(jobs)`, `ONLY(...)` (only the named modules on), settings the host cannot see written into a copy of the default state, test signals, nulls, an on-disk render cache |
-| State editing | `nulltest/refstate.py` edits a saved state by its path in the preset table (the hidden settings and the preferences) |
+| Harness | `nulltest/sc_ref.py`: `render_many(jobs)`, `ONLY(...)` (only the named modules on), settings the host cannot see written into a copy of the default state, test signals, nulls, an on-disk render cache |
+| State editing | `nulltest/refstate_lib.py` edits a saved state by its path in the preset table (the hidden settings and the preferences) |
 | Survey scripts | `nulltest/probe_survey.py`, `probe_order.py`, `measure_linear.py`: a first look at every module, the signal order, the small-signal impulse responses (`measurements/Scorpius/ir/`) |
 | Rate, block | 48 kHz, block 512 |
 | Start state | the factory preset "default"; each test switches the other modules off with their own power buttons (`ONLY`) |
@@ -253,10 +253,10 @@ amount crosses a node first hears the input it missed (its whole memory). NULLTE
 | Module | Law | Method | Residual or confidence |
 |---|---|---|---|
 | Harmonic EQ | RBJ-cookbook filters, all fed from the same input and summed in parallel: a low shelf at 43.8 Hz (Q 0.70), bells with Q ≈ 2/3 at 100 Hz, 983 Hz and 3.01 kHz, a high shelf at 9.66 kHz (Q 0.71); each band's boost, (H - 1) x, soft-clipped as u / (1 + \|u\|^2.15)^(1/2.15) with ceiling 0.47, then high-passed at 20 Hz (Butterworth); a knob's dB sets the filter's gain a little higher (+0.62 dB at 0.5, +3.65 at 3, +7.12 at 6) | `fit_eqfinal.py`, `fit_eqsat.py`, `fit_eqnull.py`, `fit_eqlaw.py` | two bands on equal the sum of their contributions to -142 dB; the high-pass after the clip, not before, is worth 10 … 16 dB on the low bands |
-| Sub | the chain's output doubled, through a 6th-order Butterworth low-pass at 140 Hz and a high-pass at 15 Hz | `fit_sub3.py` | NULLTESTS.md "sub" |
+| Sub | the chain's output doubled, through a 6th-order Butterworth low-pass at 140 Hz and a high-pass at 15 Hz | `fit_sub_parallel.py` | NULLTESTS.md "sub" |
 | Compression | feed-forward on the mid signal: threshold -12.8 dBFS (detector level), ratio 5.0, knee 7.3 dB, detector attack 1.0 ms and release 20 ms (nearly a peak follower: 4 % RMS); the wet path's fixed shelving a vector fit; modes a and b fit the same constants and differ in their wet filters (make-up); the gain comes before the wet filters, not after (the two agree on steady tones but not when the gain moves fast through the filters' low cut: a kick's attack) | `fit_comp.py`, `fit_comp_timing.py` | the learned correction below |
-| Low | a subharmonic synthesizer an octave below the bass, an octave divider times an envelope: a flip-flop toggles at each falling zero crossing of the input through a 6th-order low-pass at 217 Hz (silent until the first, starting negative, keeping its state through silence); its square wave times the peak envelope of that signal (attack 0.05 ms, release 50 ms) times 0.89 goes through a 4th-order Butterworth low-pass at 46.4 Hz, then v + 0.91 v² (the DC it makes is kept: no high-pass) and a soft limit. On a steady tone the contribution is a square wave at half the frequency whose height follows the tone's level (at 25 Hz: -0.9 × the tone's amplitude for one cycle, +0.9 for the next) | `fit_low2.py` | tones and chords -35 … -46 dB re the contribution (60 + 90 Hz gives 45 and 15 Hz; 40 + 60 + 100 Hz gives 50 and 10 Hz); a sweep 25 … 160 Hz at -30 dBFS follows the low-pass to 0.5 dB; loud tones (-3 dBFS) -10 dB (the soft limit) |
-| Low on music | the octave's shape matches (correlation ±0.99 … 1.00 in most 50 ms windows of the drums) but its polarity slips against the original's now and then, so the null is about 0 dB: some crossings count differently (not a fixed or level-relative hysteresis, not a minimum interval between flips, not a reset in silence) | `fit_low2.py` | open |
+| Low | a subharmonic synthesizer an octave below the bass, an octave divider times an envelope: a flip-flop toggles at each falling zero crossing of the input through a 6th-order low-pass at 217 Hz (silent until the first, starting negative, keeping its state through silence); its square wave times the peak envelope of that signal (attack 0.05 ms, release 50 ms) times 0.89 goes through a 4th-order Butterworth low-pass at 46.4 Hz, then v + 0.91 v² (the DC it makes is kept: no high-pass) and a soft limit. On a steady tone the contribution is a square wave at half the frequency whose height follows the tone's level (at 25 Hz: -0.9 × the tone's amplitude for one cycle, +0.9 for the next) | `fit_low_parallel.py` | tones and chords -35 … -46 dB re the contribution (60 + 90 Hz gives 45 and 15 Hz; 40 + 60 + 100 Hz gives 50 and 10 Hz); a sweep 25 … 160 Hz at -30 dBFS follows the low-pass to 0.5 dB; loud tones (-3 dBFS) -10 dB (the soft limit) |
+| Low on music | the octave's shape matches (correlation ±0.99 … 1.00 in most 50 ms windows of the drums) but its polarity slips against the original's now and then, so the null is about 0 dB: some crossings count differently (not a fixed or level-relative hysteresis, not a minimum interval between flips, not a reset in silence) | `fit_low_parallel.py` | open |
 | Loud | its gain against a fast mid-signal detector as a table; the detector a peak follower with an instant attack and a 9.9 ms release | `fit_loud.py`, `fit_loud_timing.py` on level steps and music | the parallel's error re its contribution -19 dB |
 | Loud, within a cycle | the original's gain c / x moves within each cycle about 10 times more than Scorpius's (a 50 Hz tone at -20 dBFS: 0.30 at the peak, 0.44 just after the zero crossing; Scorpius 0.35 … 0.38), and at 200 Hz its lowest point lags the peak by about a fifth of a cycle; its contribution is not flat in frequency (0.42 of the input at 40 … 60 Hz, 0.48 above 250 Hz; Scorpius 0.47 … 0.48 throughout), with up to 6 degrees of phase lead at 100 Hz | contribution against the input, sample by sample | open (Declined changes) |
 | Converters at 96 and 192 kHz | a decimating FIR (the stream's first sample kept, then every 2nd / 4th) and an interpolating FIR, not linear-phase (no windowed sinc of any length its delay allows reaches its response near 20 … 24 kHz); its responses to impulses at every phase fix the pair (y_c[t] = Σ over q ≡ -c (mod R) of d[q] u[t + S - q]), the split between the two free up to a filter in z^R, taken with the decimator at unity gain | `fit_converters.py`, alternating least squares | fit -76 / -78 dB; the round trip -86 … -92 dB on music and the presets |
@@ -269,7 +269,7 @@ amount crosses a node first hears the input it missed (its whole memory). NULLTE
 
 ### Learned blocks
 
-Every learned block is trained on captures of the original's output (`capture_nn.py`: 174 s of program material per
+Every learned block is trained on captures of the original's output (`render_training.py`: 174 s of program material per
 setting, held-out pieces up to +4 dBFS peak), with our own weights, on the GPU when there is one. `export_models.py`
 writes the weights and each network's rest state; where a network settles to a constant on silence, driven by its
 biases, `--rest` computes that constant from the weights with the plug-in's own arithmetic and takes it off the
@@ -281,9 +281,9 @@ output bias (nothing is added to the plug-in's preparation).
 | Drive colour a, hi-pass on | the same LSTM followed by a 2048-tap fixed filter fitted from the hi-pass-off output to the hi-pass-on output | the drive with its hi-pass | the filter: least squares | the filter alone -39.5 … -45.4 dB (the input's linear part alone: -4.5) | as above |
 | Drive colour b, both hi-pass settings | the same kind of LSTM, one network, with a fitted filter for the hi-pass (-44.4 … -49.6 dB held out) | the drive alone | as colour a, then 60k steps at 5e-4 from those weights | -35.4 dB (-26.1) | as colour a |
 | Drive colour c | a WaveNet of 8 channels, 12 layers of dilations 1 … 2048 with 3 taps each, the input mixed into every layer (`KERNEL=3 MIXIN=1`), its output beside a long filter, y = Post(u) + WaveNet(u), between a learned short FIR and a learned 8192-tap FIR; one per hi-pass setting (its hi-pass also a filter after the drive: -39.6 … -41.7 dB) | the drive alone | `train_wn.py` | -36.3 (-25.6) hi-pass off, -34.6 (-25.5) on | |
-| Harmonics | a WaveNet as colour c's drive, learning the fully wet process at amount 1 (`capture_nn.py harm80 / harm50`) and at amounts 0.25, 0.5 and 0.75 the fully wet equivalent x + (y - x) / w (`train_wn.py EQUIV`); the plug-in mixes by the measured amount weights and interpolates the two models either side of the amount | the module at each amount | `train_wn.py` | -62 / -63 dB at amount 1; -51 … -75 dB at the other nodes; at 0.8 in place -55 … -71 dB | NULLTESTS.md, harmonics rows |
+| Harmonics | a WaveNet as colour c's drive, learning the fully wet process at amount 1 (`render_training.py harm80 / harm50`) and at amounts 0.25, 0.5 and 0.75 the fully wet equivalent x + (y - x) / w (`train_wn.py EQUIV`); the plug-in mixes by the measured amount weights and interpolates the two models either side of the amount | the module at each amount | `train_wn.py` | -62 / -63 dB at amount 1; -51 … -75 dB at the other nodes; at 0.8 in place -55 … -71 dB | NULLTESTS.md, harmonics rows |
 | Lift | a WaveNet on the wet path between a learned short FIR and a learned 8192-tap FIR | the module at amount 1 | `train_wn.py`, 60k steps | -48.1 dB | on silence -203 dBFS RMS after `--rest=lift` |
-| Grit | a WaveNet as the drive's, one channel (the left, the right silent), run on each channel | the parallel at level 1 | `capture_nn.py grit` | in place -24 … -27 dB at level 1 (leaving it out: -20 … -25) | NULLTESTS.md, grit rows |
+| Grit | a WaveNet as the drive's, one channel (the left, the right silent), run on each channel | the parallel at level 1 | `render_training.py grit` | in place -24 … -27 dB at level 1 (leaving it out: -20 … -25) | NULLTESTS.md, grit rows |
 | Compression's gain correction | the wet path as IIR(x g 10^(c/20)), g our fitted gain and the plug-in's own IIR fixed; c (dB) from a small WaveNet that hears the detector's signal and our gain, run on each channel by itself (it hears that channel and our gain from the mid); trained through a 65536-tap copy of the IIR | the original's wet path | `train_gain.py`; mode b 4 channels, 10 layers of 3 taps (~0.13 s of memory); mode a 8 channels and 12 layers (~0.5 s, `train_gain.py a 40000 8 12`) | mode a -52.3 dB (the track excerpts -60 … -63; the start-up piece -28.2, a capture artefact: below); mode b -59.3 | to 0.1 dB on mono pieces |
 
 **Drive.** The drive's error on the loud mastered track is broadband (-11 … -20 dB in every band), the same in loud and
@@ -349,7 +349,7 @@ step with the drums: the expander, which reads the mid (3).
 | Lift as a GRU of 16 units | -39.8 dB held out (the WaveNet: -48.1) |
 | Compression's gain after the wet filters | loud drums -30.5 dB (mode b) and -29.7 (a), against -47.5 and -40.2 with the gain before |
 | A hold before compression's release, a detector low shelf, feedback from the output, a detector high-pass | no improvement |
-| A WaveNet learning compression's whole wet path (`capture_nn.py comp_a / comp_b`, 174 s per mode) | held out -43.8 / -54.0 dB against the fitted IIR's -43.2 / -53.8; in the plug-in drums -40.0 against -39.8 (a), -48.5 against -47.8 (b) |
+| A WaveNet learning compression's whole wet path (`render_training.py comp_a / comp_b`, 174 s per mode) | held out -43.8 / -54.0 dB against the fitted IIR's -43.2 / -53.8; in the plug-in drums -40.0 against -39.8 (a), -48.5 against -47.8 (b) |
 | A WaveNet learning only what the IIR leaves (`train_wn.py KPOST=64 POSTZERO=1`) | -0.5 / +0.7 dB on that rest |
 | The correction network hearing the dry signal too (`XCOND`) | no better |
 | Compression mode a's correction with 16 layers (`train_gain.py a 40000 8 16`, 80 min) | held out -53.1 against -52.3 dB; in place drums -47.4 against -47.7, drums -12 -58.2 against -57.1, the track -59.2 against -58.5, the track -10 -64.6 against -64.3; the presets unchanged; a third more CPU in the correction |
@@ -368,7 +368,7 @@ step with the drums: the expander, which reads the mid (3).
 | Drive colour a: LSTM output alone over windows of 16384 samples after 4096 without gradients (`SEG=16384 STATEWARM=4096`), 20k steps | -21.4 dB (loudest piece -13.1) |
 | Drive colour a: the WaveNet (hi-pass off / on) | -28.3 (-20.5) / -29.7 (-21.8) dB held out, against the LSTM's -31.9 (-24.4) / -31.6 (-24.5) at its first pass |
 | Drive colour a with the hi-pass: an LSTM trained for it directly | -25.7 dB at 150k steps; -26.1 at a peak learning rate of 2e-3; diverged at 300k |
-| Drive colour a trained on the same material also 24, 40 and 56 dB lower (`capture_nn.py drive_a_wide`) | -24.4 dB held out against -31.9 (quiet pieces pass the original's expander, which the network cannot learn from the input alone) |
+| Drive colour a trained on the same material also 24, 40 and 56 dB lower (`render_training.py drive_a_wide`) | -24.4 dB held out against -31.9 (quiet pieces pass the original's expander, which the network cannot learn from the input alone) |
 | A Wiener filter of 8192 taps after the drive network | -27.2 against -29.6 dB held out |
 | Drive colour b as WaveNets (hi-pass off / on) | held out -33.6 (-23.7) / -32.1 (-23.6) against the LSTM's -34.9 (-25.5) / -34.7 (-25.6) at its first pass; in place, hi-pass off, the drive alone: drums -28.7, drums -12 -39.2, the track -23.0, the track -10 -34.9 dB against the LSTM's -30.0 / -40.2 / -25.2 / -36.7 (the default preset in colour b with the hi-pass off: -31.1 / -40.1 / -23.4 / -35.4 against -32.2 / -40.8 / -25.5 / -37.2) |
 | Drive colour b, a further 100k steps at 3e-4 | -35.9 dB held out and 0.6 … 1.0 dB more at normal levels, but drums at -70 dBFS 0.8 … 0.9 dB worse |
@@ -386,6 +386,11 @@ step with the drums: the expander, which reads the mid (3).
 - The harmonics amount change (12).
 - The loud parallel's gain within a cycle (14).
 
+## Scripts
+
+Each value above names the script that measured or fitted it. `fit_low_parallel.py` fits the low parallel,
+`fit_sub_parallel.py` the sub parallel; `scripts/export_models.py` writes `Source/dsp/LearnedModels.h`.
+
 ## Provenance
 
 How each part of Scorpius was made:
@@ -400,4 +405,8 @@ How each part of Scorpius was made:
   fader caps, meters, boxes and plate); the visualiser's stripe and glass in both particle styles drawn in code from
   measured tokens with our own shading.
 - Shipped on recorded approval: the original's factory preset values, under our own names.
+- Published measurement data (approval recorded 2026-11-09): [`measurements/Scorpius/`](../../measurements/Scorpius/),
+  measured responses and fitted values of our own: the compressor's measured curves, the EQ tones, the module survey and
+  the drive's responses, and the null tests' results (`nulltest/results.json`, the data behind NULLTESTS.md). It holds
+  no render of the original and no file the original or a host wrote.
 - None of the original's code, artwork, preset files, fonts or other files ships with Scorpius.

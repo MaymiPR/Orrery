@@ -11,9 +11,9 @@ nonlinear stage hears a steeper band than the audio passes.
 import json, sys
 import numpy as np
 from scipy.optimize import brentq
-import tgp, ident as I, ident_signals as S, fit_bandlaw as F, charsim as C
+import po_ref, ident_lib as I, ident_signals_lib as S, fit_bandlaw as F, charsim_lib as C
 
-FS = tgp.FS
+FS = po_ref.FS
 INTERFERERS = {'low': [130, 160, 200, 250, 300, 400, 500, 700, 1000, 1500, 2000, 3000, 5000, 8000, 12000],
                'mid': [30, 50, 70, 100, 130, 160, 200, 1600, 2000, 2700, 3500, 5000, 6500, 8000, 10000, 12000, 16000],
                'high': [200, 400, 700, 1000, 1300, 1600, 2000, 2400, 2700, 3200]}
@@ -35,7 +35,7 @@ def run(band, loud_db=-2.0, node=4):
         a = S.PRE + int(i * SEG * FS); loud[a:a + int(SEG * FS)] = 10 ** (loud_db / 20) * np.sin(2 * np.pi * f * t[a:a + int(SEG * FS)])
     probe = 10 ** (-30 / 20) * np.sin(2 * np.pi * fp * t); probe[:S.PRE] = 0
     x = (loud + probe).astype(np.float32)
-    y = tgp.render_many([dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': node / 8}, raw=True)], cache=True)[0][0]
+    y = po_ref.render_many([dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': node / 8}, raw=True)], cache=True)[0][0]
     pb = I.bands(probe)[:, 0]
     xb, sb = I.bands(x)[:, 0], I.nl_bands(x)[:, 0]
     names = ['low', 'mid', 'high']

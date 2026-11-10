@@ -7,7 +7,7 @@ samples, longer for modules with slow envelopes (grit: 9600). Grit's linear filt
 import os, sys, time
 import numpy as np
 import torch
-import ori as o
+import sc_ref as o
 from train_wh import fftconv, NN, IR, load
 from train_wn import irname_of, MAXPEAK
 

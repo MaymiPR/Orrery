@@ -1,6 +1,6 @@
 """Side-by-side comparison of a Scorpius snapshot with the reference's screenshot (same scale): per region the
 reference, ours and the difference (x4), stacked; and the mean absolute difference per region.
-  python compare_ui.py reference/orion/ui200_idle.png ours.png out.png [scale=2]"""
+  python compare_ui.py reference/scorpius/ui200_idle.png ours.png out.png [scale=2]"""
 import sys
 import numpy as np
 from PIL import Image, ImageDraw

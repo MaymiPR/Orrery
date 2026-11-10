@@ -11,15 +11,15 @@ Writes measurements/Positron/limiter/limiter.json and plots."""
 import json, os
 import numpy as np
 from scipy.signal import resample_poly
-import tgp, plotstyle as ps
+import po_ref, plotstyle_lib as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'limiter'); os.makedirs(OUT, exist_ok=True)
-FS = tgp.FS
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'limiter'); os.makedirs(OUT, exist_ok=True)
+FS = po_ref.FS
 PRE = 2 * FS
 STEP = 0.6
 LEVELS = list(range(-30, 13, 2))
 PREGAINS = [0, 2.5, 5, 8, 12]
-L = lambda: {**tgp.LIM_ONLY}
+L = lambda: {**po_ref.LIM_ONLY}
 
 
 def sig(*parts):
@@ -81,10 +81,10 @@ if __name__ == '__main__':
     for pg in PREGAINS:
         jobs.append(dict(x=staircase(), norm=L(), params={'Limiter Input Gain': pg}, raw=True)); tags.append(('static', pg))
     imp = np.zeros(PRE + 8192, np.float32); imp[PRE] = 10 ** (-60 / 20)
-    jobs.append(dict(x=imp, norm=tgp.NONE, raw=True)); tags.append(('imp_none', 0))
+    jobs.append(dict(x=imp, norm=po_ref.NONE, raw=True)); tags.append(('imp_none', 0))
     for pg in (0, 1, 2, 3, 4, 5, 6, 8, 10, 12):
         jobs.append(dict(x=imp, norm=L(), params={'Limiter Input Gain': pg}, raw=True)); tags.append(('imp', pg))
-    loudsig = {'noise +6 dBFS RMS-12': sig(tgp.noise(4, -6, seed=7)), 'pink +0 crest': sig(tgp.noise(4, -10, seed=8, pink=True)),
+    loudsig = {'noise +6 dBFS RMS-12': sig(po_ref.noise(4, -6, seed=7)), 'pink +0 crest': sig(po_ref.noise(4, -10, seed=8, pink=True)),
                'sine 9 kHz +6': sig(sine(9000, 4, 6)), 'sine 15 kHz +6': sig(sine(15000, 4, 6)), 'sine 11025 Hz +6 (pi/2 phase steps)': sig(sine(12000, 4, 6))}
     for k, x in loudsig.items():
         jobs.append(dict(x=x, norm=L(), raw=True)); tags.append(('ceil', k))
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     for st in STEPS:
         jobs.append(dict(x=step_sig(*st), norm=L(), raw=True)); tags.append(('step', st))
         jobs.append(dict(x=step_sig(*st) / 1000, norm=L(), raw=True)); tags.append(('stepq', st))
-    ys = tgp.render_many(jobs, cache=True)
+    ys = po_ref.render_many(jobs, cache=True)
     Y = dict(zip([tuple(t) for t in tags], ys))
 
     res = {}
@@ -131,7 +131,7 @@ if __name__ == '__main__':
             y = Y[(tag, k)][0, PRE + FS:]
             ceil[f'{k} | pregain {"5" if tag == "ceil" else "12"}'] = dict(sample_peak_dBFS=round(float(20 * np.log10(np.max(np.abs(y)))), 3),
                                                                      true_peak_dBFS=round(float(true_peak(y)), 3),
-                                                                     rms_dBFS=round(tgp.rms_db(y), 2))
+                                                                     rms_dBFS=round(po_ref.rms_db(y), 2))
     res['ceiling'] = ceil
     # envelopes
     ref = Y[('pilot', 0)][0]

@@ -5,9 +5,9 @@ ours re the reference (dB, positive = ours louder, i.e. compressing less). Defau
     python probe_sweep_residual.py [sweep dBFS] [--tune KEY=V ...]     (--tune: our processor with a DSP constant overridden)"""
 import sys
 import numpy as np
-import tgp, nulltest as N
+import po_ref, nulltest as N
 
-FS = tgp.FS
+FS = po_ref.FS
 TUNE = {a.split('=')[0]: float(a.split('=')[1]) for i, a in enumerate(sys.argv) if i and sys.argv[i - 1] == '--tune'}
 
 
@@ -27,10 +27,10 @@ if __name__ == '__main__':
     db = float(sys.argv[1]) if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else -6.0
     x = N.sig_sweep(db)
     x = np.concatenate([np.zeros((2, N.PRE), np.float32), np.vstack([x, x])], -1)
-    cases = [('defaults', {}), ('character only', tgp.CHAR_ONLY)]
+    cases = [('defaults', {}), ('character only', po_ref.CHAR_ONLY)]
     jobs = [dict(x=x, norm=nm) for _, nm in cases]
-    ref = tgp.render_many(jobs, 'ref', cache=True)
-    ours = tgp.render_many([dict(j, tune=TUNE) if TUNE else j for j in jobs], 'model')
+    ref = po_ref.render_many(jobs, 'ref', cache=True)
+    ours = po_ref.render_many([dict(j, tune=TUNE) if TUNE else j for j in jobs], 'model')
     for (name, _), r, o in zip(cases, ref, ours):
         r, o = r[:, N.PRE:], o[:, N.PRE:]
         t = table(r, o, db)

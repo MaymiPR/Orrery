@@ -2,13 +2,13 @@
     y = Post(N(Pre(x)))
 Pre a causal FIR (starts as a unit impulse), N a static shaper (an asymmetric soft clip with learned drive, ceiling,
 bias and knee, plus a small MLP correction that starts at zero), Post a long causal FIR (starts as the measured
-small-signal impulse response). Trained on capture_nn.py's material (mean squared error relative to each piece's
+small-signal impulse response). Trained on render_training.py's material (mean squared error relative to each piece's
 level), validated by nulls on the held-out pieces. Writes measurements/Scorpius/nn/<case>_model.pt and a JSON copy.
     python train_wh.py <case> [steps] [ir name]"""
 import json, os, sys, time
 import numpy as np
 import torch
-import ori as o
+import sc_ref as o
 
 FS = 48000
 NN = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'nn')

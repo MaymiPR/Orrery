@@ -5,7 +5,7 @@ from 20 Hz to 20 kHz.
 import os
 import numpy as np
 from scipy.optimize import least_squares
-import ori as o
+import sc_ref as o
 
 IR = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'ir')
 FS = o.FS

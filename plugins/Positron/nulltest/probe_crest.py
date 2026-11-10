@@ -6,9 +6,9 @@ that reacts to peaks compresses the peakier signals more.
 import sys
 import numpy as np
 from scipy.signal import butter, sosfiltfilt
-import tgp, ident as I
+import po_ref, ident_lib as I
 
-FS = tgp.FS; PRE = 2 * FS
+FS = po_ref.FS; PRE = 2 * FS
 CENTRE = {'low': 70.0, 'mid': 700.0, 'high': 8000.0}
 NOISE = {'low': (45, 110), 'mid': (400, 1200), 'high': (5000, 11000)}
 
@@ -30,8 +30,8 @@ if __name__ == '__main__':
     sig = signals(band, n)
     bi = ['low', 'mid', 'high'].index(band)
     for lvl in (-20, -10, -4):
-        jobs = [dict(x=(v * 10 ** (lvl / 20)).astype(np.float32), norm={**tgp.CHAR_ONLY, 'Character': amt}, raw=True) for v in sig.values()]
-        r = tgp.render_many(jobs, 'ref', cache=True); o = tgp.render_many(jobs, 'model')
+        jobs = [dict(x=(v * 10 ** (lvl / 20)).astype(np.float32), norm={**po_ref.CHAR_ONLY, 'Character': amt}, raw=True) for v in sig.values()]
+        r = po_ref.render_many(jobs, 'ref', cache=True); o = po_ref.render_many(jobs, 'model')
         row = []
         for (k, v), yr, yo, j in zip(sig.items(), r, o, jobs):
             x = j['x']; seg = slice(PRE + FS // 2, n)

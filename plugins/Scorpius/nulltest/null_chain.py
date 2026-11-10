@@ -4,7 +4,7 @@ of NULLTESTS.md.
     python null_chain.py [model|ours]"""
 import sys
 import numpy as np
-import ori as o
+import sc_ref as o
 import null_modules as N
 
 SETTINGS = {

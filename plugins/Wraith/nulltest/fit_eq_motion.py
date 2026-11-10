@@ -7,7 +7,7 @@ first milliseconds after the jump tell the structures apart.
 """
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 FS = 48000
 AT = 47 * 512

@@ -9,11 +9,11 @@ Writes measurements/Positron/character/grdrop_<amount>.json."""
 import json, os, sys
 import numpy as np
 from scipy.optimize import least_squares
-import tgp, charsim as C, charmodel as CM, nulltest as N
-import measure_mid_release as R, hirel as H
-from measure_high_trace3 import header_laws
+import po_ref, charsim_lib as C, charmodel_lib as CM, nulltest as N
+import measure_mid_release as R, measure_high_release as H
+from measure_high_gain_noise import header_laws
 
-FS = tgp.FS
+FS = po_ref.FS
 F = 8000.0
 DEPTHS = (-3, -5, -7, -9, -11, -15, -21, -45)
 HOLD, AFTER = 1.0, 1.0
@@ -81,5 +81,5 @@ if __name__ == '__main__':
         print('reduction smoothed: rms error (dB) per probe:', ' '.join(f'{err(r, m):.3f}' for r, m in zip(ref, mt)))
         res['gr_smoothed'] = {n: err(r, m) for n, r, m in zip(names, ref, mt)}
         res['gr_law'] = {k: float(v) for k, v in zip(keys, best.x)}
-    out = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', f'grdrop_{amt}.json')
+    out = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character', f'grdrop_{amt}.json')
     json.dump(res, open(out, 'w'), indent=1)

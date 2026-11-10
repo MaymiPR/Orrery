@@ -9,7 +9,7 @@ own delay shows as a gain that rises and falls with it.
 import numpy as np
 from scipy.signal import butter, sosfiltfilt
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 
 FS = 48000
 RATE, PHASE, CENTRE, DEPTH = 0.502995, 0.9972, 7.5727, 1.5027      # as tracked (MEASUREMENTS.md 7.1; the centre includes the filters)

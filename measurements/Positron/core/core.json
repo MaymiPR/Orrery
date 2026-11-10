@@ -1,0 +1,42 @@
+{
+ "44100": {
+  "reported_latency": 179,
+  "core_delay": 138,
+  "allpass_a": 0.00569,
+  "fit_rms": 6.486681797095532e-10,
+  "limiter_extra": 40,
+  "peak_all_on": 179
+ },
+ "48000": {
+  "reported_latency": 189,
+  "core_delay": 151,
+  "allpass_a": 0.5636,
+  "fit_rms": 1.3341320446294015e-09,
+  "limiter_extra": 38,
+  "peak_all_on": 189
+ },
+ "88200": {
+  "reported_latency": 328,
+  "core_delay": 277,
+  "allpass_a": 0.02317,
+  "fit_rms": 5.504599033173228e-10,
+  "limiter_extra": 50,
+  "peak_all_on": 328
+ },
+ "96000": {
+  "reported_latency": 357,
+  "core_delay": 302,
+  "allpass_a": 0.30602,
+  "fit_rms": 1.2648854438545102e-09,
+  "limiter_extra": 54,
+  "peak_all_on": 357
+ },
+ "192000": {
+  "reported_latency": 701,
+  "core_delay": 604,
+  "allpass_a": 0.02272,
+  "fit_rms": 1.2391258799335405e-09,
+  "limiter_extra": 96,
+  "peak_all_on": 701
+ }
+}

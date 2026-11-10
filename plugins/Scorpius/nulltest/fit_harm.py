@@ -5,7 +5,7 @@ W = x + HP(c S(boost / c)), S(u) = u / (1 + |u|^p)^(1/p); or a structure given b
 import numpy as np
 from scipy.optimize import minimize
 from scipy.signal import butter, sosfilt, lfilter
-import ori as o
+import sc_ref as o
 import null_modules as N
 from fit_eqrbj import rbj
 

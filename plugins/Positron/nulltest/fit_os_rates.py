@@ -5,7 +5,7 @@ import sys
 import numpy as np
 from scipy.optimize import minimize_scalar
 from scipy.signal import lfilter
-import tgp
+import po_ref
 from fit_oversampling import design
 from measure_os_rates import jobs, RATES
 
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     R = {}
     for fs in RATES:
         for k in (2, 4, 8):
-            y = tgp.render_many(jobs(fs, k), fs=fs, cache=True)[0][0, 2 * fs:2 * fs + N] / 1e-3
+            y = po_ref.render_many(jobs(fs, k), fs=fs, cache=True)[0][0, 2 * fs:2 * fs + N] / 1e-3
             R[fs, k] = np.fft.rfft(y)
     edges = [float(a) for a in sys.argv[1:]] or [16500, 16700, 16900, 17000, 17100, 17200]
     for e in edges:

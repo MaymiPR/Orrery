@@ -2,10 +2,10 @@
 input levels (is it a dynamic EQ?), and the knob law. Writes measurements/Positron/eq/eq.json and plots."""
 import json, os
 import numpy as np
-import tgp, plotstyle as ps
+import po_ref, plotstyle_lib as ps
 
-OUT = os.path.join(tgp.ROOT, 'measurements', 'Positron', 'eq'); os.makedirs(OUT, exist_ok=True)
-FS = tgp.FS
+OUT = os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'eq'); os.makedirs(OUT, exist_ok=True)
+FS = po_ref.FS
 N = 65536
 PRE = 2 * FS                       # start-up: the path's delay settles in ~0.25 s
 
@@ -16,7 +16,7 @@ def impulse(level_db):
 
 def noise_probe(level_db):
     # white noise, deconvolved: tells whether the response depends on the signal level
-    return tgp.noise(3, level_db, seed=3)
+    return po_ref.noise(3, level_db, seed=3)
 
 
 def response(y, x0, level_db):
@@ -29,11 +29,11 @@ bands = ['EQ Low Gain', 'EQ Mid Gain', 'EQ High Gain']
 settings = [-6, -3, 3, 6]
 jobs, keys = [], []
 for lvl in (-40, -12):
-    jobs.append(dict(x=impulse(lvl), norm=tgp.EQ_ONLY, raw=True)); keys.append(('flat', 0, lvl))
+    jobs.append(dict(x=impulse(lvl), norm=po_ref.EQ_ONLY, raw=True)); keys.append(('flat', 0, lvl))
     for b in bands:
         for s in settings:
-            jobs.append(dict(x=impulse(lvl), norm=tgp.EQ_ONLY, params={b: s}, raw=True)); keys.append((b, s, lvl))
-ys = tgp.render_many(jobs)
+            jobs.append(dict(x=impulse(lvl), norm=po_ref.EQ_ONLY, params={b: s}, raw=True)); keys.append((b, s, lvl))
+ys = po_ref.render_many(jobs)
 f = np.fft.rfftfreq(N, 1 / FS)
 H = {k: response(y, None, k[2]) for k, y in zip(keys, ys)}
 ref = {lvl: H[('flat', 0, lvl)] for lvl in (-40, -12)}

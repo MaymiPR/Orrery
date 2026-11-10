@@ -7,9 +7,9 @@ Source/dsp/BandFilters.h (the IRs, and the per-band small-signal gains at each a
 measurements/Positron/character/bands.json."""
 import json, os
 import numpy as np
-import tgp
+import po_ref
 
-FS = tgp.FS
+FS = po_ref.FS
 PRE = 2 * FS
 L = 1024
 NF = 8192
@@ -19,7 +19,7 @@ FC1, FC2 = 157.1, 2675.8
 if __name__ == '__main__':
     x = np.zeros(PRE + 65536, np.float32); x[PRE] = 10 ** (-60 / 20)
     amounts = [k / 8 for k in range(9)]
-    ys = tgp.render_many([dict(x=x, norm={**tgp.CHAR_ONLY, 'Character': a}, raw=True) for a in amounts], cache=True)
+    ys = po_ref.render_many([dict(x=x, norm={**po_ref.CHAR_ONLY, 'Character': a}, raw=True) for a in amounts], cache=True)
     H = np.array([y[0, PRE:PRE + L] / 1e-3 for y in ys]).astype(float)
     U, s, Vt = np.linalg.svd(H, full_matrices=False)
     print('singular values re the first:', np.round(s / s[0], 9))
@@ -52,6 +52,6 @@ if __name__ == '__main__':
     lines += ['};', 'inline constexpr double bandGain48k[3][9] {']
     for b in range(3): lines.append('    { ' + ', '.join(f'{v:.6f}' for v in gains_db[b]) + ' },')
     lines += ['};', '}', '']
-    open(os.path.join(tgp.PLUGIN, 'Source', 'dsp', 'BandFilters.h'), 'w').write('\n'.join(lines))
+    open(os.path.join(po_ref.PLUGIN, 'Source', 'dsp', 'BandFilters.h'), 'w').write('\n'.join(lines))
     json.dump(dict(taps=n, reconstruction_error=float(err), gains_dB=gains_db.round(4).tolist(),
-                   singular_values=(s / s[0]).tolist()), open(os.path.join(tgp.ROOT, 'measurements', 'Positron', 'character', 'bands.json'), 'w'), indent=1)
+                   singular_values=(s / s[0]).tolist()), open(os.path.join(po_ref.ROOT, 'measurements', 'Positron', 'character', 'bands.json'), 'w'), indent=1)

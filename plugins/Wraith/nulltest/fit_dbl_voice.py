@@ -9,7 +9,7 @@ second renderer (WR_RENDER=dev).
 import argparse, json, os
 import numpy as np
 import nulltest_lib as nl
-import ts as h
+import wr_ref as h
 import fit_char as fc
 
 PARAMS = [('dblVoiceGain', 0.3365, 0.1, 0.8, False), ('dblHpHz', 363.7, 50.0, 1500.0, True), ('dblLpHz', 12879.0, 4000.0, 22000.0, True),

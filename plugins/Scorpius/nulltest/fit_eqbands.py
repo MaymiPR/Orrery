@@ -5,7 +5,7 @@ Source/dsp/EqBands.h.
 import os
 import numpy as np
 from scipy.optimize import least_squares
-import ori as o
+import sc_ref as o
 
 NS = 3                     # biquads per band
 IR = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'ir')
