@@ -6,3 +6,4 @@ vendor: Cradle, Orion, The God Particle, God Particle, The Spirit, The Prince, S
 #
 # allow: <path glob>  <reason, with the approval recorded and its date>
 allow: plugins/Wraith/resources/ir/*.bin  measured reverb responses, room and plate per sample rate (approval recorded, 2026-11-01)
+allow: plugins/*/tests/data/state-*.bin  saved-state fixtures of our own releases, written by tools/HostTest.cpp from our VST3 (approval recorded 2026-11-09)
