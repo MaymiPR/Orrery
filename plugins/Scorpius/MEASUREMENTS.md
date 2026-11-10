@@ -205,8 +205,7 @@ Each path is mixed in with the faders' taper (5); levels below at level 1.
 
 The identified laws and learned models are in 14.
 
-## 12. Smoothing and switching (`nulltest/probe_autom.py`, `measure_autom_curve.py`, `probe_switch_on.py`,
-`measure_harm_ramp.py`)
+## 12. Smoothing and switching (`nulltest/probe_autom.py`, `measure_autom_curve.py`, `probe_switch_on.py`, `measure_harm_ramp.py`)
 
 First readings, a 1 kHz tone at -20 dBFS, a change at a 64-sample block boundary:
 

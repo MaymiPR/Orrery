@@ -224,8 +224,7 @@ the same at every amount:
   each signal weighed equally in dB (`fit_music.py mid N --loud --track --relative --fixed`); the 200 % node again on
   the path of 3.15.
 - The high band's laws are fitted around its measured shaper (3.14) and detector (3.17).
-- The fitted laws are in `measurements/Positron/character/bandlaw_final_v13.json`, compiled into the plug-in's band
-  tables.
+- The fitted laws are in `measurements/Positron/character/bandlaw_final_v13.json`, compiled into the plug-in's band tables.
 
 ### 3.10 Stereo: mid-only detectors and a side gain after the shaper (`fit_width.py`)
 
@@ -331,28 +330,23 @@ excerpts). From 100 % up each signal is weighed equally in dB (`--relative`); be
 fits better.
 
 - The steady curve matches: read through the shaper on steady staircases (tone, two tones, band noise, -18 … 0 dBFS
-  in 1 dB steps, `measure_static_n.py`, `fit_music.py --static`), with γ included, the laws follow the original's curve
-to
+  in 1 dB steps, `measure_static_n.py`, `fit_music.py --static`), with γ included, the laws follow the original's curve to
   0.003 dB rms at 12.5 %, 0.019 at 100 %, 0.023 at 87.5 % (0.05 dB after the refits). The remaining high-band
   difference on loud material is in the detector's timing, not in the curve.
 - On the mastered track (70 s, 44.1 kHz, about -10 dBFS RMS) the band's gain is right on average (±0.1 dB per 20 ms
   frame); the difference is in how fast the detector moves, at 44.1 and 48 kHz alike and with the irregular host
   blocks FL Studio sends. The band holds most of the section's residual there (84 %, -34 dB relative to the band,
   before the refits of 3.15 and 3.17).
-- The gain trace on loud drums (`measure_high_gain_program.py`) is the check for the start and depth of compression
-  through each hit.
+- The gain trace on loud drums (`measure_high_gain_program.py`) is the check for the start and depth of compression through each hit.
 
-### 3.15 What the mid band's gain acts on above its band (`nulltest/probe_cross.py`, `probe_band_path.py`,
-`probe_mid_edge.py`)
+### 3.15 What the mid band's gain acts on above its band (`nulltest/probe_cross.py`, `probe_band_path.py`, `probe_mid_edge.py`)
 
 Quiet tones above 1.5 kHz under a loud masker below 1 kHz turn the original down by nothing between 4 and 8 kHz
-(`probe_cross.py`; a mid gain applied to the whole steep-edged band of 3.11 turns them down 0.05 to 0.15 dB), and on
-pink
+(`probe_cross.py`; a mid gain applied to the whole steep-edged band of 3.11 turns them down 0.05 to 0.15 dB), and on pink
 noise at -18 dBFS the original's high-band gain sits a steady 0.03 dB above such a model's while neither compresses
 (`measure_high_gain_noise.py`): the mid band's gain reaches less far up than its nonlinear stage's input.
 
-Probe (`probe_band_path.py`): quiet tones (-50 dBFS, 60 frequencies from 0.9 to 18 kHz, too quiet to move any detector)
-under
+Probe (`probe_band_path.py`): quiet tones (-50 dBFS, 60 frequencies from 0.9 to 18 kHz, too quiet to move any detector) under
 a loud in-band masker (pink noise, 250 to 700 Hz, -6 dBFS RMS), and the masker alone. Each tone's complex change (with
 the masker, less alone, less the masker's own output) is the band's gain change times the response of the path the
 gain is applied through. Normalised at 900 Hz; the plug-in reads its own path to within 0.05 dB this way.
@@ -375,8 +369,7 @@ Model: the measured ratio is applied to the mid band's nonlinear-stage filter fr
 NlBandFilters.h and BandFiltersRates.h at every supported rate), no law refitted for it. NULLTESTS.md: "char: pink
 -18, 100 %", "char: pink -6, 100 %", "char: drums -6, 100 %", "char: music -10, 50 %" and "100 %".
 
-**The mid shaper's drive.** Tone staircases at 300, 500, 700 and 1000 Hz (`measure_mid_static.py`, 100 %) show the
-band's
+**The mid shaper's drive.** Tone staircases at 300, 500, 700 and 1000 Hz (`measure_mid_static.py`, 100 %) show the band's
 steady gain within 0.01 dB of the original's from -44 to +4 dBFS, with the 3rd harmonic 0.37 dB too strong at low
 levels at every frequency: the drive, not a filter. The fitted k (2.514) is 2 % above the 2.445 read with anti-phase
 tones (3.14); the measured drive fits worse on program material (Declined changes), so the fitted drive compensates
@@ -386,8 +379,7 @@ for a mid-band difference not yet found (8).
 correlation of 0.993 (0.974 before the mid path was measured). The nodes at 100, 125 and 175 % are refitted on it;
 25, 150 and 200 % keep their laws (Declined changes).
 
-### 3.16 The detectors' release, read from tone drops (`nulltest/measure_mid_release.py`, `measure_mid_times.py`,
-`measure_high_release.py`, `fit_high_static.py`)
+### 3.16 The detectors' release, read from tone drops (`nulltest/measure_mid_release.py`, `measure_mid_times.py`, `measure_high_release.py`, `fit_high_static.py`)
 
 Probe: a steady tone in one band (700 Hz for the mid band, 8 kHz for the high band) drops from a loud level to a
 quiet one; the other two bands are taken off the output through their laws, the rest inverted through the band's
@@ -432,18 +424,15 @@ A one-pole on |x| gives -22 dB/s for the drop to -3 dBFS and one on x⁴ gives -
 | Laws | `measurements/Positron/character/bandlaw_final_v13.json` | | |
 
 NULLTESTS.md: "defaults, sweep -6", "defaults, drums -1", the mastered track. The sweep at -6 dBFS nulls at -56 to
--66 dB in the crossover region (1.5 to 3.5 kHz), within 0.013 dB of the original's level
-(`nulltest/probe_sweep_residual.py`,
+-66 dB in the crossover region (1.5 to 3.5 kHz), within 0.013 dB of the original's level (`nulltest/probe_sweep_residual.py`,
 50 ms windows).
 
 ### 3.18 The mid band on loud material (`nulltest/probe_mid_det_spectrum.py`, `probe_mid_det.py`, `fit_music.py`)
 
-The mid band reduces loud pink noise a steady 0.04 dB more than the original (`measure_high_gain_noise.py --band mid`;
-pink noise at
+The mid band reduces loud pink noise a steady 0.04 dB more than the original (`measure_high_gain_noise.py --band mid`; pink noise at
 -6 dBFS, "char: pink -6, 100 %"), and its fitted drive sits 2 % above the measured one (3.15).
 
-**What the detector hears** (`probe_mid_det_spectrum.py --map`: a 700 Hz probe at -40 dBFS rides on a steady sine pump;
-the
+**What the detector hears** (`probe_mid_det_spectrum.py --map`: a 700 Hz probe at -40 dBFS rides on a steady sine pump; the
 probe's gain is the band's reduction, read back through each plug-in's own in-band curve as a level). In band (300 Hz
 to 2 kHz) Positron reads the pump within 0.02 dB of the original; below the band it reads it louder, more at higher
 levels; above 2.4 kHz slightly quieter:
@@ -535,8 +524,7 @@ near-ties), so they were chosen by the mean.
 | 96 kHz | 12, 14.5 | -56.7 |
 | 192 kHz | 10, 16 | -55.4 |
 
-**The level estimate against the original's readings** (`nulltest/probe_lim_pulse.py`, `probe_lim_interp.py`,
-`limiter_lib.py`, `probe_lim_nl.py`):
+**The level estimate against the original's readings** (`nulltest/probe_lim_pulse.py`, `probe_lim_interp.py`, `limiter_lib.py`, `probe_lim_nl.py`):
 an isolated pulse above the ceiling is planned to exactly its level, so at its loudest point output / input =
 trim / level. On 3873 isolated pulses (1084 of them raw bursts 2 to 6 samples long):
 
@@ -557,8 +545,7 @@ No linear interpolator is left to gain from; on short raw noise bursts the origi
 the plug-in exactly, every variant (peaks of the sample magnitudes, peaks over two neighbours, a minimum prominence,
 the steepest reachable peak) is far worse (pink noise -21 … -29 dB against -47.5).
 
-**How far the limiter can null** (`nulltest/probe_sensitivity.py`): the original against itself, white noise added to
-pink
+**How far the limiter can null** (`nulltest/probe_sensitivity.py`): the original against itself, white noise added to pink
 noise at -6 dBFS (5 dB into the limiter). Noise at -140 or -120 dBFS moves its output by -132 / -113 dB, as a linear
 stage would; at -100 dBFS by -67.5 dB, at -80 dBFS by -57.5 dB. A difference of a ten-thousandth in the level changes
 plan decisions (near-ties: a local maximum 0.001 above its neighbour that the original does not count as one), and
