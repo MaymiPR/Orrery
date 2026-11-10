@@ -1,0 +1,20 @@
+Input Gain	-8.712
+Gain Rider Speed	0.008
+Gain Rider Amount	0.373
+Gain Rider Floor	-18.285
+Gain Rider State	1.000
+Compression	-27.000
+Focus	35.000
+Character State	0.000
+EQ Low Gain	-10.049
+EQ High Gain	4.783
+EQ State	0.000
+Doubler Stereo	0.935
+Doubler Mix	0.237
+Doubler State	0.000
+Reverb Filter	13784.587
+Reverb Mix	0.147
+Reverb State	0.000
+Output Gain	3.446
+Bypass	Off
+Reverb Type	room

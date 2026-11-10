@@ -24,3 +24,12 @@ clap_src: ''
 pluginval: ''
 # The Inno Setup 7 compiler (ISCC.exe), for the Windows installer
 iscc: ''
+
+# Suite keys: the keys this suite's own scripts read, below this line. sync_template.py replaces everything above it
+# with the starter's form and keeps this block as it is.
+Positron.ref_vst3: ''
+Positron.ref_name: ''
+Scorpius.ref_vst3: ''
+Scorpius.ref_name: ''
+Wraith.ref_vst3: ''
+Wraith.ref_name: ''

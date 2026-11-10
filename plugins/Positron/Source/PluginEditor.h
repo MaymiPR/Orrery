@@ -1,13 +1,16 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <optional>
 #include "PluginProcessor.h"
-#include "ui/MetalKnob.h"
+#include "shared/ui/MetalKnob.h"
 #include "ui/Visualizer.h"
-#include "ui/Widgets.h"
+#include "shared/ui/Widgets.h"
+#include "shared/ui/HostFocus.h"
 
 // The editor is laid out in the reference's design pixels (888 x 359.5 at 100 %) and scaled as a whole by the
 // UI Scale menu (50 ... 200 %), or freely by dragging its bottom-right corner (ours; the proportions stay).
 class PositronEditor : public juce::AudioProcessorEditor,
+                             public orrery::SnapshotHooks,
                              private juce::Timer,
                              private juce::ChangeListener,
                              private juce::AudioProcessorValueTreeState::Listener
@@ -24,6 +27,10 @@ public:
 
     // snapshot tool: freeze meters and visualiser to a given state
     void setTestLevels (float inDb, float outDb, bool audio);
+    // the suite's snapshot tool (tools/Snapshot.cpp): --levels, and the options --audio (the particles as for that
+    // input level), --ext (the side-chain source external), --anti or --classic (the particle style, for this run only)
+    void setTestLevels (float inDb, float outDb) override;
+    bool snapshotOption (const juce::String&) override;
 
 private:
     struct Meter                                     // one channel of an I/O meter as drawn
@@ -55,7 +62,7 @@ private:
     void showSettings();
     void showSavePreset();
     void showAboutMenu();
-    void showDialog (std::unique_ptr<po::Dialog>);
+    void showDialog (std::unique_ptr<orrery::Dialog>);
     void updateMeter (Meter&, po::LevelTap&);
     void sampleReadouts();
 
@@ -90,15 +97,15 @@ private:
         PositronEditor& ed;
     } hoverTracker { *this };
     void updateReadout (const juce::MouseEvent&, bool released);
-    juce::String captionText (const po::MetalKnob&, const char* name) const;
-    const po::MetalKnob* readoutKnob = nullptr;
+    juce::String captionText (const orrery::MetalKnob&, const char* name) const;
+    const orrery::MetalKnob* readoutKnob = nullptr;
 
     // I/O link (ours): while linked the output gain is always the input gain's opposite. A gesture on either knob
     // moves the other (as one host gesture each); changes from the host are mirrored too
-    void beginLink (po::MetalKnob&);
-    void endLink (po::MetalKnob&);
+    void beginLink (orrery::MetalKnob&);
+    void endLink (orrery::MetalKnob&);
     void mirror (bool fromInput);
-    po::MetalKnob* linkSource = nullptr;
+    orrery::MetalKnob* linkSource = nullptr;
     bool mirroring = false;
 
     PositronProcessor& proc;
@@ -116,22 +123,22 @@ private:
     juce::uint32 lastResizeMs = 0;
     void endLiveResize();
 
-    po::Logo logo;
-    po::DropBox presetBox, scaleBox;
-    po::IconButton prevButton { po::IconButton::Icon::left }, nextButton { po::IconButton::Icon::right },
-        saveButton { po::IconButton::Icon::save };
-    po::SegmentToggle sidechain;
-    po::GearButton gear;
+    orrery::Logo logo;
+    orrery::DropBox presetBox, scaleBox;
+    orrery::IconButton prevButton { orrery::IconButton::Icon::left }, nextButton { orrery::IconButton::Icon::right },
+        saveButton { orrery::IconButton::Icon::save };
+    orrery::SegmentToggle sidechain;
+    orrery::GearButton gear;
 
-    po::PowerButton eqPower, amountPower, limiterPower;
-    po::MetalKnob eqHigh { po::MetalKnob::Kind::small }, eqMid { po::MetalKnob::Kind::small }, eqLow { po::MetalKnob::Kind::small };
-    po::MetalKnob amount { po::MetalKnob::Kind::large };
-    po::MetalKnob inputKnob { po::MetalKnob::Kind::plate }, limiterKnob { po::MetalKnob::Kind::plate },
-        outputKnob { po::MetalKnob::Kind::plate };
+    orrery::PowerButton eqPower, amountPower, limiterPower;
+    orrery::MetalKnob eqHigh { orrery::MetalKnob::Kind::small }, eqMid { orrery::MetalKnob::Kind::small }, eqLow { orrery::MetalKnob::Kind::small };
+    orrery::MetalKnob amount { orrery::MetalKnob::Kind::large };
+    orrery::MetalKnob inputKnob { orrery::MetalKnob::Kind::plate }, limiterKnob { orrery::MetalKnob::Kind::plate },
+        outputKnob { orrery::MetalKnob::Kind::plate };
     po::Visualizer visualizer;
-    po::LinkButton ioLinkButton;
-    po::CompareToggle compare;         // ours (as Cradle's Orion): A / B settings, left of the preset menu
-    po::Toast toast;                   // "A copied to B.", over the plate
+    orrery::LinkButton ioLinkButton;
+    orrery::CompareToggle compare;         // ours (as Scorpius's reference has it): A / B settings, left of the preset menu
+    orrery::Toast toast;                   // "A copied to B.", over the plate
     struct PaintOverlay : juce::Component
     {
         std::function<void (juce::Graphics&)> paintFn;
@@ -139,8 +146,11 @@ private:
     } amountText;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> attachments;
 
-    std::unique_ptr<po::DropList> dropList;
+    std::unique_ptr<orrery::DropList> dropList;
     std::unique_ptr<juce::Component> dialog;
+    std::unique_ptr<orrery::HostFocus> hostFocus;      // the host's keys after a click (FL Studio)
+    bool snapshotAudio = false;                         // snapshot tool: --audio
+    std::optional<po::Settings::Particles> snapshotStyle;   // the global style a snapshot run changed, put back on close
 
     Meter inMeter[2], outMeter[2];
     float bandGrDb[3] {}, limGrDb[2] {};                     // now (the bars)

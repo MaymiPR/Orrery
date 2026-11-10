@@ -13,6 +13,16 @@ inline void noFocus (juce::Component& c)
     c.setMouseClickGrabsKeyboardFocus (false);
 }
 
+// What the snapshot tool (tools/Snapshot.cpp, one for the plug-ins that need nothing more) may ask of an editor beyond
+// its parameters: meters frozen at given levels, and the plug-in's own options (a particle style, a side-chain source),
+// each a "--name" argument the tool hands over after the editor is open. The tool finds it by dynamic_cast.
+struct SnapshotHooks
+{
+    virtual ~SnapshotHooks() = default;
+    virtual void setTestLevels (float inDb, float outDb) = 0;
+    virtual bool snapshotOption (const juce::String&) { return false; }     // true when the editor took the option
+};
+
 // Mint power button: filled while the section runs, outlined while it is bypassed.
 class PowerButton : public juce::Component
 {
@@ -21,8 +31,8 @@ public:
     void paint (juce::Graphics&) override;
     void mouseUp (const juce::MouseEvent& e) override { if (contains (e.getPosition()) && onClick) onClick(); }
     bool active = true;
-    float boxHeight = 24.5f;         // The God Particle's buttons; Orion's are 23.5 tall
-    // Orion's hover (measured): a running button does not change, a bypassed one fills with mint at 20 %; pressed, either
+    float boxHeight = 24.5f;         // Positron's buttons; Scorpius's are 23.5 tall
+    // Scorpius's reference's hover (measured): a running button does not change, a bypassed one fills with mint at 20 %; pressed, either
     // shows a dark mint box without outline
     bool offHoverFill = false;
     std::function<void()> onClick;
@@ -59,7 +69,7 @@ class DropBox : public juce::Component
 public:
     DropBox() { noFocus (*this); setRepaintsOnMouseActivity (true); }
     void paint (juce::Graphics&) override;
-    // opens on release over it, as Orion's (a press dragged off does nothing)
+    // opens on release over it, as Scorpius's reference does (a press dragged off does nothing)
     void mouseUp (const juce::MouseEvent& e) override { if (contains (e.getPosition()) && onClick) onClick(); }
     juce::String text;
     bool open = false;
@@ -91,7 +101,7 @@ public:
     std::function<void()> onClick;
 };
 
-// The Orrery Suite mark (left of the top bar), drawn as the reference draws its maker's mark there: a flat grey glyph
+// The Orrery mark (left of the top bar), drawn as the reference draws its maker's mark there: a flat grey glyph
 // in the same place, size and grey.
 class Logo : public juce::Component
 {
@@ -103,7 +113,7 @@ public:
 };
 
 
-// Compare A -> B of the top bar (Orion's; Positron has it too, ours): the active letter's half is white; the circle in the middle copies the active setting
+// Compare A -> B of the top bar (Scorpius's reference has it; Positron has it too, ours): the active letter's half is white; the circle in the middle copies the active setting
 // to the other one, its arrow pointing that way. Under the mouse (measured): the inactive half lightens (#252523), the
 // active half's letter turns grey, the arrow turns grey.
 class CompareToggle : public juce::Component
@@ -125,7 +135,7 @@ private:
     int hover = -1, pressedPart = -1;
 };
 
-// The message Orion shows over the plate when Compare's arrow copies one setting to the other ("A copied to
+// The message Scorpius's reference shows over the plate when Compare's arrow copies one setting to the other ("A copied to
 // B."): a black box with a dark grey edge, there at once, held for 0.55 s, then fading out over 1.05 s (measured).
 class Toast : public juce::Component, private juce::Timer
 {

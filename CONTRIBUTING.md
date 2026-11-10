@@ -1,4 +1,4 @@
-# Contributing to Orrery Suite
+# Contributing to Orrery
 
 Bug reports and null-test findings go to the [issues](https://github.com/MaymiPR/Orrery/issues/new/choose). This page
 covers changing the code: how it is built, tested and checked, how a change reaches `main`, and how a release is
@@ -22,7 +22,10 @@ are recordings that a model cannot null. They are measurements of its output, no
 Requirements and the commands per platform are in the [build guide](docs/BUILDING.md), the Windows installer
 included. The default configuration (`-DORRERY_TOOLS=ON`) also builds the hosts for the reference plug-ins
 (`tools/`), each plug-in's offline renderer (PoRender, ScRender, WrRender), its editor snapshot tool and Positron's
-`charsim` library for the fits, under `build/<tool>_artefacts/Release/`.
+`charsim` library for the fits (`plugins/Positron/tools/CharSim.cpp`), under `build/<tool>_artefacts/Release/`.
+`-DORRERY_DEV_COPY=ON` (the default) also copies each VST3 to `build/plugins/<Product name>.vst3`, the folder a DAW's
+plug-in junction points at. The code in `shared/` is built once, as the static library `OrreryShared`, which every
+plug-in, test, snapshot and renderer links.
 
 ## Tests
 
@@ -31,6 +34,7 @@ included. The default configuration (`-DORRERY_TOOLS=ON`) also builds the hosts 
 | `PositronTests` | Positron's DSP and processor: filters, the FIR crossover, latency, bypass, the limiter's ceiling, oversampling, state, extreme input | `ctest --test-dir build -C Release --output-on-failure` |
 | `ScorpiusTests` | Scorpius's DSP and processor: the modules, presets, A / B, the side-chain, state; `bench` times the learned models | the same |
 | `WraithTests` | Wraith's DSP and processor: layout, every stage off passes the input, gains, bypass, state, the start-up preset, tapers, extreme input, A / B, I/O LINK, the side-chain without a bus | the same |
+| `PositronHostTest`, `ScorpiusHostTest`, `WraithHostTest` | the built VST3 hosted as a DAW hosts it (`tools/HostTest.cpp`): parameters, save and reload into a new instance, the editor, a sample-rate change, offline rendering, and every saved state in `plugins/<Id>/tests/data/state-<x.y.z>.bin` loading with the same parameter texts | the same |
 | Render regression | `tests/regress/<Id>/jobs.txt` through PoRender, ScRender and WrRender against the committed goldens; our output does not change unless intended (`--update` after an intended DSP change, committed with it) | `python scripts/render_regress.py --build build` |
 | Null tests | the same signals through the original and through ours; the residual in dB | per plug-in, [Null tests](#null-tests) |
 | Repository checks | absolute paths, old names, attribution forms, document style, whitespace | `python scripts/check_repo.py` |
@@ -81,9 +85,9 @@ unsigned and the notes say so.
 
 | Path | What it holds |
 |---|---|
-| `plugins/<Id>/` | one plug-in: `Source/`, `resources/` (Positron's glass), `ir/` (Wraith's measured reverb responses), `tests/`, `tools/` (its renderer, snapshot tool and UI fitting scripts), `nulltest/` (the harness; needs the original installed), README, RESEARCH, MEASUREMENTS, NULLTESTS |
-| `shared/` | code and resources shared by the plug-ins: the UI library, the I/O level meter, the Instrument Sans font |
-| `tools/` | hosts for the reference plug-ins: offline renders (RefRender), editor films and screenshots (RefCapture), parameter lists (ParamDump), the keyboard-focus check (FocusCheck); and `tgpstate.py`, the reader of the originals' saved state that the harnesses import |
+| `plugins/<Id>/` | one plug-in: `Source/`, `resources/` (Positron's glass, Wraith's measured reverb responses), `tests/` (with `data/`, the saved-state fixtures), `tools/` (its renderer; Scorpius's and Wraith's own snapshot tools), `scripts/` (the scripts that write its resources and measure its editor), `nulltest/` (the harness; needs the original installed), README, RESEARCH, MEASUREMENTS, NULLTESTS |
+| `shared/` | the static library `OrreryShared`: the UI library (theme, controls, metal knob, the host-keys hand-back `HostFocus`), the I/O level meter, the Instrument Sans font |
+| `tools/` | hosts for the reference plug-ins: offline renders (RefRender), editor films and screenshots (RefCapture), parameter lists (ParamDump), the keyboard-focus check (FocusCheck); the host test (`HostTest.cpp`) and the editor snapshot tool (`Snapshot.cpp`), built per plug-in |
 | `tests/regress/` | the render regression's cases and golden renders |
 | `scripts/` | `bump_version.py`, `release_notes.py`, `render_regress.py`, `make_site.py`, `check_repo.py`, `check.ps1`, `check.sh` |
 | `packaging/` | the installers; `plugins.txt` lists the plug-ins they hold |
@@ -133,6 +137,21 @@ new renders.
 One version for the suite (`project(... VERSION ...)` in `CMakeLists.txt`). A new plug-in raises the middle number
 (1.1.0 added Scorpius, 1.2.0 Wraith), a fix the last. Tags are `vx.y.z`; `vx.y.z-rc.N` publishes a pre-release.
 `scripts/bump_version.py` writes every version.
+
+## Frozen identity
+
+What saved projects, presets and installs depend on, never changed once a release has shipped. These items keep the
+suite's first name, Orrery Suite, which the suite carried until it took the repository's name, Orrery (2026-11-09):
+
+| Item | Value |
+|---|---|
+| Manufacturer code | `Orry` |
+| Plug-in codes | Positron `Pstn`, Scorpius `Scrp`, Wraith `Wrth` (`packaging/plugins.txt`) |
+| Bundle and CLAP IDs | `com.orrerysuite.positron`, `com.orrerysuite.scorpius`, `com.orrerysuite.wraith` |
+| Parameter IDs | each plug-in's `Source/Params.h` |
+| Company name | `Orrery Suite` (`COMPANY_NAME` in each `plugin.cmake`) |
+| Installer AppId | `CFCB62BB-FB41-4B4B-AB2C-4ED7523FCF0F` (`packaging/Orrery.iss`) |
+| Install folders | Windows `VST3\Orrery Suite`, `CLAP\Orrery Suite` and `Program Files\Orrery Suite` (`packaging/Orrery.iss`); macOS `Orrery Suite` (`SUBFOLDER` in `release.yml`); Linux `~/.vst3/Orrery Suite` and `~/.clap/Orrery Suite` (`packaging/install-linux.sh`) |
 
 ## Deviations from the standard
 

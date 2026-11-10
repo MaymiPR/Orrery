@@ -48,7 +48,7 @@ void Engine::reset()
     first = true;
 }
 
-// a module's power for this block: switching at the block's start, as the reference does (Cradle's framework: with
+// a module's power for this block: switching at the block's start, as the reference does (its framework: with
 // host blocks under a control chunk the switch waits until a whole chunk has gathered, 128 - n rounded up to whole
 // blocks; MEASUREMENTS.md 12), or crossfading (switchMs > 0); switched on, it restarts from silence
 void Engine::switchModule (Power& power, bool on, int n, const std::function<void()>& restart)

@@ -1,4 +1,4 @@
-Release checklist for Orrery Suite {{VERSION}} (branch `{{BRANCH}}`). One list for every release: tick each item
+Release checklist for Orrery {{VERSION}} (branch `{{BRANCH}}`). One list for every release: tick each item
 as it happens and close this issue when the release is live. The flow in short is in CONTRIBUTING.md under
 "Making a release"; the rules are in STANDARDS.md.
 
@@ -11,8 +11,10 @@ as it happens and close this issue when the release is live. The flow in short i
   commit, tests with a clean settings file.
 - [ ] The four documents of every plug-in are current; NULLTESTS.md is regenerated from the result files (`nulltest.py --report`); the README's How close rows equal it; no number typed by hand.
 - [ ] Screenshots regenerated with the Snapshot tool where the editor changed; `docs/screenshots/hero.png` rebuilt.
-- [ ] `packaging/plugins.txt` lists every plug-in that ships; `packaging/THIRD-PARTY-NOTICES.txt` names every dependency and font.
-- [ ] A saved-state fixture exists for this version if a parameter or its reading changed.
+- [ ] `packaging/plugins.txt` lists every plug-in that ships with its AU type; `packaging/THIRD-PARTY-NOTICES.txt` names every dependency and font.
+- [ ] A saved-state fixture exists for this version if a parameter or its reading changed
+  (`<Stem>HostTest <vst3> --save-state plugins/<Id>/tests/data/state-{{VERSION}}.bin`); the frozen identity in
+  CONTRIBUTING.md is unchanged.
 - [ ] `CHANGELOG.md` has everything user-facing under `## Unreleased`, with before and after numbers in dB for sound changes; `### Highlights` for a new plug-in.
 - [ ] The provenance and public gates pass: `python scripts/check_repo.py --release` (the Provenance section in every
   MEASUREMENTS.md, `## Unreleased` first in the CHANGELOG, no absolute path, old name, attribution form or dated
@@ -20,7 +22,7 @@ as it happens and close this issue when the release is live. The flow in short i
 - [ ] First release of a plug-in only: the name review (the vendor's catalogue and the trademark registers searched for the name and its stem), approval recorded with its date.
 - [ ] The Windows test installer builds from PowerShell and installs and uninstalls cleanly: `pwsh
   packaging\make_iss_include.ps1 build`, then `ISCC /DTestRoot=<scratch> /DAppVersion={{VERSION}}
-  packaging\OrrerySuite.iss`.
+  packaging\Orrery.iss`.
 - [ ] Hygiene: no real email, no em or en dash, no `TODO`, no vendor internals, no version string where a plain product name is wanted; the VST3 junction still points at the build.
 
 ## The bump and the tag
@@ -35,8 +37,8 @@ as it happens and close this issue when the release is live. The flow in short i
 
 ## After
 
-- [ ] The release page is not a draft; the title is `Orrery Suite {{VERSION}}`; the files are
-  `OrrerySuite-{{VERSION}}-Windows-Setup.exe`, `OrrerySuite-{{VERSION}}-macOS.pkg`, `OrrerySuite-{{VERSION}}-Linux.tar.gz`
+- [ ] The release page is not a draft; the title is `Orrery {{VERSION}}`; the files are
+  `Orrery-{{VERSION}}-Windows-Setup.exe`, `Orrery-{{VERSION}}-macOS.pkg`, `Orrery-{{VERSION}}-Linux.tar.gz`
   and `SHA256SUMS.txt`; the notes are the CHANGELOG section plus the footer with the signing state.
 - [ ] One file downloaded on another machine; its digest equals its line in `SHA256SUMS.txt`; `gh attestation verify <file> --repo MaymiPR/Orrery` passes on a public repository.
 - [ ] The README's badges show the new version.

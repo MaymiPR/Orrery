@@ -1,5 +1,5 @@
 #!/bin/sh
-# Installs every Orrery Suite plug-in in this folder for the current user: VST3 to ~/.vst3, CLAP to ~/.clap and
+# Installs every Orrery plug-in in this folder for the current user: VST3 to ~/.vst3, CLAP to ~/.clap and
 # the standalone apps (when the tarball carries a Standalone/ folder) to ~/.local/bin.
 #   sh install-linux.sh              install
 #   sh install-linux.sh --uninstall  remove again
@@ -13,7 +13,7 @@ if [ "$1" = "--uninstall" ]; then
     for p in Standalone/*; do
         [ -f "$p" ] && rm -f "$B/$(basename "$p")"
     done
-    echo "Orrery Suite removed from $V, $C and $B"
+    echo "Orrery removed from $V, $C and $B"
     exit 0
 fi
 mkdir -p "$V" "$C"

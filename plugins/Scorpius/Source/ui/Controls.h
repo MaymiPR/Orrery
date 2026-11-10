@@ -2,7 +2,7 @@
 #include "shared/ui/Widgets.h"
 #include "shared/ui/MetalKnob.h"
 
-// Scorpius's own controls, at the reference's measured sizes and with its behaviour (Orion at 200 %: RESEARCH.md "GUI";
+// Scorpius's own controls, at the reference's measured sizes and with its behaviour (the reference at 200 %: RESEARCH.md "GUI";
 // all sizes in design pixels, the editor scales them), drawn in the suite's own look (shared/ui/Theme.h). The shared
 // ones (power buttons, menus, knobs) are in shared/ui.
 namespace sc

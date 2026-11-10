@@ -11,6 +11,11 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 
 - **Keys in VST3 hosts:** the VST3 editors take the keys the host offers them, so a focused editor
   receives its keys in FL Studio; every key the editor does not use still goes to the host (the space bar, Ctrl+Z).
+- **Keys after a click:** each editor hands the keyboard focus back to the host's window after a click, so the space
+  bar and the host's other shortcuts keep working after a knob is touched (FL Studio).
+- **Suite name:** the suite is called Orrery, its repository's name: the installers are
+  `Orrery-<version>-<OS>` files and the About menus and Wraith's plate say Orrery. The plug-ins keep their codes,
+  bundle IDs, parameter IDs, company name and install folders, so saved projects, presets and installs are unchanged.
 
 ## 1.2.1 (2026-11-04)
 

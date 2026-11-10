@@ -29,7 +29,7 @@ struct Tuning
     double eqRampMs = 5.0;                 // a band's gain moves linearly to a new value over this time
     double switchMs = 0.0;                 // > 0: a module's power crossfades over this time; 0: it switches (the reference)
     double amountRampMs = 10.0;            // harmonics, compression and lift amounts move linearly over this time
-    // Cradle's control rate (Filters.h Ramp::setChunked; 0 = off): chunk (samples), the parameter's ramp (ms, read
+    // The reference's control rate (Filters.h Ramp::setChunked; 0 = off): chunk (samples), the parameter's ramp (ms, read
     // per chunk), the glide to each reading (ms); and modules starting afresh when switched on
     double ctlChunk = 128, paramRampMs = 5.0, glideMs = 5.0, chunkEq = 0, chunkPar = 0, restartOnEnable = 31;   // per module (bits: drive 1, harmonics 2, compression 4, lift 8, EQ 16): restart on enable (from silence), else pause while off
     // the rate converters' cutoffs (into and out of 48 kHz, shares of the lower rate's Nyquist), for hosts below and

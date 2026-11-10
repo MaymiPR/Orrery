@@ -1,11 +1,11 @@
-Orrery Suite: third-party software
+Orrery: third-party software
 ==================================
 
-The Orrery Suite plug-ins are open source under the GNU Affero General Public License v3
+The Orrery plug-ins are open source under the GNU Affero General Public License v3
 (LICENSE). They include the following third-party software, under these licenses.
 
 ------------------------------------------------------------------------------
-JUCE (https://juce.com), used under the GNU Affero General Public License v3, like Orrery Suite itself: see LICENSE.
+JUCE (https://juce.com), used under the GNU Affero General Public License v3, like Orrery itself: see LICENSE.
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------

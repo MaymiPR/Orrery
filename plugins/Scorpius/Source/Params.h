@@ -1,8 +1,8 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
 
-// The host parameters (RESEARCH.md "Documented controls"): Orion's 26, with its names, ranges and display text, in its
-// order; then the two settings Orion keeps out of the host's reach (drive colour, compression mode), which here are
+// The host parameters (RESEARCH.md "Documented controls"): the reference's 26, with its names, ranges and display text, in its
+// order; then the two settings the reference keeps out of the host's reach (drive colour, compression mode), which here are
 // ordinary parameters so they can be automated. The defaults are the factory preset "default", which the
 // reference opens with.
 namespace sc

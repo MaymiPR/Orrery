@@ -1,7 +1,7 @@
 #pragma once
 #include <algorithm>
 
-// Linear ramps for parameters, as Cradle's framework moves them (Scorpius's Filters.h has the same struct).
+// Linear ramps for parameters, as the reference's framework moves them (Scorpius's Filters.h has the same struct).
 namespace wr::dsp
 {
 // a == b without the compiler's warning about comparing floating point exactly (where that is what is meant)
@@ -14,7 +14,7 @@ constexpr bool exactly (double a, double b) noexcept { return a == b; }
  #pragma GCC diagnostic pop
 #endif
 
-// moves linearly to each new target over a fixed number of samples. With setChunked, as Cradle's framework smooths its
+// moves linearly to each new target over a fixed number of samples. With setChunked, as the reference's framework smooths its
 // parameters (measured on both references, Positron's MEASUREMENTS.md 5 and Scorpius's 12): a new target first
 // moves along a ramp of its own that is read once per control chunk (chunks counted from the block's start), and the
 // value glides linearly to each reading over `length` samples

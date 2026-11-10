@@ -1,14 +1,14 @@
-Orrery Suite for Windows (64-bit)
-=================================
+Orrery for Windows (64-bit)
+===========================
 
-Run OrrerySuite-<version>-Windows-Setup.exe. It installs every Orrery Suite plug-in:
+Run Orrery-<version>-Windows-Setup.exe. It installs every Orrery plug-in:
   - VST3 to C:\Program Files\Common Files\VST3\Orrery Suite
   - CLAP to C:\Program Files\Common Files\CLAP\Orrery Suite
   - optionally the standalone apps to C:\Program Files\Orrery Suite
 Pick "Choose plug-ins and formats" to leave some out, then rescan plug-ins in your DAW.
-Uninstall from Settings > Apps > Orrery Suite.
+Uninstall from Settings > Apps > Orrery.
 
 A signed installer opens without a warning. An unsigned one (the release notes say which) makes Windows SmartScreen
 warn: click "More info", then "Run anyway".
 To check the download, compare its SHA-256 with SHA256SUMS.txt on the Releases page:
-  certutil -hashfile OrrerySuite-<version>-Windows-Setup.exe SHA256
+  certutil -hashfile Orrery-<version>-Windows-Setup.exe SHA256

@@ -9,8 +9,7 @@ set(WR_SOURCES
     ${WR_DIR}/Source/Presets.cpp
     ${WR_DIR}/Source/ui/Faceplate.cpp
     ${WR_DIR}/Source/ui/Controls.cpp
-    ${WR_DIR}/Source/ui/Displays.cpp
-    ${SUITE_UI_SOURCES})
+    ${WR_DIR}/Source/ui/Displays.cpp)
 
 # the reverb's measured responses per rate (nulltest/pack_reverb.py)
 juce_add_binary_data(WraithIR HEADER_NAME WraithIR.h NAMESPACE WraithIR SOURCES
@@ -27,6 +26,7 @@ if(APPLE)
     list(APPEND formats AU)
 endif()
 # The manufacturer and plug-in codes make the plug-in's identity in hosts (saved projects find it by them): keep them.
+# COMPANY_NAME, BUNDLE_ID and CLAP_ID keep the suite's first name, Orrery Suite (CONTRIBUTING.md "Frozen identity").
 juce_add_plugin(Wraith
     COMPANY_NAME "Orrery Suite"
     PLUGIN_MANUFACTURER_CODE Orry
@@ -47,12 +47,19 @@ set_target_properties(Wraith PROPERTIES OUTPUT_NAME "Wraith_SharedCode" XCODE_AT
 target_sources(Wraith PRIVATE ${WR_SOURCES})
 target_include_directories(Wraith PRIVATE ${WR_DIR}/Source ${CMAKE_SOURCE_DIR})
 target_compile_definitions(Wraith PUBLIC ${WR_DEFS})
-target_link_libraries(Wraith PRIVATE OrreryUiData WraithIR juce::juce_audio_utils juce::juce_dsp
+target_link_libraries(Wraith PRIVATE OrreryShared WraithIR juce::juce_audio_utils juce::juce_dsp
     juce::juce_recommended_config_flags juce::juce_recommended_lto_flags juce::juce_recommended_warning_flags suite_warnings)
 # The VST3 wrapper compiles the SDK's vst2persistence.cpp, whose four-character constants GCC reports as -Wmultichar
 # (48 lines per build); the option has to sit on the wrapper target, not the shared code.
 target_compile_options(Wraith_VST3 PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-multichar>)
 add_dependencies(ci_targets Wraith_VST3)
+if(ORRERY_DEV_COPY)
+    # Every rebuild also lands at build/plugins/<Product name>.vst3, the one folder a DAW's plug-in junction points at.
+    add_custom_command(TARGET Wraith_VST3 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:Wraith_VST3>/../.."
+            "${CMAKE_BINARY_DIR}/plugins/Wraith.vst3"
+        VERBATIM)
+endif()
 if(ORRERY_CLAP)
     clap_juce_extensions_plugin(TARGET Wraith
         CLAP_ID "com.orrerysuite.wraith" CLAP_FEATURES audio-effect compressor reverb stereo)
@@ -65,10 +72,24 @@ juce_add_console_app(WraithTests PRODUCT_NAME "WraithTests")
 target_sources(WraithTests PRIVATE ${WR_DIR}/tests/WraithTests.cpp ${WR_SOURCES})
 target_include_directories(WraithTests PRIVATE ${WR_DIR}/Source ${CMAKE_SOURCE_DIR})
 target_compile_definitions(WraithTests PRIVATE ${WR_APP_DEFS})
-target_link_libraries(WraithTests PRIVATE OrreryUiData WraithIR juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags
+target_link_libraries(WraithTests PRIVATE OrreryShared WraithIR juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags
     juce::juce_recommended_warning_flags suite_warnings)
 add_test(NAME WraithTests COMMAND WraithTests)
 add_dependencies(ci_targets WraithTests)
+
+# The built VST3 hosted as a DAW hosts it (tools/HostTest.cpp): save and reload, rate changes, offline rendering and
+# every saved state of an earlier release in tests/data (state-<x.y.z>.bin with its .txt, written at each release
+# that changes a parameter or its reading: WraithHostTest <vst3> --save-state plugins/Wraith/tests/data/state-<x.y.z>.bin).
+juce_add_console_app(WraithHostTest PRODUCT_NAME "WraithHostTest")
+target_sources(WraithHostTest PRIVATE ${CMAKE_SOURCE_DIR}/tools/HostTest.cpp)
+target_compile_definitions(WraithHostTest PRIVATE JUCE_PLUGINHOST_VST3=1 JUCE_MODAL_LOOPS_PERMITTED=1 ${SUITE_DEFS})
+target_link_libraries(WraithHostTest PRIVATE juce::juce_audio_processors juce::juce_gui_basics
+    juce::juce_recommended_config_flags juce::juce_recommended_warning_flags suite_warnings)
+add_dependencies(WraithHostTest Wraith_VST3)          # the test loads the VST3 bundle
+file(GLOB WR_STATES CONFIGURE_DEPENDS ${WR_DIR}/tests/data/state-*.bin)
+add_test(NAME WraithHostTest
+    COMMAND WraithHostTest $<GENEX_EVAL:$<TARGET_PROPERTY:Wraith_VST3,JUCE_PLUGIN_ARTEFACT_FILE>> ${WR_STATES})
+add_dependencies(ci_targets WraithHostTest)
 
 if(ORRERY_TOOLS)
     # Editor snapshot (PNG) for the visual comparison with the reference (nulltest/compare_ui.py)
@@ -76,7 +97,7 @@ if(ORRERY_TOOLS)
     target_sources(WraithSnapshot PRIVATE ${WR_DIR}/tools/Snapshot.cpp ${WR_SOURCES})
     target_include_directories(WraithSnapshot PRIVATE ${WR_DIR}/Source ${CMAKE_SOURCE_DIR})
     target_compile_definitions(WraithSnapshot PRIVATE JUCE_MODAL_LOOPS_PERMITTED=1 ${WR_APP_DEFS})
-    target_link_libraries(WraithSnapshot PRIVATE OrreryUiData WraithIR juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags)
+    target_link_libraries(WraithSnapshot PRIVATE OrreryShared WraithIR juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags)
 
     # Offline renders through our own processor with every DSP constant open to change (fitting, null tests), and a
     # second copy for trying DSP changes while a fit is running with the first (nulltest/ts.py: WR_RENDER=dev)
@@ -85,7 +106,7 @@ if(ORRERY_TOOLS)
         target_sources(${t} PRIVATE ${WR_DIR}/tools/WrRender.cpp ${WR_SOURCES})
         target_include_directories(${t} PRIVATE ${WR_DIR}/Source ${CMAKE_SOURCE_DIR})
         target_compile_definitions(${t} PRIVATE ${WR_APP_DEFS})
-        target_link_libraries(${t} PRIVATE OrreryUiData WraithIR juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags)
+        target_link_libraries(${t} PRIVATE OrreryShared WraithIR juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags)
     endforeach()
     if(WIN32)
         add_dependencies(ci_targets WraithSnapshot)      # ci.yml's screenshot artefact is made on Windows

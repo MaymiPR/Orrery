@@ -36,7 +36,7 @@ void PowerButton::paint (Graphics& g)
     const auto b = getLocalBounds().toFloat().withHeight (boxHeight);
     if (offHoverFill && isMouseButtonDown() && isMouseOver())
     {
-        // Orion's pressed look, on or off: a dark mint box without its outline and a dimmed icon (measured)
+        // Scorpius's reference's pressed look, on or off: a dark mint box without its outline and a dimmed icon (measured)
         g.setColour (theme::mint.withAlpha (0.2f));
         g.fillRoundedRectangle (b.reduced (0.5f), 2.5f);
         powerIcon (g, b.getCentre().translated (0.0f, 0.5f), 6.2f, theme::mint.withAlpha (0.85f), 1.0f);
@@ -178,7 +178,7 @@ void GearButton::paint (Graphics& g)
 void Logo::paint (Graphics& g)
 {
     if (isMouseOver()) { g.setColour (theme::text.withAlpha (0.06f)); g.fillRoundedRectangle (getLocalBounds().toFloat(), 2.0f); }
-    // the Orrery Suite mark: the orbit in violet: a sun with its
+    // the Orrery mark: the orbit in violet: a sun with its
     // orbit, the orbit lit along its lower arc as a crescent, a planet nearer in (at this size the inner orbit is left out)
     const auto c = getLocalBounds().toFloat().getCentre();
     const float ro = 7.2f;

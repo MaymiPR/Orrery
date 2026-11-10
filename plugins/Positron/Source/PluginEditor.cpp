@@ -1,13 +1,13 @@
 #include "PluginEditor.h"
 #include "Settings.h"
-#include "ui/KnobShadow.h"
+#include "shared/ui/KnobShadow.h"
 
 using namespace juce;
-namespace theme = po::theme;
+namespace theme = orrery::theme;
 #ifndef SUITE_REPOSITORY
  #define SUITE_REPOSITORY "https://github.com/MaymiPR/Orrery"
 #endif
-static const juce::String repository = SUITE_REPOSITORY;     // the Orrery Suite repository (CMakeLists.txt)
+static const juce::String repository = SUITE_REPOSITORY;     // the Orrery repository (CMakeLists.txt)
 
 namespace
 {
@@ -22,7 +22,7 @@ constexpr float orbitRx[] { 50.0f, 90.0f, 135.0f, 180.0f };
 constexpr float orbitTilt = 0.2f;                                   // ry / rx
 constexpr float planetAngle[] { 2.2f, 5.4f, 0.75f, 3.75f };         // radians, round each orbit from the right
 
-// the Orrery Suite mark (as the top bar's logo, po::Logo) at any size: an orbit, its lower arc lit as a crescent, the
+// the Orrery mark (as the top bar's logo, orrery::Logo) at any size: an orbit, its lower arc lit as a crescent, the
 // sun and a planet nearer in; ro is the orbit's radius (7.2 on the top bar)
 void drawMark (Graphics& g, Point<float> c, float ro, Colour orbit, Colour lit)
 {
@@ -89,8 +89,8 @@ float toDb (float lin) { return lin > 1.0e-6f ? Decibels::gainToDecibels (lin) :
 
 PositronEditor::PositronEditor (PositronProcessor& p) : AudioProcessorEditor (p), proc (p)
 {
-    po::noFocus (*this);
-    po::noFocus (content);
+    orrery::noFocus (*this);
+    orrery::noFocus (content);
     setOpaque (true);
     addAndMakeVisible (content);
     content.setBounds (0, 0, (int) std::ceil (designW), (int) std::ceil (designH));
@@ -133,7 +133,7 @@ PositronEditor::PositronEditor (PositronProcessor& p) : AudioProcessorEditor (p)
     for (auto* k : { &eqHigh, &eqMid, &eqLow, &inputKnob, &outputKnob })     // bipolar: the value's arc starts at 0 dB
         k->setArcOrigin (0.5f);
     ioLinkButton.setBounds (664, 3, 64, 25);      // centred between the side-chain switch (ends 645) and "UI Scale" (747.5)
-    // A / B (ours, Orion's switch and behaviour): in the free space between the logo and "Preset" (no caption: no room)
+    // A / B (ours, the switch and behaviour of Scorpius's reference): in the free space between the logo and "Preset" (no caption: no room)
     content.addAndMakeVisible (compare);
     compare.setBounds (52, 3, 74, 25);
     content.addChildComponent (toast);                // over everything else (shown by the switch's arrow)
@@ -143,7 +143,7 @@ PositronEditor::PositronEditor (PositronProcessor& p) : AudioProcessorEditor (p)
     limiterPower.setBounds (719, 40, 72, 25);
 
     auto& s = proc.apvts;
-    auto attach = [&] (po::MetalKnob& sl, const char* pid)
+    auto attach = [&] (orrery::MetalKnob& sl, const char* pid)
     {
         attachments.push_back (std::make_unique<AudioProcessorValueTreeState::SliderAttachment> (s, pid, sl));
         if (auto* prm = dynamic_cast<RangedAudioParameter*> (s.getParameter (pid)))
@@ -229,10 +229,11 @@ PositronEditor::PositronEditor (PositronProcessor& p) : AudioProcessorEditor (p)
     setResizable (true, false);          // hosts may resize the window too; the corner below is our own
     setConstrainer (&constrainer);
     grip = std::make_unique<Grip> (this, &constrainer);
-    po::noFocus (*grip);
+    orrery::noFocus (*grip);
     addAndMakeVisible (*grip);
     grip->setAlwaysOnTop (true);
     setUiScale (proc.uiScale.load());
+    hostFocus = std::make_unique<orrery::HostFocus> (*this);
     startTimerHz (30);
     readoutClock.startTimer (46);
 }
@@ -242,6 +243,7 @@ PositronEditor::~PositronEditor()
     readoutClock.stopTimer();
     content.removeMouseListener (&hoverTracker);
     po::Settings::get().removeChangeListener (this);
+    if (snapshotStyle) po::Settings::get().setParticleStyle (*snapshotStyle);
     for (auto* pid : { po::id::eqBypass, po::id::characterBypass, po::id::limiterBypass, po::id::character, po::id::inputGain, po::id::outputGain })
         proc.apvts.removeParameterListener (pid, this);
 }
@@ -335,8 +337,8 @@ void PositronEditor::changeListenerCallback (ChangeBroadcaster*) { content.repai
 void PositronEditor::updateReadout (const MouseEvent& e, bool released)
 {
     const auto p = e.getEventRelativeTo (&content).position;
-    const po::MetalKnob* t = nullptr;
-    const po::MetalKnob* knobs[] { &inputKnob, &limiterKnob, &outputKnob, &eqHigh, &eqMid, &eqLow };
+    const orrery::MetalKnob* t = nullptr;
+    const orrery::MetalKnob* knobs[] { &inputKnob, &limiterKnob, &outputKnob, &eqHigh, &eqMid, &eqLow };
     if (! released)
         for (auto* k : knobs)
             if (k->isMouseButtonDown()) t = k;          // a drag keeps its readout wherever the mouse goes
@@ -344,7 +346,7 @@ void PositronEditor::updateReadout (const MouseEvent& e, bool released)
                         && ! (e.eventComponent == &content && ! content.isMouseOver (true));
     if (t == nullptr && inside)
     {
-        const std::pair<const po::MetalKnob*, Rectangle<float>> cells[] {
+        const std::pair<const orrery::MetalKnob*, Rectangle<float>> cells[] {
             { &inputKnob, plateCell (45.755f) }, { &limiterKnob, plateCell (754.745f) }, { &outputKnob, plateCell (841.74f) },
             { &eqHigh, eqCell (90.75f) }, { &eqMid, eqCell (155.75f) }, { &eqLow, eqCell (220.75f) } };
         for (auto& [k, r] : cells)
@@ -353,14 +355,14 @@ void PositronEditor::updateReadout (const MouseEvent& e, bool released)
     if (t != readoutKnob) { readoutKnob = t; content.repaint(); }
 }
 
-String PositronEditor::captionText (const po::MetalKnob& k, const char* name) const
+String PositronEditor::captionText (const orrery::MetalKnob& k, const char* name) const
 {
     const bool linkedPartner = linkSource != nullptr && linkSource != &k && (&k == &inputKnob || &k == &outputKnob);
     if (&k == readoutKnob || linkedPartner) return String::formatted ("%.1f dB", k.getValue());
     return name;
 }
 
-void PositronEditor::beginLink (po::MetalKnob& src)
+void PositronEditor::beginLink (orrery::MetalKnob& src)
 {
     if (! proc.ioLink.load() || linkSource != nullptr) return;
     if (auto* prm = proc.apvts.getParameter (&src == &inputKnob ? po::id::outputGain : po::id::inputGain))
@@ -386,7 +388,7 @@ void PositronEditor::mirror (bool fromInput)
     content.repaint();
 }
 
-void PositronEditor::endLink (po::MetalKnob& src)
+void PositronEditor::endLink (orrery::MetalKnob& src)
 {
     if (linkSource != &src) return;
     if (auto* prm = proc.apvts.getParameter (&src == &inputKnob ? po::id::outputGain : po::id::inputGain))
@@ -474,6 +476,26 @@ void PositronEditor::setTestLevels (float inDb, float outDb, bool audio)
     content.repaint();
 }
 
+void PositronEditor::setTestLevels (float inDb, float outDb)
+{
+    setTestLevels (inDb, outDb, snapshotAudio);
+    if (snapshotAudio) for (int i = 0; i < 20; ++i) setTestLevels (inDb, outDb, true);
+}
+
+bool PositronEditor::snapshotOption (const juce::String& option)
+{
+    if (option == "--audio") { snapshotAudio = true; return true; }
+    if (option == "--ext") { proc.sidechainExternal = true; sidechain.external = true; sidechain.repaint(); return true; }
+    if (option == "--anti" || option == "--classic")
+    {
+        auto& settings = po::Settings::get();
+        if (! snapshotStyle) snapshotStyle = settings.particleStyle();
+        settings.setParticleStyle (option == "--anti" ? po::Settings::Particles::positron : po::Settings::Particles::classic);
+        return true;
+    }
+    return false;
+}
+
 //==============================================================================
 void PositronEditor::Content::paint (Graphics& g)
 {
@@ -532,7 +554,7 @@ void PositronEditor::paintPanel (Graphics& g)
     g.setFont (theme::font (11.25f));
     const float baselines[3] { 125.5f, 190.5f, 255.5f };
     const char* names[3] { "high", "mid", "low" };
-    const po::MetalKnob* eqKnobs[3] { &eqHigh, &eqMid, &eqLow };
+    const orrery::MetalKnob* eqKnobs[3] { &eqHigh, &eqMid, &eqLow };
     for (int i = 0; i < 3; ++i)
     {
         const auto t = captionText (*eqKnobs[i], names[i]);
@@ -761,7 +783,7 @@ void PositronEditor::paintPlate (Graphics& g)
                     const float d = std::sqrt (dx * dx + dy * dy) - R;
                     if (d < -1.0f || d >= reach) continue;
                     const float fade = jlimit (0.0f, 1.0f, (reach - d) / 15.0f);       // soft end, no ring
-                    bd.setPixelColour (x, y, Colours::black.withAlpha (jlimit (0.0f, 1.0f, po::knobshadow::darkness (dx, dy, R) * fade)));
+                    bd.setPixelColour (x, y, Colours::black.withAlpha (jlimit (0.0f, 1.0f, orrery::knobshadow::darkness (dx, dy, R) * fade)));
                 }
             knobShadowScale = dpx;
         }
@@ -798,7 +820,7 @@ void PositronEditor::showPresetList()
 {
     closePopups();
     const auto all = proc.presets.list();
-    std::vector<po::DropList::Item> items { { "factory", true } };
+    std::vector<orrery::DropList::Item> items { { "factory", true } };
     std::vector<int> map { -1 };
     for (int i = 0; i < (int) all.size(); ++i)
         if (all[(size_t) i].factory) { items.push_back ({ all[(size_t) i].name, false, all[(size_t) i].name == proc.presets.currentName() }); map.push_back (i); }
@@ -807,7 +829,7 @@ void PositronEditor::showPresetList()
     for (int i = 0; i < (int) all.size(); ++i)
         if (! all[(size_t) i].factory) { items.push_back ({ all[(size_t) i].name }); map.push_back (i); anyUser = true; }
     if (! anyUser) { items.push_back ({ "-" }); map.push_back (-1); }
-    dropList = std::make_unique<po::DropList>();
+    dropList = std::make_unique<orrery::DropList>();
     dropList->setItems (items, 24.0f, true);
     dropList->onPick = [this, all, map] (int row)
     {
@@ -823,9 +845,9 @@ void PositronEditor::showPresetList()
 void PositronEditor::showScaleList()
 {
     closePopups();
-    std::vector<po::DropList::Item> items;
+    std::vector<orrery::DropList::Item> items;
     for (float s : scales) items.push_back ({ String (roundToInt (s * 100.0f)) + "%", false, std::abs (s - scale) < 0.01f });
-    dropList = std::make_unique<po::DropList>();
+    dropList = std::make_unique<orrery::DropList>();
     dropList->setItems (items, 24.0f, false);
     dropList->onPick = [safe = Component::SafePointer<PositronEditor> (this)] (int row)
     {
@@ -841,7 +863,7 @@ void PositronEditor::showScaleList()
 namespace
 {
 // settings page: oversampling ratio, I/O metering, particle animation (layout measured on the reference)
-class SettingsDialog : public po::Dialog
+class SettingsDialog : public orrery::Dialog
 {
 public:
     // the reference's three rows plus ours: particle style (classic / positron)
@@ -922,7 +944,7 @@ private:
 };
 
 // save preset: a name field and save / cancel
-class SaveDialog : public po::Dialog
+class SaveDialog : public orrery::Dialog
 {
 public:
     SaveDialog (po::PresetManager& pm, std::function<void()> saved)
@@ -1009,7 +1031,7 @@ void PositronEditor::showSavePreset()
     raw->focusName();
 }
 
-void PositronEditor::showDialog (std::unique_ptr<po::Dialog> d)
+void PositronEditor::showDialog (std::unique_ptr<orrery::Dialog> d)
 {
     closePopups();
     if (dialog != nullptr) { content.removeChildComponent (dialog.get()); dialog.reset(); }
@@ -1027,8 +1049,8 @@ void PositronEditor::showAboutMenu()
 {
     if (dropList != nullptr) { closePopups(); return; }
     const String version = JucePlugin_VersionString;
-    dropList = std::make_unique<po::DropList>();
-    dropList->setItems ({ { "Positron v" + version, true }, { "About Positron" }, { "Orrery Suite on GitHub" },
+    dropList = std::make_unique<orrery::DropList>();
+    dropList->setItems ({ { "Positron v" + version, true }, { "About Positron" }, { "Orrery on GitHub" },
                           { "Report an Issue" }, { "License (AGPL-3.0)" } }, 24.0f, true);
     dropList->onPick = [safe = Component::SafePointer<PositronEditor> (this), version] (int row)
     {
@@ -1038,11 +1060,11 @@ void PositronEditor::showAboutMenu()
         {
             const auto wrapper = safe->proc.wrapperType;
             const String format = AudioProcessor::getWrapperTypeDescription (wrapper);
-            safe->showDialog (std::make_unique<po::InfoDialog> ("about Positron", std::vector<std::pair<String, String>> {
+            safe->showDialog (std::make_unique<orrery::InfoDialog> ("about Positron", std::vector<std::pair<String, String>> {
                 { "Version", version + (wrapper == AudioProcessor::wrapperType_Undefined ? String() : " (" + format + ")") },
                 { {}, {} },
                 { "What it is", "An open-source mix-bus processor modelled on and measured against Cradle's The God Particle" },
-                { "Part of", "Orrery Suite: open-source recreations, null-tested against the originals" },
+                { "Part of", "Orrery: open-source recreations, null-tested against the originals" },
                 { "License", "Open source under the GNU Affero General Public License v3" },
                 { "Built with", "JUCE, the VST3 SDK and CLAP; Instrument Sans (SIL OFL). Their licenses come with it" },
                 { "Source", repository.fromFirstOccurrenceOf ("https://", false, false) },
