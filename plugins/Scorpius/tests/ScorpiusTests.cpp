@@ -32,7 +32,7 @@ static void setReal (ScorpiusProcessor& p, const char* pid, float v)
 static void testParameters()
 {
     ScorpiusProcessor p;
-    // Orion's 26 host parameters with its names, in its order, then ours
+    // the reference's 26 host parameters with its names, in its order, then ours
     const char* names[] { "Input Gain", "Drive On/Off", "Drive Hi-Pass", "Harm On/Off", "Harm Freq", "Harm Amount", "Comp On/Off",
                           "Comp Amount", "Lift On/Off", "Lift Amount", "EQ On/Off", "EQ 40Hz", "EQ 100Hz", "EQ 1kHz", "EQ 3kHz",
                           "EQ 10kHz", "Par Sub On/Off", "Par Sub Level", "Par Low On/Off", "Par Low Level", "Par Loud On/Off",

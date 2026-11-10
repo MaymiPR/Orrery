@@ -11,7 +11,7 @@
 #include "dsp/Resampler.h"
 #include "dsp/ConverterFits.h"
 
-// Scorpius: the recreation of Cradle's Orion (RESEARCH.md, MEASUREMENTS.md). The audio runs input gain -> the modules
+// Scorpius (RESEARCH.md, MEASUREMENTS.md). The audio runs input gain -> the modules
 // (dsp/Engine.h) -> output gain.
 class ScorpiusProcessor : public juce::AudioProcessor
 {

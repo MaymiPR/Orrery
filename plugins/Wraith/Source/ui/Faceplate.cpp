@@ -1,5 +1,5 @@
 #include "Faceplate.h"
-#include "Look.h"
+#include "Theme.h"
 #include "Controls.h"
 #include "shared/ui/Theme.h"
 
@@ -83,7 +83,7 @@ Image renderFaceplate (float dpx)
         theme::textAt (g, "WRAITH", cx, 352.0f + 4.0f);
         g.setColour (theme::letteringFaint);
         g.setFont (theme::font (6.5f).withExtraKerningFactor (0.08f));
-        theme::textAt (g, "Orrery Suite", cx, 352.0f + 12.5f);
+        theme::textAt (g, "Orrery", cx, 352.0f + 12.5f);
     }
     return img;
 }

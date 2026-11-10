@@ -1,0 +1,11 @@
+Input Gain	-8.712
+Output Gain	6.121
+EQ Low Gain	-1.523
+EQ Mid Gain	5.893
+EQ High Gain	1.310
+EQ Bypass	0.000
+Character	0.845
+Character Bypass	0.000
+Limiter Input Gain	0.729
+Limiter Bypass	1.000
+Bypass	Off

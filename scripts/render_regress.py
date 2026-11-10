@@ -7,7 +7,12 @@ reference plug-in, which CI does not have. The null tests against the originals 
     python scripts/render_regress.py --build build --only sine     # cases whose names contain "sine"
 
 tests/regress/<PluginTarget>/jobs.txt, one case per line:
-    <name> signal=<sine|noise|burst|mix> [seconds=0.5] [fs=48000] [block=512] [threshold=-80] [param:Name=text ...]
+    <name> signal=<sine|noise|burst|mix|silence> [seconds=0.5] [fs=48000] [block=512] [threshold=-80] [param:Name=text ...]
+An instrument's case plays notes instead (instrument mode: notes in, the input is silence unless signal= says otherwise):
+    <name> notes=<key:start:length:velocity;...> [sample=<saw|sine|noise|drum|voice>] [seconds=0.5] ... [param:Name=text ...]
+notes= reaches the renderer as it is (start and length in seconds, velocity 1 ... 127; the renderers turn it into MIDI
+note events). sample= is for a sampler: the script writes that synthesized sample (0.5 s, mono, 32-bit float WAV at
+44.1 kHz, root C5) and passes sample=<path> to the renderer, which loads it.
 A renderer that takes one case on its command line instead of a job file (the form
 "<Ab>Render in.f32 out.f32 channels fs [positional ...] [key=value ...]") is named by a line before the cases:
     @call <Tool> {in} {out} 2 {fs} {args} block={block}
@@ -22,7 +27,7 @@ around -120 dB, a DSP change far above -80). The renderer of a plug-in is found 
 (foreach(t <Ab>Render ...), or juce_add_console_app(<Ab>Render ...)) under build/<Ab>Render_artefacts/{Release/,}.
 Pure standard library: no numpy needed on the runners.
 """
-import argparse, array, glob, math, os, re, subprocess, sys
+import argparse, array, glob, math, os, re, struct, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REGRESS = os.path.join(ROOT, 'tests', 'regress')
@@ -57,10 +62,55 @@ def synth(kind, seconds, fs):
             v = 0.15 * math.sin(2 * math.pi * 110.0 * t) + 0.1 * math.sin(2 * math.pi * 1234.5 * t) + 0.05 * rng.next()
             v *= 0.6 + 0.4 * math.sin(2 * math.pi * 1.5 * t)
             l, r = v, 0.8 * v + 0.05 * rng.next()
+        elif kind == 'silence':
+            l, r = 0.0, 0.0
         else:
             sys.exit(f'unknown signal {kind}')
         out.append(l); out.append(r)
     return out
+
+
+SAMPLE_FS = 44100
+SAMPLE_SECONDS = 0.5
+
+
+def synth_sample(kind):
+    """A short mono sample for a sampler to play: root C5, so 261.63 Hz plays at key 60."""
+    n = int(SAMPLE_SECONDS * SAMPLE_FS)
+    f0 = 261.6256
+    rng = LCG(12345)
+    out = array.array('f')
+    for i in range(n):
+        t = i / SAMPLE_FS
+        fade = min(1.0, t / 0.005, (SAMPLE_SECONDS - t) / 0.01)
+        if kind == 'sine':
+            v = 0.5 * math.sin(2 * math.pi * f0 * t)
+        elif kind == 'saw':   # eight harmonics, so nothing aliases at the highest key a case plays
+            v = 0.4 * sum(math.sin(2 * math.pi * f0 * k * t) / k for k in range(1, 9))
+        elif kind == 'noise':
+            v = 0.3 * rng.next()
+        elif kind == 'drum':
+            v = 0.8 * math.exp(-t / 0.06) * math.sin(2 * math.pi * (60.0 + 140.0 * math.exp(-t / 0.02)) * t) \
+                + 0.2 * math.exp(-t / 0.01) * rng.next()
+        elif kind == 'voice':  # a vowel-like tone with vibrato and a pause: material for stretch modes
+            vib = 1.0 + 0.01 * math.sin(2 * math.pi * 5.5 * t)
+            env = 1.0 if (t % 0.25) < 0.18 else 0.0
+            v = env * 0.3 * sum(math.sin(2 * math.pi * f0 * vib * k * t) * (1.0 if k in (2, 3) else 0.4) / k for k in range(1, 7))
+        else:
+            sys.exit(f'unknown sample {kind}')
+        out.append(v * fade)
+    return out
+
+
+def write_wav_float(path, mono):
+    b = array.array('f', mono)
+    if sys.byteorder != 'little':
+        b.byteswap()
+    data = b.tobytes()
+    with open(path, 'wb') as h:
+        h.write(b'RIFF' + struct.pack('<I', 36 + len(data)) + b'WAVE')
+        h.write(b'fmt ' + struct.pack('<IHHIIHH', 16, 3, 1, SAMPLE_FS, SAMPLE_FS * 4, 4, 32))
+        h.write(b'data' + struct.pack('<I', len(data)) + data)
 
 
 def read_f32(path):
@@ -142,17 +192,22 @@ def parse_jobs(path):
                 call = line.split()[1:]
                 continue
             parts = line.split()
-            c = {'name': parts[0], 'signal': 'sine', 'seconds': 0.5, 'fs': 48000, 'block': 512, 'threshold': -80.0, 'params': []}
+            c = {'name': parts[0], 'signal': None, 'seconds': 0.5, 'fs': 48000, 'block': 512, 'threshold': -80.0,
+                 'params': [], 'notes': None, 'sample': None}
             for p in parts[1:]:
                 if p.startswith('arg:'):          # the renderer's own key, even when its name is one of ours
                     c['params'].append(p[4:]); continue
                 k, _, v = p.partition('=')
                 if k == 'signal': c['signal'] = v
+                elif k == 'notes': c['notes'] = v; c['params'].append(p)
+                elif k == 'sample': c['sample'] = v
                 elif k == 'seconds': c['seconds'] = float(v)
                 elif k == 'fs': c['fs'] = int(v)
                 elif k == 'block': c['block'] = int(v)
                 elif k == 'threshold': c['threshold'] = float(v)
                 else: c['params'].append(p)
+            # instrument mode: notes in, silence through the input unless the case names a signal
+            c['signal'] = c['signal'] or ('silence' if c['notes'] else 'sine')
             cases.append(c)
     return cases, call
 
@@ -181,6 +236,12 @@ def main():
         tool = find_tool(call[0], build) if call else renderer_for(target, build)
         golden_dir = os.path.join(REGRESS, target, 'golden')
         os.makedirs(golden_dir, exist_ok=True)
+        for c in cases:
+            if c['sample']:               # a sampler's case: the synthesized sample, by path
+                wav = os.path.join(work, f'sample_{c["sample"]}.wav')
+                if not os.path.isfile(wav):
+                    write_wav_float(wav, synth_sample(c['sample']))
+                c['params'].append('sample=' + rel(wav))
         if call:
             # one renderer run per case, its command line filled from the @call line
             for c in cases:

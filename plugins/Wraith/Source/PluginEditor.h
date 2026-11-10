@@ -3,7 +3,8 @@
 #include "PluginProcessor.h"
 #include "shared/ui/Theme.h"
 #include "shared/ui/Widgets.h"
-#include "ui/Look.h"
+#include "shared/ui/HostFocus.h"
+#include "ui/Theme.h"
 #include "ui/Controls.h"
 #include "ui/Displays.h"
 
@@ -139,6 +140,7 @@ private:
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> attachments;
     std::unique_ptr<orrery::DropList> dropList;
     std::unique_ptr<juce::Component> dialog;
+    std::unique_ptr<orrery::HostFocus> hostFocus;      // the host's keys after a click (FL Studio)
 
     // a knob's label shows its value while the mouse is over it or drags it (as the reference)
     struct HoverTracker : juce::MouseListener

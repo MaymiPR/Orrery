@@ -65,7 +65,7 @@ public:
     juce::AudioProcessorValueTreeState apvts;
     po::PresetManager presets { apvts };
 
-    // Compare A -> B (ours, as Cradle's Orion has it): two complete settings in one instance. The active one lives in the
+    // Compare A -> B (ours, as Scorpius's reference has it): two complete settings in one instance. The active one lives in the
     // parameters; the other is kept here. Switching stores the active one and loads the other; copy() copies the active
     // one over the other. A setting never used yet starts as a copy of the one in use when it is first selected.
     int compareSlot() const { return slot; }

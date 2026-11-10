@@ -198,6 +198,7 @@ WraithEditor::WraithEditor (WraithProcessor& p) : AudioProcessorEditor (p), proc
     animate = true;
     lastTick = Time::getMillisecondCounterHiRes() * 0.001;
     startTimerHz (60);
+    hostFocus = std::make_unique<orrery::HostFocus> (*this);
 }
 
 WraithEditor::~WraithEditor()
@@ -837,7 +838,7 @@ void WraithEditor::showAboutMenu()
     if (dropList != nullptr) { closePopups(); return; }
     const String version = JucePlugin_VersionString;
     dropList = std::make_unique<orrery::DropList>();
-    dropList->setItems ({ { "Wraith v" + version, true }, { "About Wraith" }, { "Orrery Suite on GitHub" },
+    dropList->setItems ({ { "Wraith v" + version, true }, { "About Wraith" }, { "Orrery on GitHub" },
                           { "Report an Issue" }, { "License (AGPL-3.0)" } }, 24.0f, true);
     dropList->onPick = [safe = Component::SafePointer<WraithEditor> (this), version] (int row)
     {
@@ -851,7 +852,7 @@ void WraithEditor::showAboutMenu()
                 { "Version", version + (wrapper == AudioProcessor::wrapperType_Undefined ? String() : " (" + format + ")") },
                 { {}, {} },
                 { "What it is", "An open-source vocal chain modelled on and measured against Cradle's The Spirit" },
-                { "Part of", "Orrery Suite: open-source recreations, null-tested against the originals" },
+                { "Part of", "Orrery: open-source recreations, null-tested against the originals" },
                 { "License", "Open source under the GNU Affero General Public License v3" },
                 { "Built with", "JUCE, the VST3 SDK and CLAP; Instrument Sans (SIL OFL). Their licenses come with it" },
                 { "Source", repository.fromFirstOccurrenceOf ("https://", false, false) },

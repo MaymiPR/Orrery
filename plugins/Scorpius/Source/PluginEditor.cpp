@@ -6,7 +6,7 @@ namespace theme = orrery::theme;
 #ifndef SUITE_REPOSITORY
  #define SUITE_REPOSITORY "https://github.com/MaymiPR/Orrery"
 #endif
-static const juce::String repository = SUITE_REPOSITORY;     // the Orrery Suite repository (CMakeLists.txt)
+static const juce::String repository = SUITE_REPOSITORY;     // the Orrery repository (CMakeLists.txt)
 
 namespace
 {
@@ -18,7 +18,7 @@ constexpr float labelBaseline = 263.5f, upperLabelBaseline = 192.5f, selectorLab
 constexpr float readoutCentres[2][2] { { 30.5f, 60.5f }, { 827.5f, 857.5f } };     // input L R, output L R
 constexpr float ledX[2][2] { { 26.0f, 56.0f }, { 824.0f, 854.0f } };
 constexpr float ledBottom = 258.0f;
-// knob centres and radii (silver regions corrected as on The God Particle, whose knobs are known exactly)
+// knob centres and radii (silver regions corrected as on Positron's, whose knobs are known exactly)
 // (then checked against our own snapshot: the column knobs +0.5 / +0.8, the plate knobs +0.47 / +0.52)
 constexpr float smallR = 20.11f, plateR = 25.06f, bottomRowY = 229.76f, topRowY = 158.68f, plateKnobY = 356.6f;
 constexpr float harmX = 220.25f, compX = 300.24f, liftX = 380.25f;
@@ -224,6 +224,7 @@ ScorpiusEditor::ScorpiusEditor (ScorpiusProcessor& p) : AudioProcessorEditor (p)
     startTimerHz (60);                   // (the animations' clock: the reference's stripe never repeats a frame in a film at 36
                                          // frames a second; at 40 Hz ours, busy painting, managed ~31)
     readoutClock.startTimer (46);
+    hostFocus = std::make_unique<orrery::HostFocus> (*this);
 }
 
 ScorpiusEditor::~ScorpiusEditor()
@@ -639,7 +640,7 @@ void ScorpiusEditor::paintIoMeter (Graphics& g, bool output)
         }
     }
     if (output) return;
-    // the input target (as The God Particle's, narrower and higher): fills with the fast peak from -12 to -3 dBFS
+    // the input target (as Positron's, narrower and higher): fills with the fast peak from -12 to -3 dBFS
     const float fast = jmax (m[0].fastDb, m[1].fastDb);
     const float fill = jlimit (0.0f, 1.0f, (fast + 13.5f) / 1.5f) * jlimit (0.0f, 1.0f, (-1.5f - fast) / 1.5f);
     static constexpr float top = 101.0f, bottom = 119.5f, r = 2.5f;
@@ -955,7 +956,7 @@ void ScorpiusEditor::showAboutMenu()
     if (dropList != nullptr) { closePopups(); return; }
     const String version = JucePlugin_VersionString;
     dropList = std::make_unique<orrery::DropList>();
-    dropList->setItems ({ { "Scorpius v" + version, true }, { "About Scorpius" }, { "Orrery Suite on GitHub" },
+    dropList->setItems ({ { "Scorpius v" + version, true }, { "About Scorpius" }, { "Orrery on GitHub" },
                           { "Report an Issue" }, { "License (AGPL-3.0)" } }, 24.0f, true);
     dropList->onPick = [safe = Component::SafePointer<ScorpiusEditor> (this), version] (int row)
     {
@@ -969,7 +970,7 @@ void ScorpiusEditor::showAboutMenu()
                 { "Version", version + (wrapper == AudioProcessor::wrapperType_Undefined ? String() : " (" + format + ")") },
                 { {}, {} },
                 { "What it is", "An open-source drum-bus processor modelled on and measured against Cradle's Orion" },
-                { "Part of", "Orrery Suite: open-source recreations, null-tested against the originals" },
+                { "Part of", "Orrery: open-source recreations, null-tested against the originals" },
                 { "License", "Open source under the GNU Affero General Public License v3" },
                 { "Built with", "JUCE, the VST3 SDK and CLAP; Instrument Sans (SIL OFL). Their licenses come with it" },
                 { "Source", repository.fromFirstOccurrenceOf ("https://", false, false) },

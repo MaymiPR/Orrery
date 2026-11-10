@@ -1,7 +1,7 @@
 #pragma once
 #include "Widgets.h"
 
-// "save preset": a name field and save / cancel (layout measured on The God Particle; Orion's is the same).
+// "save preset": a name field and save / cancel (layout measured for Positron; Scorpius's reference has the same).
 namespace orrery
 {
 class SaveDialog : public Dialog

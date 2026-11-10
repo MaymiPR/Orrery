@@ -287,7 +287,7 @@ static void testStateRoundTrip()
     CHECK (b->sidechainExternal.load());
 }
 
-// A / B (as Orion's): the arrow copies the active setting over the other; an unused setting starts as a copy of the one
+// A / B (as Scorpius's reference has it): the arrow copies the active setting over the other; an unused setting starts as a copy of the one
 // in use; switching keeps each setting's changes; the state keeps both and which one is active
 static float param (PositronProcessor& p, const char* name)
 {

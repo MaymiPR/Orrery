@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 
-# Orrery Suite: one CMake project for every plug-in (plugins/<Name>/plugin.cmake) and the measurement tools.
+# Orrery: one CMake project for every plug-in (plugins/<Name>/plugin.cmake) and the measurement tools.
 # The suite's version, shared by every plug-in: a new plug-in raises the middle number (1.1.0, 1.2.0 ...), fixes and
 # small updates the last (1.1.1, 1.1.2 ...). CHANGELOG.md has a section per version.
-project(OrrerySuite VERSION 1.2.1)
+project(Orrery VERSION 1.2.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -21,6 +21,11 @@ FetchContent_Declare(JUCE
     GIT_TAG 9.0.5
     GIT_SHALLOW ON)
 FetchContent_MakeAvailable(JUCE)
+# JUCE's helper-tool bootstrap sets the environment variable CMAKE_GENERATOR_PLATFORM inside this CMake process for
+# its nested configure. When `cmake --build` re-runs the configure itself (after a CMake file changed), the variable
+# stays in that process and reaches MSBuild and every CMake call MSBuild makes, which print "Environment variable
+# CMAKE_GENERATOR_PLATFORM will be ignored" as a build warning. Cleared once JUCE is set up.
+unset(ENV{CMAKE_GENERATOR_PLATFORM})
 # A tag can be moved: build only from the commit it pointed to when chosen
 # (unless FETCHCONTENT_SOURCE_DIR_JUCE points at a JUCE of your own).
 set(ORRERY_JUCE_COMMIT d60b7a78030661574a615b586d9325ba7a7fa7dd)
@@ -57,8 +62,11 @@ if(ORRERY_CLAP)
     FetchContent_MakeAvailable(clap_juce_extensions)
 endif()
 
-# Measurement tools (hosts for the reference plug-ins, fitting helpers); not shipped.
+# Measurement tools (hosts for the reference plug-ins, our offline renderers, snapshots); not shipped.
 option(ORRERY_TOOLS "Build the measurement tools" ON)
+# A copy of every VST3 at build/plugins/<Product name>.vst3 after each build, the folder a DAW's plug-in junction points
+# at in every suite.
+option(ORRERY_DEV_COPY "Copy each VST3 to build/plugins after a build" ON)
 
 set(SUITE_DEFS JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
 set(SUITE_REPOSITORY "https://github.com/MaymiPR/Orrery")
@@ -85,8 +93,9 @@ endif()
 
 # The plug-ins. Each is included (not added as a subdirectory), so its build output stays at
 # build/<Target>_artefacts. packaging/plugins.txt lists them for the installers and the release workflow.
-# Every plugin.cmake adds its VST3, its tests, its renderer (and on Windows its snapshot tool) to ci_targets, so
-# ci.yml builds one target on every system and a new plug-in needs no workflow edit.
+# Every plugin.cmake adds its VST3, its tests (the host test included), its renderer (and on Windows its snapshot
+# tool) to ci_targets, so ci.yml builds one target on every system and a new plug-in needs no workflow edit. The
+# suite's code in shared/ is the static library OrreryShared that each of them links.
 add_custom_target(ci_targets)
 include(shared/shared.cmake)
 include(plugins/Positron/plugin.cmake)
@@ -94,25 +103,22 @@ include(plugins/Scorpius/plugin.cmake)
 include(plugins/Wraith/plugin.cmake)
 
 if(ORRERY_TOOLS)
+    # Everything a host sees without audio: buses, latency, programs, every parameter's text across its range.
     juce_add_console_app(ParamDump PRODUCT_NAME "ParamDump")
     target_sources(ParamDump PRIVATE tools/ParamDump.cpp)
-    target_compile_definitions(ParamDump PRIVATE
-        JUCE_PLUGINHOST_VST3=1 JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
-    target_link_libraries(ParamDump PRIVATE
-        juce::juce_audio_processors juce::juce_gui_basics
-        juce::juce_recommended_config_flags)
-    # offline renders through any VST3 (the measurements and null tests; tools/RefRender.cpp)
+    target_compile_definitions(ParamDump PRIVATE JUCE_PLUGINHOST_VST3=1 ${SUITE_DEFS})
+    target_link_libraries(ParamDump PRIVATE juce::juce_audio_processors juce::juce_gui_basics juce::juce_recommended_config_flags)
+    # Offline renders through any VST3 (the measurements and null tests; tools/RefRender.cpp).
     juce_add_console_app(RefRender PRODUCT_NAME "RefRender")
     target_sources(RefRender PRIVATE tools/RefRender.cpp)
-    target_compile_definitions(RefRender PRIVATE JUCE_PLUGINHOST_VST3=1 JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
+    target_compile_definitions(RefRender PRIVATE JUCE_PLUGINHOST_VST3=1 ${SUITE_DEFS})
     target_link_libraries(RefRender PRIVATE juce::juce_audio_processors juce::juce_recommended_config_flags)
     if(WIN32)
-        # films / screenshots a plug-in's editor while audio plays (tools/RefCapture.cpp)
+        # Films / screenshots a plug-in's editor while audio plays (tools/RefCapture.cpp).
         juce_add_gui_app(RefCapture PRODUCT_NAME "RefCapture")
         target_sources(RefCapture PRIVATE tools/RefCapture.cpp)
-        target_compile_definitions(RefCapture PRIVATE JUCE_PLUGINHOST_VST3=1 JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
-        target_link_libraries(RefCapture PRIVATE juce::juce_audio_processors juce::juce_gui_basics
-            juce::juce_recommended_config_flags)
+        target_compile_definitions(RefCapture PRIVATE JUCE_PLUGINHOST_VST3=1 ${SUITE_DEFS})
+        target_link_libraries(RefCapture PRIVATE juce::juce_audio_processors juce::juce_gui_basics juce::juce_recommended_config_flags)
         # PASS when the space bar still reaches the host after clicks in an editor (tools/FocusCheck.cpp).
         juce_add_console_app(FocusCheck PRODUCT_NAME "FocusCheck")
         target_sources(FocusCheck PRIVATE tools/FocusCheck.cpp)

@@ -3,10 +3,11 @@
 #include "PluginProcessor.h"
 #include "shared/ui/MetalKnob.h"
 #include "shared/ui/Widgets.h"
+#include "shared/ui/HostFocus.h"
 #include "ui/Controls.h"
 #include "ui/Stripe.h"
 
-// The editor is laid out in the reference's design pixels (888 x 403.5 at 100 %, measured on Orion at 200 %) and
+// The editor is laid out in the reference's design pixels (888 x 403.5 at 100 %, measured on the reference at 200 %) and
 // scaled as a whole by the UI Scale menu (50 ... 200 %), or freely by dragging its bottom-right corner (ours).
 class ScorpiusEditor : public juce::AudioProcessorEditor,
                        private juce::Timer,
@@ -148,6 +149,7 @@ private:
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> attachments;
     std::unique_ptr<orrery::DropList> dropList;
     std::unique_ptr<juce::Component> dialog;
+    std::unique_ptr<orrery::HostFocus> hostFocus;      // the host's keys after a click (FL Studio)
 
     orrery::Readouts inMeter[2], outMeter[2];
     float compGrDb = 0.0f;

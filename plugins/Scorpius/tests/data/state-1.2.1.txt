@@ -1,0 +1,28 @@
+Input Gain	-8.712
+Drive On/Off	1.000
+Drive Hi-Pass	0.000
+Harm On/Off	1.000
+Harm Freq	80.000
+Harm Amount	0.227
+Comp On/Off	1.000
+Comp Amount	0.463
+Lift On/Off	0.000
+Lift Amount	0.699
+EQ On/Off	0.000
+EQ 40Hz	5.612
+EQ 100Hz	3.320
+EQ 1kHz	1.029
+EQ 3kHz	4.737
+EQ 10kHz	2.445
+Par Sub On/Off	0.000
+Par Sub Level	0.644
+Par Low On/Off	0.000
+Par Low Level	0.880
+Par Loud On/Off	0.000
+Par Loud Level	0.116
+Par Grit On/Off	1.000
+Par Grit Level	0.352
+Output Gain	11.276
+Drive Color	b
+Comp Mode	a
+Bypass	Off

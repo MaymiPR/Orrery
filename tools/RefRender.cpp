@@ -10,7 +10,7 @@
 //   raw=1                no latency compensation (the output is the plug-in's output sample for sample)
 //   reset=0              keep the instance of the previous job (default: a fresh instance per job)
 //   settle=ms            run the message loop this long after setting the parameters (a plug-in that applies them
-//                        asynchronously, as Orion does, would otherwise take them partway through the render)
+//                        asynchronously, as some references do, would otherwise take them partway through the render)
 // Prints the latency and, per job, the number of frames written.
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <cstdio>

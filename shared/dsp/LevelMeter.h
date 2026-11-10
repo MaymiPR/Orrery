@@ -3,8 +3,8 @@
 #include <atomic>
 #include <cmath>
 
-// The I/O meters of Cradle's plug-ins, as measured on The God Particle (plugins/Positron/MEASUREMENTS.md 6) and
-// seen again on Orion: a green LED bar on the RMS, a mint run above it up to a fast peak, and two readouts.
+// The I/O meters of the references, as measured for Positron (plugins/Positron/MEASUREMENTS.md 6) and
+// seen again for Scorpius: a green LED bar on the RMS, a mint run above it up to a fast peak, and two readouts.
 //   LevelTap:   what the audio thread hands the editor for one channel
 //   LevelMeter: the audio-thread side for a stereo pair (call measure() on the signal at the meter's point)
 //   Readouts:   the editor side of one channel (peak held and sampled, RMS live), on the reference's own clock

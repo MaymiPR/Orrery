@@ -1,9 +1,10 @@
 #include "Visualizer.h"
 #include <complex>
-#include "Theme.h"
+#include "shared/ui/Theme.h"
 #include "BinaryData.h"
 
 using namespace juce;
+namespace theme = orrery::theme;
 
 namespace po
 {
