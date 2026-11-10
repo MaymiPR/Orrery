@@ -1,7 +1,7 @@
 # Positron
 
-Part of [Orrery Suite](../../README.md). A recreation of Cradle's The God Particle (v1.2.4): its controls, layout and
-sound, null-tested against the original, drawn in Orrery Suite's own look.
+Part of [Orrery](../../README.md). A recreation of Cradle's The God Particle (v1.2.4): its controls, layout and
+sound, null-tested against the original, drawn in Orrery's own look.
 
 <p align="center">
   <img src="../../docs/screenshots/positron.png" alt="Positron, the Positron particle style (the default)" width="49%">
@@ -55,10 +55,15 @@ and the offline renderer give the same numbers. Every case: [NULLTESTS.md](NULLT
 
 - `tests/PositronTests.cpp`: unit tests of the DSP and the processor, including filters, the FIR crossover, latency,
   bypass, the limiter's ceiling, state and extreme input (`ctest` after a build).
+- `PositronHostTest` (the suite's `tools/HostTest.cpp`, under `ctest`): the built VST3 hosted as a DAW hosts it, with
+  the saved state of each release that changed a parameter in `tests/data/`.
 - `nulltest/`: the null tests against an installed copy of the original (Windows, Python 3.12 or newer with the root
   `requirements.txt`; not in CI). `nulltest.py` (the table in NULLTESTS.md), `null_stress.py` (163 cases) and `null_track.py`
   (a music file of your own) are the entry points; `po_ref.py` is the render harness. The other scripts are the
-  measurements and fits that MEASUREMENTS.md cites. Reference renders and measurement data stay local (git-ignored).
-- `tools/`: PoRender (our processor offline, every DSP constant open to change), the editor snapshot, the band gain
-  computer as a C library for the fits, and the measuring tools for the knobs and the glass (their numbers become the
-  drawing's tokens; `make_glass.py` draws the glass textures).
+  measurements and fits that MEASUREMENTS.md cites. Reference renders stay local (git-ignored); the measurement data is
+  published in [`measurements/Positron/`](../../measurements/Positron/).
+- `scripts/`: `make_character_table.py` (writes `Source/dsp/CharacterTable.h`), `make_glass.py` (draws the glass
+  textures) and the editor's measuring tools (`compare_ui.py`, `fit_glass.py`, `fit_knobs.py`, `fit_knob_shadow.py`),
+  whose numbers become the drawing's tokens.
+- `tools/`: PoRender (our processor offline, every DSP constant open to change) and the band gain computer as a C
+  library for the fits (`CharSim.cpp`); the editor snapshot is the suite's `tools/Snapshot.cpp`.

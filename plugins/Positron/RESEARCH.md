@@ -135,7 +135,7 @@ text edges).
 
 ## Positron's own editor
 
-The layout (positions, sizes, hit areas) is the measured one; everything drawn on it is Orrery Suite's own look
+The layout (positions, sizes, hit areas) is the measured one; everything drawn on it is Orrery's own look
 (`shared/ui/Theme.h`): a violet-black panel and plate on true black, lavender-white lettering, gold values, meters,
 targets and power buttons, pearl pointers.
 
@@ -144,7 +144,7 @@ targets and power buttons, pearl pointers.
 | Knobs | the suite's knob at the measured sizes and pointer travel (a violet-black disc, a gold value arc from 0 dB on the bipolar gains, a pearl pointer; `theme::drawKnob`); the plate knobs' shadow drawn from the measured numbers as tokens (`shared/ui/KnobShadow.h`: the disc swept away from the light with a soft edge, plus a contact shadow) |
 | Meters | the suite's meter bars, lit in whole cells on the LED scales above so they move at the same thresholds |
 | Plate | a card with a small orrery (four slanted orbits round the suite's mark, a few seeded stars) in place of the leather and grille; "POSITRON" lettering centred on the sixteen letter slots |
-| Maker's mark | the Orrery Suite mark (a sun on its orbit, the orbit's lower arc lit as a crescent and a planet) in the logo's place and size; the logo opens a menu drawn as the editor's own drop list: version header, About panel, repository, Report an Issue, License (AGPL-3.0) |
+| Maker's mark | the Orrery mark (a sun on its orbit, the orbit's lower arc lit as a crescent and a planet) in the logo's place and size; the logo opens a menu drawn as the editor's own drop list: version header, About panel, repository, Report an Issue, License (AGPL-3.0) |
 | Font | Instrument Sans Regular (SIL OFL, `resources/fonts`), the closest in widths and shapes of five candidates on rendered words ("amount", "Sidechain", "high", "Preset") |
 | Glass | a procedural drawing at the measured layout (`tools/fit/make_glass.py`, `glass_params.json` → `resources/glass/*.png`): two rim lines and faint sheen lines, each a base level with a few soft highlights at measured stations; the reflections as soft-edged bands between cubic edge curves (four radii per piece, one to three pieces per edge) with our own shading (a highlight across the band over a floor, a rise and a fall along it) in the measured peak colours; for the lit glass the sparks' light as coloured vertical streaks from seeded noise, fading outwards along an exponential set to the measured falloff, held back by the reflections; positions, sizes and colours are measured tokens (radii to 0.5 px); Catmull-Rom interpolation keeps the reflections' slanted edges smooth; a greyscale version when the sparks are white |
 | Visualiser light | the same meter, glow v^1.6, sparks ((v - 0.4) / 0.6)^0.7, falling with real elapsed time: the glow within ~1 grey level of the original at every step and the track's ending, stops within a frame |

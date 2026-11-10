@@ -1,4 +1,4 @@
-# Building Orrery Suite
+# Building Orrery
 
 JUCE and [clap-juce-extensions](https://github.com/free-audio/clap-juce-extensions) are downloaded automatically when
 you configure. JUCE is pinned to the commit its tag pointed to when it was chosen: configuring stops if the tag moves.
@@ -15,7 +15,8 @@ you configure. JUCE is pinned to the commit its tag pointed to when it was chose
   ```
 
 `-DORRERY_CLAP=OFF` leaves the CLAP versions out (and skips their download). `-DORRERY_TOOLS=OFF` leaves out the measurement
-tools, which only matter for the null tests ([CONTRIBUTING.md](../CONTRIBUTING.md)).
+tools, which only matter for the null tests ([CONTRIBUTING.md](../CONTRIBUTING.md)). `-DORRERY_DEV_COPY=OFF` stops the
+copy of each VST3 to `build/plugins/<Product name>.vst3` that a DAW's plug-in junction can point at.
 
 ## Windows (VST3, CLAP, Standalone)
 
@@ -27,7 +28,7 @@ cmake --build build --config Release
 CMake picks the newest Visual Studio installed. To choose one, add its generator, for example
 `-G "Visual Studio 17 2022"`.
 
-Keep the build folder's path short (for example `C:\src\OrrerySuite\build`). JUCE's checkout holds deeply nested
+Keep the build folder's path short (for example `C:\src\Orrery\build`). JUCE's checkout holds deeply nested
 files, and under a long path Git stops with "Filename too long" while configuring.
 
 ## macOS (universal AU, VST3, CLAP, Standalone)
@@ -50,7 +51,8 @@ Each plug-in lands in `build/<Target>_artefacts/Release/` (`VST3/`, `CLAP/`, `AU
 `build/Scorpius_artefacts/Release/VST3/Scorpius.vst3`. Copy the plug-ins to your plug-in folders, or run a standalone
 app from there.
 
-The same build makes the unit tests; run them with:
+The same build makes the unit tests and the host tests (each VST3 loaded as a DAW loads it, with the saved states
+in `plugins/<Id>/tests/data/`); run them with:
 
 ```bash
 ctest --test-dir build -C Release --output-on-failure
@@ -62,7 +64,7 @@ Made with Inno Setup 7 (7.1.1 or newer; the release workflow installs it), from 
 
 ```powershell
 pwsh packaging/make_iss_include.ps1 build
-iscc /DAppVersion=x.y.z packaging/OrrerySuite.iss
+iscc /DAppVersion=x.y.z packaging/Orrery.iss
 ```
 
 The installer lands in `dist/`. Add `/DTestRoot=<folder>` to make a test installer that installs everything under that

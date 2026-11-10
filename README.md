@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/branding/orrerysuite-banner-dark.svg">
-    <img src="docs/branding/orrerysuite-banner-light.svg" alt="Orrery Suite: open-source recreations of Cradle's mix-bus plug-ins, null-tested against the originals" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/branding/orrery-banner-dark.svg">
+    <img src="docs/branding/orrery-banner-light.svg" alt="Orrery: open-source recreations of Cradle's mix-bus plug-ins, null-tested against the originals" width="100%">
   </picture>
 </p>
 
@@ -13,7 +13,7 @@
   <a href="LICENSE"><img alt="License: AGPL v3" src="https://img.shields.io/badge/license-AGPL--3.0-9b6cff"></a>
 </p>
 
-# Orrery Suite
+# Orrery
 
 Open-source recreations of Cradle's mixing plug-ins, null-tested against the originals. VST3, CLAP and AU for
 Windows, macOS and Linux.
@@ -28,16 +28,17 @@ Windows, macOS and Linux.
 | **[Scorpius](plugins/Scorpius)** | Cradle Orion | Drum-bus drive, harmonics, compression, lift, harmonic EQ and four parallel paths |
 | **[Wraith](plugins/Wraith)** | Cradle The Spirit | Vocal chain: gain rider, compression with a focus EQ, two shelves, doubler, room and plate reverb |
 
-> Orrery Suite is an independent project. It is not affiliated with, endorsed by or sponsored by Cradle, Jaycen
+> Orrery is an independent project. It is not affiliated with, endorsed by or sponsored by Cradle, Jaycen
 > Joshua or Louis Bell. Product names are theirs and only describe what each plug-in is modelled on. No code, models or
 > data of theirs is included; Wraith's two reverb responses are measured from The Spirit's output, as its
 > MEASUREMENTS.md describes.
 
 ## How it was built
 
-Orrery Suite is made with Claude (Anthropic's AI): the code, the measurements behind it and this documentation. The
+Orrery is made with Claude (Anthropic's AI): the code, the measurements behind it and this documentation. The
 originals are the reference for every behaviour, as [Positron's](plugins/Positron/MEASUREMENTS.md),
-[Scorpius's](plugins/Scorpius/MEASUREMENTS.md) and [Wraith's](plugins/Wraith/MEASUREMENTS.md) measurements describe.
+[Scorpius's](plugins/Scorpius/MEASUREMENTS.md) and [Wraith's](plugins/Wraith/MEASUREMENTS.md) measurements describe;
+the measurement data itself is in [`measurements/`](measurements/).
 
 ## Features
 
@@ -48,12 +49,12 @@ originals are the reference for every behaviour, as [Positron's](plugins/Positro
 - **A few additions**, in the same top bar on every plug-in: A / B compare, an external side-chain (INT / EXT) and
   **I/O LINK**, which turns the output down as you turn the input up so you can drive harder at the same level.
 
-  <img src="docs/screenshots/orrerysuite-top-bar.png" alt="The shared top bar: A / B compare, preset menu, side-chain INT / EXT, I/O LINK, UI scale" width="100%">
+  <img src="docs/screenshots/orrery-top-bar.png" alt="The shared top bar: A / B compare, preset menu, side-chain INT / EXT, I/O LINK, UI scale" width="100%">
 
 - **Particle visualisers that follow your music**, in each original's style or ours, moving with the project's tempo.
 
   <img
-    src="docs/screenshots/orrerysuite-particle-styles.png"
+    src="docs/screenshots/orrery-particle-styles.png"
     alt="Particle styles. Top: Positron's own style (left) and the classic style (right). Bottom: Scorpius's own style, then the classic style"
     width="100%">
 
@@ -66,9 +67,9 @@ originals are the reference for every behaviour, as [Positron's](plugins/Positro
 
    | System | File | Installs |
    |---|---|---|
-   | Windows | `OrrerySuite-<version>-Windows-Setup.exe` | VST3 and CLAP to `C:\Program Files\Common Files\`, standalone apps if you choose, with an uninstaller |
-   | macOS 10.13+ (universal) | `OrrerySuite-<version>-macOS.pkg` | AU, VST3 and CLAP (you choose which), and the standalone apps if you tick them |
-   | Linux x86-64 (glibc 2.35+) | `OrrerySuite-<version>-Linux.tar.gz` | VST3 and CLAP: run `sh install-linux.sh` to copy them to `~/.vst3` and `~/.clap` |
+   | Windows | `Orrery-<version>-Windows-Setup.exe` | VST3 and CLAP to `C:\Program Files\Common Files\`, standalone apps if you choose, with an uninstaller |
+   | macOS 10.13+ (universal) | `Orrery-<version>-macOS.pkg` | AU, VST3 and CLAP (you choose which), and the standalone apps if you tick them |
+   | Linux x86-64 (glibc 2.35+) | `Orrery-<version>-Linux.tar.gz` | VST3 and CLAP: run `sh install-linux.sh` to copy them to `~/.vst3` and `~/.clap` |
 
 2. Run it, then rescan plug-ins in your DAW.
 
@@ -128,7 +129,7 @@ A file that makes a plug-in crash or misbehave is a security bug. Please report 
 
 ## License
 
-Orrery Suite is open source under the [GNU Affero General Public License v3](LICENSE). It is built with
+Orrery is open source under the [GNU Affero General Public License v3](LICENSE). It is built with
 [JUCE](https://juce.com) (used under the AGPLv3), the VST3 SDK, CLAP and clap-juce-extensions (MIT), and uses the
 Instrument Sans font (SIL Open Font License 1.1). Their licenses are in
 [THIRD-PARTY-NOTICES.txt](packaging/THIRD-PARTY-NOTICES.txt) and ship with every download.
