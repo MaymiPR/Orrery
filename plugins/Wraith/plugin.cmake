@@ -48,10 +48,7 @@ target_sources(Wraith PRIVATE ${WR_SOURCES})
 target_include_directories(Wraith PRIVATE ${WR_DIR}/Source ${CMAKE_SOURCE_DIR})
 target_compile_definitions(Wraith PUBLIC ${WR_DEFS})
 target_link_libraries(Wraith PRIVATE OrreryUiData WraithIR juce::juce_audio_utils juce::juce_dsp
-    juce::juce_recommended_config_flags juce::juce_recommended_lto_flags juce::juce_recommended_warning_flags
-    # (GCC: the link-time optimisation in parallel, not serially with a warning; a link item after JUCE's -flto,
-    # so it comes later on every format's link line)
-    $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-flto=auto>)
+    juce::juce_recommended_config_flags juce::juce_recommended_lto_flags juce::juce_recommended_warning_flags suite_warnings)
 # The VST3 wrapper compiles the SDK's vst2persistence.cpp, whose four-character constants GCC reports as -Wmultichar
 # (48 lines per build); the option has to sit on the wrapper target, not the shared code.
 target_compile_options(Wraith_VST3 PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-multichar>)
@@ -69,7 +66,7 @@ target_sources(WraithTests PRIVATE ${WR_DIR}/tests/WraithTests.cpp ${WR_SOURCES}
 target_include_directories(WraithTests PRIVATE ${WR_DIR}/Source ${CMAKE_SOURCE_DIR})
 target_compile_definitions(WraithTests PRIVATE ${WR_APP_DEFS})
 target_link_libraries(WraithTests PRIVATE OrreryUiData WraithIR juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags
-    juce::juce_recommended_warning_flags)
+    juce::juce_recommended_warning_flags suite_warnings)
 add_test(NAME WraithTests COMMAND WraithTests)
 add_dependencies(ci_targets WraithTests)
 

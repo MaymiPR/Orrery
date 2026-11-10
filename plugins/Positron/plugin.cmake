@@ -43,10 +43,7 @@ target_sources(Positron PRIVATE ${PO_SOURCES})
 target_include_directories(Positron PRIVATE ${PO_DIR}/Source ${CMAKE_SOURCE_DIR})
 target_compile_definitions(Positron PUBLIC ${PO_DEFS})
 target_link_libraries(Positron PRIVATE PositronData OrreryUiData juce::juce_audio_utils juce::juce_dsp
-    juce::juce_recommended_config_flags juce::juce_recommended_lto_flags juce::juce_recommended_warning_flags
-    # (GCC: the link-time optimisation in parallel, not serially with a warning; a link item after JUCE's -flto,
-    # so it comes later on every format's link line)
-    $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-flto=auto>)
+    juce::juce_recommended_config_flags juce::juce_recommended_lto_flags juce::juce_recommended_warning_flags suite_warnings)
 # (GCC: JUCE's VST3 SDK copy has multi-character constants)
 target_compile_options(Positron_VST3 PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-multichar>)
 add_dependencies(ci_targets Positron_VST3)

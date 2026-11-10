@@ -7,6 +7,11 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 
 ## Unreleased
 
+### Improved
+
+- **Keys in VST3 hosts:** the VST3 editors take the keys the host offers them, so a focused editor
+  receives its keys in FL Studio; every key the editor does not use still goes to the host (the space bar, Ctrl+Z).
+
 ## 1.2.1 (2026-11-04)
 
 ### Highlights

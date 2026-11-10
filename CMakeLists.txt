@@ -10,6 +10,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Windows: static C++ runtime, so the plugins load on any PC without a redistributable.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+# No fused multiply-add: GCC and Clang contract a * b + c into one rounding by default, which makes the same source
+# give different last bits on different platforms; with this off a render keeps the same last bits on Windows, Linux
+# and macOS, so the render regression's goldens hold on all three. MSVC does not contract.
+add_compile_options($<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-ffp-contract=off>)
 
 include(FetchContent)
 FetchContent_Declare(JUCE
@@ -27,6 +31,13 @@ if(NOT FETCHCONTENT_SOURCE_DIR_JUCE)
     if(NOT juce_commit STREQUAL ORRERY_JUCE_COMMIT)
         message(FATAL_ERROR "JUCE 9.0.5 is at ${juce_commit}, expected ${ORRERY_JUCE_COMMIT}")
     endif()
+endif()
+# JUCE's VST3 editor ignores the keys a host offers it (FL Studio's Ctrl+Z then never reaches the plug-in): patch it
+# at configure time (idempotent; see the script).
+execute_process(COMMAND ${CMAKE_COMMAND} -DJUCE_DIR=${juce_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/PatchJuceVst3Keys.cmake
+    RESULT_VARIABLE juce_patch_result)
+if(NOT juce_patch_result EQUAL 0)
+    message(FATAL_ERROR "cmake/PatchJuceVst3Keys.cmake failed")
 endif()
 
 # GCC 13 and later report juce_LookAndFeel_V2.cpp:413 (JUCE 9.0.5) as -Wdangling-reference: front() of a span
@@ -52,6 +63,25 @@ option(ORRERY_TOOLS "Build the measurement tools" ON)
 set(SUITE_DEFS JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
 set(SUITE_REPOSITORY "https://github.com/MaymiPR/Orrery")
 enable_testing()
+
+# Two of JUCE's recommended GCC / Clang warnings flag patterns this code uses on purpose: switches over a few cases
+# with a default, and exact float comparisons of values that are set, not computed. Linked after JUCE's warning
+# flags, so these come later and win. Our own code builds with 0 warnings on every platform; keep it so.
+# GCC 13's -Wdangling-reference (in -Wall) fires twice inside JUCE 9.0.5's LookAndFeel_V2 on a reference a
+# function returns into a temporary that outlives it; a false positive GCC 14 no longer reports and not our code,
+# so GCC alone drops that one warning. The flag exists only for C++, and JUCE's modules carry C sources, so the
+# language is part of the condition (44 cc1 lines otherwise).
+add_library(suite_warnings INTERFACE)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(suite_warnings INTERFACE -Wno-switch-enum -Wno-float-equal
+        $<$<AND:$<CXX_COMPILER_ID:GNU>,$<COMPILE_LANGUAGE:CXX>>:-Wno-dangling-reference>)
+endif()
+# GCC links JUCE's plain -flto serially and warns about it (lto-wrapper: serial compilation of N LTRANS jobs);
+# -flto=auto later on the link line runs the same link in parallel. A link item on purpose: link options land
+# before the libraries and the later -flto would win.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_link_libraries(suite_warnings INTERFACE $<$<CONFIG:Release>:-flto=auto>)
+endif()
 
 # The plug-ins. Each is included (not added as a subdirectory), so its build output stays at
 # build/<Target>_artefacts. packaging/plugins.txt lists them for the installers and the release workflow.
@@ -83,5 +113,10 @@ if(ORRERY_TOOLS)
         target_compile_definitions(RefCapture PRIVATE JUCE_PLUGINHOST_VST3=1 JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
         target_link_libraries(RefCapture PRIVATE juce::juce_audio_processors juce::juce_gui_basics
             juce::juce_recommended_config_flags)
+        # PASS when the space bar still reaches the host after clicks in an editor (tools/FocusCheck.cpp).
+        juce_add_console_app(FocusCheck PRODUCT_NAME "FocusCheck")
+        target_sources(FocusCheck PRIVATE tools/FocusCheck.cpp)
+        target_compile_definitions(FocusCheck PRIVATE JUCE_PLUGINHOST_VST3=1 JUCE_MODAL_LOOPS_PERMITTED=1 ${SUITE_DEFS})
+        target_link_libraries(FocusCheck PRIVATE juce::juce_audio_processors juce::juce_gui_basics juce::juce_recommended_config_flags)
     endif()
 endif()
