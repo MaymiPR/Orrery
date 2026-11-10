@@ -83,7 +83,7 @@ unsigned and the notes say so.
 |---|---|
 | `plugins/<Id>/` | one plug-in: `Source/`, `resources/` (Positron's glass), `ir/` (Wraith's measured reverb responses), `tests/`, `tools/` (its renderer, snapshot tool and UI fitting scripts), `nulltest/` (the harness; needs the original installed), README, RESEARCH, MEASUREMENTS, NULLTESTS |
 | `shared/` | code and resources shared by the plug-ins: the UI library, the I/O level meter, the Instrument Sans font |
-| `tools/` | hosts for the reference plug-ins: offline renders (RefRender), editor films and screenshots (RefCapture), parameter lists (ParamDump); and `tgpstate.py`, the reader of the originals' saved state that the harnesses import |
+| `tools/` | hosts for the reference plug-ins: offline renders (RefRender), editor films and screenshots (RefCapture), parameter lists (ParamDump), the keyboard-focus check (FocusCheck); and `tgpstate.py`, the reader of the originals' saved state that the harnesses import |
 | `tests/regress/` | the render regression's cases and golden renders |
 | `scripts/` | `bump_version.py`, `release_notes.py`, `render_regress.py`, `make_site.py`, `check_repo.py`, `check.ps1`, `check.sh` |
 | `packaging/` | the installers; `plugins.txt` lists the plug-ins they hold |
