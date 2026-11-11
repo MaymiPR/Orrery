@@ -4,9 +4,9 @@
 #include "Params.h"
 #include "Presets.h"
 #include "shared/dsp/LevelMeter.h"
-#include "dsp/Visuals.h"
-#include "dsp/Light.h"
-#include "dsp/Kick.h"
+#include "Visuals.h"
+#include "Light.h"
+#include "Kick.h"
 #include "dsp/Engine.h"
 #include "dsp/Resampler.h"
 #include "dsp/ConverterFits.h"
@@ -63,9 +63,9 @@ public:
     // meters: input (after the input gain) and output, L R; the compression module's gain reduction (positive dB)
     orrery::LevelMeter inMeter, outMeter;
     std::atomic<float> compGr { 0.0f };
-    sc::Visuals visuals;                     // what the circles follow (dsp/Visuals.h)
-    sc::Light light;                         // what the stripe's light follows (dsp/Light.h)
-    sc::Kick kick;                           // the kicks the scorpions strike on (dsp/Kick.h)
+    sc::Visuals visuals;                     // what the circles follow (Visuals.h)
+    sc::Light light;                         // what the stripe's light follows (Light.h)
+    sc::Kick kick;                           // the kicks the scorpions strike on (Kick.h)
     std::atomic<int> blocksProcessed { 0 };
     std::atomic<float> hostBpm { 0.0f };     // the project's tempo, as the host last gave it (0: it gives none)
     std::atomic<int> hostPlaying { -1 };     // whether its transport runs (1), is stopped (0), or it does not say (-1)

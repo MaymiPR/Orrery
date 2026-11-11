@@ -1,7 +1,8 @@
 #pragma once
-#include <juce_dsp/juce_dsp.h>
 #include <algorithm>
 #include <vector>
+#include "CpuFeatures.h"
+#include "shared/dsp/Fft.h"
 #if defined (_M_X64) || defined (_M_AMD64) || defined (__x86_64__)
  #include <immintrin.h>
  #define SC_CONV_WIDE 1
@@ -91,7 +92,7 @@ public:
                 const size_t idx = (size_t) (B + p * B + k);
                 if (idx < taps.size()) buf[(size_t) k] = taps[idx];
             }
-            fft.performRealOnlyForwardTransform (buf.data(), true);
+            fft.forwardReal (buf.data());
             for (int k = 0; k < bins; ++k) { spectraRe[(size_t) p][(size_t) k] = buf[(size_t) (2 * k)]; spectraIm[(size_t) p][(size_t) k] = buf[(size_t) (2 * k + 1)]; }
         }
         inputRe.assign ((size_t) std::max (1, parts), std::vector<float> ((size_t) binsPadded, 0.0f));
@@ -177,7 +178,7 @@ private:
     static int wide()
     {
 #if SC_CONV_WIDE
-        static const int w = juce::SystemStats::hasAVX512F() ? 3 : juce::SystemStats::hasAVX2() && juce::SystemStats::hasFMA3() ? 2 : 0;
+        static const int w = cpuFeatures().avx512f ? 3 : cpuFeatures().avx2 && cpuFeatures().fma ? 2 : 0;
         return w;
 #else
         return 0;
@@ -190,7 +191,7 @@ private:
         auto& buf = work;                                                // (no allocation on the audio thread)
         std::fill (buf.begin(), buf.end(), 0.0f);
         std::copy (block.begin(), block.end(), buf.begin());
-        fft.performRealOnlyForwardTransform (buf.data(), true);
+        fft.forwardReal (buf.data());
         newest = (newest + 1) % parts;
         float* sr = inputRe[(size_t) newest].data(); float* si = inputIm[(size_t) newest].data();
         for (int k = 0; k < bins; ++k) { sr[k] = buf[(size_t) (2 * k)]; si[k] = buf[(size_t) (2 * k + 1)]; }
@@ -212,12 +213,12 @@ private:
             }
         }
         for (int k = 0; k < bins; ++k) { buf[(size_t) (2 * k)] = ar[k]; buf[(size_t) (2 * k + 1)] = ai[k]; }
-        fft.performRealOnlyInverseTransform (buf.data());
+        fft.inverseReal (buf.data());
         // overlap-save: the second half is valid; it is the partitions' output for the next B samples
         for (int k = 0; k < B; ++k) tail[(size_t) k] = buf[(size_t) (B + k)];
     }
 
-    juce::dsp::FFT fft { order };
+    orrery::Fft fft { order };
     std::vector<float> head, block, tail, work, accRe, accIm, out;
     std::vector<std::vector<float>> spectraRe, spectraIm, inputRe, inputIm;
     int parts = 0, pos = 0, newest = 0;

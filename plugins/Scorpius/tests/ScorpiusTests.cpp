@@ -41,6 +41,10 @@ static void testParameters()
     CHECK (params.size() == (int) std::size (names));
     for (int i = 0; i < jmin (params.size(), (int) std::size (names)); ++i)
         CHECK (params[i]->getName (64) == names[i]);
+    // Params.h's list in the same order
+    CHECK (params.size() == sc::numParams);
+    for (int i = 0; i < jmin (params.size(), sc::numParams); ++i)
+        if (auto* r = dynamic_cast<RangedAudioParameter*> (params[i])) CHECK (r->getParameterID() == sc::allIds[i]);
     // display text and ranges as the reference
     CHECK (params[0]->getText (0.0f, 64) == "-12.000");
     CHECK (params[4]->getText (0.0f, 64) == "50.000");
@@ -224,7 +228,7 @@ static void testSidechain()
     CHECK (q.sidechainExternal.load());
 }
 
-// The stripe's light level (dsp/Light.h, measured on the reference): a jump is taken at once, a smooth ramp is not;
+// The stripe's light level (Light.h, measured on the reference): a jump is taken at once, a smooth ramp is not;
 // music-like pulses fading out are followed; at a stop the level takes the loudest of the last 0.15 s and falls at
 // 50 dB/s
 static void testLight()
@@ -277,7 +281,7 @@ static void testLight()
     CHECK (light.levelDb() > -40.0f);
 }
 
-// The kicks the scorpions strike on (dsp/Kick.h): every one of fast kicks and of back-to-back 808s counts, a held 808
+// The kicks the scorpions strike on (Kick.h): every one of fast kicks and of back-to-back 808s counts, a held 808
 // counts once, hats and snares never
 static void testKick()
 {

@@ -5,7 +5,8 @@ reported latency (both report 0).
     python nulltest.py                 # every case, our processor via WrRender (fast)
     python nulltest.py --vst3          # our built VST3 through RefRender (the shipped binary)
     python nulltest.py --only preset   # cases whose name contains 'preset'
-    python nulltest.py --report        # write NULLTESTS.md from results.json (never hand-edit that file)
+    python nulltest.py --report        # write NULLTESTS.md from results.json (never hand-edit that file; the published
+                                       # copy of results.json is measurements/Wraith/nulltest/results.json)
     python nulltest.py --no-plate      # skip the plate presets whose capture is not cached yet (no real-time capture)
     python nulltest.py --out results_x.json   # the results under another name (a baseline beside the current run)
     python nulltest.py --tune renders/x.json  # our processor with a fit's constants (a tuning file, before shipping it)
@@ -219,7 +220,10 @@ def report(results):
         rows.append(f'| {part} | {len(v)} | {np.median(v):.1f} | {min(v):.1f} | {max(v):.1f} |')
     notes = NOTES.strip()
     if '{doubler_metric}' in notes:             # the behaviour table, from measure_doubler.py's results
-        dm = json.load(open(os.path.join(HERE, 'renders', 'doubler_metric.json')))
+        dmp = os.path.join(HERE, 'renders', 'doubler_metric.json')
+        if not os.path.exists(dmp):         # the published copy (measurements/Wraith/nulltest/)
+            dmp = os.path.join(h.ROOT, 'measurements', 'Wraith', 'nulltest', 'doubler_metric.json')
+        dm = json.load(open(dmp))
         t = ['  | Signal, setting | Spectrum error, rms (dB, third octaves) | Spectrum error, worst (dB) | L / R correlation, original | ours | Level, ours less original (dB) |',
              '  |---|---|---|---|---|---|']
         t += [f"  | {k} | {v['spectrum_rms_db']:.2f} | {v['spectrum_max_db']:.2f} | {v['corr_ref']:.3f} | {v['corr_ours']:.3f} | {v['level_diff_db']:.2f} |" for k, v in dm.items()]

@@ -3,6 +3,7 @@ set(WR_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 set(WR_SOURCES
     ${WR_DIR}/Source/dsp/Engine.cpp
+    ${WR_DIR}/Source/dsp/Convolution.cpp
     ${WR_DIR}/Source/dsp/Reverb.cpp
     ${WR_DIR}/Source/PluginProcessor.cpp
     ${WR_DIR}/Source/PluginEditor.cpp

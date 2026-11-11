@@ -46,9 +46,7 @@ PositronProcessor::PositronProcessor()
       apvts (*this, nullptr, "Positron", po::createLayout())
 {
     bypassParam = apvts.getParameter (po::id::bypass);
-    const char* ids[11] { po::id::inputGain, po::id::outputGain, po::id::eqLow, po::id::eqMid, po::id::eqHigh, po::id::eqBypass,
-                          po::id::character, po::id::characterBypass, po::id::limiterGain, po::id::limiterBypass, po::id::bypass };
-    for (int i = 0; i < 11; ++i) raw[i] = apvts.getRawParameterValue (ids[i]);
+    for (int i = 0; i < po::numParams; ++i) raw[i] = apvts.getRawParameterValue (po::allIds[i]);
     po::Settings::get().addChangeListener (this);
     slots[0] = captureSlot();
     slots[1] = slots[0].createCopy();

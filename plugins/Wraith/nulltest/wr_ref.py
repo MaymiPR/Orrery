@@ -15,7 +15,8 @@ state=file loads a raw plug-in state first (the reference's own presets); sc=sig
 settle=ms lets a plug-in that applies parameters asynchronously catch up (Scorpius's reference needed 400); salt='...' goes into
 the cache key for global state a job cannot carry (an oversampling setting on the reference's settings page).
 Every job runs in a fresh instance (reset=False keeps the previous one). cache=True keeps reference renders in
-renders/cache keyed on the exact input and settings; renders of our processor are never cached.
+renders/cache keyed on the exact input and settings (a state file by its contents); renders of our processor are
+never cached.
 """
 import hashlib, os, re, subprocess, uuid
 import numpy as np
@@ -74,9 +75,18 @@ def _stereo(x):
     return x
 
 
+def _keyed(k, v):
+    """a job's value as the cache key holds it: a state file by its bytes, so the key does not depend on where the
+    repository is"""
+    if k == 'state' and v:
+        with open(v, 'rb') as f:
+            return ('bytes', hashlib.sha1(f.read()).hexdigest())
+    return v
+
+
 def _key(j, plugin, fs, block, vary=False):
     h = hashlib.sha1(_stereo(j['x']).tobytes())
-    for k in ('params', 'norm', 'auto', 'raw', 'reset', 'state', 'settle'): h.update(repr((k, j.get(k))).encode())
+    for k in ('params', 'norm', 'auto', 'raw', 'reset', 'state', 'settle'): h.update(repr((k, _keyed(k, j.get(k)))).encode())
     if j.get('salt'): h.update(repr(('salt', j['salt'])).encode())
     if j.get('sc') is not None: h.update(_stereo(j['sc']).tobytes())
     h.update(repr((plugin, fs, block) + (('vary',) if vary else ())).encode())

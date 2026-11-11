@@ -19,8 +19,12 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 - **Measurement data:** each plug-in's measured responses, fitted values and null-test results are published as JSON in
   `measurements/<Id>/`.
 - **Null-test scripts:** the harnesses are `po_ref.py`, `sc_ref.py` and `wr_ref.py`, the helpers end in `_lib.py`, the
-  scripts that write a plug-in's sources sit in `plugins/<Id>/scripts/`, and Scorpius's NULLTESTS.md is written by
-  `nulltest.py --report` like the others.
+  scripts that write a plug-in's sources sit in `plugins/<Id>/scripts/`, and Scorpius's and Wraith's NULLTESTS.md are
+  written by `nulltest.py --report` like Positron's.
+- **Source layout:** every plug-in's DSP is plain C++: Wraith's reverb convolution and Scorpius's long filters run on
+  the suite's own FFT (`shared/dsp/Fft.h`) in the order of operations they had, so the renders are unchanged to the
+  last bit; Scorpius's editor analyses sit beside its processor; Positron's band gain computer for the fits is a null
+  test's native helper (`scripts/build_native.py`).
 
 ## 1.2.1 (2026-11-04)
 

@@ -94,7 +94,7 @@ private:
     int slot = 0;
 
     juce::AudioProcessorParameter* bypassParam = nullptr;
-    std::atomic<float>* raw[11] {};       // every parameter's current value, in po::id order
+    std::atomic<float>* raw[po::numParams] {};   // every parameter's current value, in po::allIds order
     po::dsp::Engine engine;
     juce::AudioBuffer<float> meterBuf;    // the input meters' copy (after the input gain)
     double preparedRate = 0.0;

@@ -213,7 +213,7 @@ same ballistics and peak hold; the input and output knobs' arcs run from 0 dB.
 | Knob entry | a double-click opens a field over the knob to type its value (Enter or a click elsewhere sets it, as one host gesture; Escape leaves it); Alt-click resets to the default |
 | Compression readout | the original's law run inside the compressor (`dsp/Compressor.h`) on its own gain reduction: 4.3 changes a second on music, within 0.7 … 0.9 dB per frame of the original's on both films |
 | Circles | the radius laws above; per-frame radius against the original: harmonics 0.95 px rms, lift 1.5; means and wobble within 0.15 px |
-| Stripe light | the light law above, run on the audio thread (`dsp/Light.h`); a frame without a new audio block is not a stop until 0.1 s have passed (the circles keep their last spectrum the same way), so long host buffers do not flicker the light; through the sparse loop it never falls below 0.90, and its end matches the original's to ~0.05 of full brightness (out ~0.07 s sooner at the very bottom) |
+| Stripe light | the light law above, run on the audio thread (`Light.h`); a frame without a new audio block is not a stop until 0.1 s have passed (the circles keep their last spectrum the same way), so long host buffers do not flicker the light; through the sparse loop it never falls below 0.90, and its end matches the original's to ~0.05 of full brightness (out ~0.07 s sooner at the very bottom) |
 | Clock | the stripe, circles and meters move on one 60 Hz clock; the plate's ~400 grille dots drawn once per scale: 0.12 of a core playing at 200 % |
 
 ### Particle styles
@@ -263,7 +263,7 @@ the middle, streamers flowing outwards, tall coloured pillars, the glass's refle
   every kick their tails strike forwards over their heads in ~0.06 s and settle back over ~0.25 s (a kick mid-swing
   strikes again from where the tails are), a pulse of light running up them and the stings flaring. Any beat (the
   light's jumps) brightens them.
-- **Kicks** (`dsp/Kick.h`), found on the audio thread every 2.5 ms in two bands: the sub (below 90 Hz; its peak over
+- **Kicks** (`Kick.h`), found on the audio thread every 2.5 ms in two bands: the sub (below 90 Hz; its peak over
   25 ms 3 dB above a level that rises over 60 ms and follows a decay within 15 ms, above -28 dBFS) finds a kick or an
   808 out of silence or out of a decayed tail; the punch (70 … 200 Hz; its peak over 10 ms 4 dB above a 30 / 8 ms
   level, above -30 dBFS, confirmed by the sub above -26 dBFS within 20 ms) finds a kick landing on one still ringing,

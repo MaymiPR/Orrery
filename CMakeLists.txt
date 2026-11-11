@@ -8,7 +8,7 @@ project(Orrery VERSION 1.2.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Windows: static C++ runtime, so the plugins load on any PC without a redistributable.
+# Windows: static C++ runtime, so the plug-ins load on any PC without a redistributable.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 # No fused multiply-add: GCC and Clang contract a * b + c into one rounding by default, which makes the same source
 # give different last bits on different platforms; with this off a render keeps the same last bits on Windows, Linux
@@ -44,13 +44,6 @@ execute_process(COMMAND ${CMAKE_COMMAND} -DJUCE_DIR=${juce_SOURCE_DIR} -P ${CMAK
 if(NOT juce_patch_result EQUAL 0)
     message(FATAL_ERROR "cmake/PatchJuceVst3Keys.cmake failed")
 endif()
-
-# GCC 13 and later report juce_LookAndFeel_V2.cpp:413 (JUCE 9.0.5) as -Wdangling-reference: front() of a span
-# returned by value, whose storage the alert options own, so nothing dangles. Off for that one JUCE file only
-# (the plug-ins are included below, not added as subdirectories, so this directory's source property reaches them);
-# GCC 12 and earlier don't know the option.
-set_source_files_properties("${juce_SOURCE_DIR}/modules/juce_gui_basics/juce_gui_basics_2.cpp" PROPERTIES
-    COMPILE_OPTIONS "$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,13>>:-Wno-dangling-reference>")
 
 # CLAP through clap-juce-extensions (MIT; brings the CLAP SDK).
 option(ORRERY_CLAP "Build the CLAP plugins" ON)

@@ -1,9 +1,11 @@
 #pragma once
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <cstring>
 #include <vector>
 #include "Convolver.h"
+#include "CpuFeatures.h"
 #include "FastMath.h"
 #if defined (__SSE2__) || defined (_M_X64) || defined (_M_AMD64) || (defined (_M_IX86_FP) && _M_IX86_FP >= 2)
  #include <emmintrin.h>
@@ -467,11 +469,11 @@ public:
     {
         weights = &w;
         const int C = w.channels;
-        jassert (C % 2 == 0);                // (the tiles: 4 of the 2C gate outputs, 2 of the C residual outputs)
+        assert (C % 2 == 0);                 // (the tiles: 4 of the 2C gate outputs, 2 of the C residual outputs)
         post.prepare (w.post);
         preLine.assign (w.pre.size() - 1 + (size_t) maxBlock, 0.0f);
         hist.clear();
-        jassert (w.kernel == 2 || w.kernel == 3);
+        assert (w.kernel == 2 || w.kernel == 3);
         for (int d : w.dilations) hist.push_back (std::vector<float> ((size_t) C * (size_t) ((w.kernel - 1) * d + span), 0.0f));
         writeAt.assign (w.dilations.size(), 0);
         u.assign ((size_t) maxBlock, 0.0f); y = u; postIn = u;
@@ -529,9 +531,9 @@ private:
         const int C = w.channels, PL = (int) w.pre.size(), N = maxBlock;
 #if SC_AVX
         // (0: SSE / NEON / plain, 1: AVX, 2: AVX2 and FMA, 3: AVX-512)
-        static const int wide = juce::SystemStats::hasAVX512F() ? 3
-                              : juce::SystemStats::hasAVX2() && juce::SystemStats::hasFMA3() ? 2
-                              : juce::SystemStats::hasAVX() ? 1 : 0;
+        static const int wide = cpuFeatures().avx512f ? 3
+                              : cpuFeatures().avx2 && cpuFeatures().fma ? 2
+                              : cpuFeatures().avx ? 1 : 0;
         const bool avx = wide == 1;
 #else
         constexpr int wide = 0;

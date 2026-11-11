@@ -1,5 +1,6 @@
-// charsim: the character band's gain computer (Source/dsp/BandDynamics.h) as a C library for the fitting scripts
-// (nulltest/charsim_lib.py loads it with ctypes): band signal in, gain n(t) and wet reduction out.
+// CharSim: the character band's gain computer (Source/dsp/BandDynamics.h) as a C library for the fitting scripts
+// (nulltest/charsim_lib.py loads it with ctypes; scripts/build_native.py builds it): band signal in, gain n(t) and
+// wet reduction out.
 #include "dsp/BandDynamics.h"
 
 extern "C"

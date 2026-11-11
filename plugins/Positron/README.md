@@ -65,5 +65,6 @@ and the offline renderer give the same numbers. Every case: [NULLTESTS.md](NULLT
 - `scripts/`: `make_character_table.py` (writes `Source/dsp/CharacterTable.h`), `make_glass.py` (draws the glass
   textures) and the editor's measuring tools (`compare_ui.py`, `fit_glass.py`, `fit_knobs.py`, `fit_knob_shadow.py`),
   whose numbers become the drawing's tokens.
-- `tools/`: PoRender (our processor offline, every DSP constant open to change) and the band gain computer as a C
-  library for the fits (`CharSim.cpp`); the editor snapshot is the suite's `tools/Snapshot.cpp`.
+- `tools/`: PoRender (our processor offline, every DSP constant open to change); the editor snapshot is the suite's
+  `tools/Snapshot.cpp`. The band gain computer as a C library for the fits is `nulltest/native/CharSim.cpp`, built by
+  `scripts/build_native.py`.

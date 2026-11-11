@@ -58,7 +58,7 @@ void PresetManager::load (const Entry& e)
         for (auto& f : factory())
             if (e.name == f.name)
             {
-                for (auto* pid : presetIds())
+                for (auto* pid : presetIds)
                     if (auto* p = apvts.getParameter (pid)) p->setValueNotifyingHost (p->getDefaultValue());
                 for (auto& [pid, v] : f.values) setReal (apvts, pid, v);
             }
@@ -67,7 +67,7 @@ void PresetManager::load (const Entry& e)
     {
         auto xml = parseXML (e.file);
         if (xml == nullptr || ! xml->hasTagName ("ScorpiusPreset")) return;
-        for (auto* pid : presetIds())
+        for (auto* pid : presetIds)
             if (xml->hasAttribute (pid)) setReal (apvts, pid, (float) xml->getDoubleAttribute (pid));
     }
     current = e.name;
@@ -87,7 +87,7 @@ bool PresetManager::save (const String& name)
 {
     if (name.trim().isEmpty()) return false;
     XmlElement xml ("ScorpiusPreset");
-    for (auto* pid : presetIds())
+    for (auto* pid : presetIds)
         if (auto* p = dynamic_cast<RangedAudioParameter*> (apvts.getParameter (pid)))
             xml.setAttribute (pid, (double) p->convertFrom0to1 (p->getValue()));
     const auto f = fileFor (name.trim());

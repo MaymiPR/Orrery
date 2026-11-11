@@ -866,7 +866,7 @@ void Stripe::advanceScorpion (float real, float paced)
     bodyTime += real * 0.5f * pace;
     presence = envelope >= presence || ! playing ? envelope : presence * std::exp (-real / 1.5f);
     if (presence < 0.03f && envelope <= 0.002f) presence = 0.0f;           // (and out, once faint)
-    // a kick (dsp/Kick.h) strikes, from wherever the tails are in their swing
+    // a kick (Kick.h) strikes, from wherever the tails are in their swing
     if (kicked && envelope > 0.02f)
     {
         strikeFrom = struck;

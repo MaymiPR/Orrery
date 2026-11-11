@@ -1,0 +1,778 @@
+{
+ "path: every stage off / pink -18": {
+  "case": "path: every stage off",
+  "signal": "pink -18",
+  "residual_db": -337.75,
+  "worst_second_db": -331.24,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "gains: in -6, out +4 / pink -18": {
+  "case": "gains: in -6, out +4",
+  "signal": "pink -18",
+  "residual_db": -143.57,
+  "worst_second_db": -143.53,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "eq: start-up values / pink -18": {
+  "case": "eq: start-up values",
+  "signal": "pink -18",
+  "residual_db": -137.84,
+  "worst_second_db": -137.52,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "eq: low -7.5, high +9 / pink -18": {
+  "case": "eq: low -7.5, high +9",
+  "signal": "pink -18",
+  "residual_db": -127.83,
+  "worst_second_db": -127.81,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "rider: start-up values / pink -18": {
+  "case": "rider: start-up values",
+  "signal": "pink -18",
+  "residual_db": -86.14,
+  "worst_second_db": -79.99,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "rider: amount 1, floor -50, speed 0.01 / pink -18": {
+  "case": "rider: amount 1, floor -50, speed 0.01",
+  "signal": "pink -18",
+  "residual_db": -63.39,
+  "worst_second_db": -57.4,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "character: start-up (compression 0, focus +8) / pink -18": {
+  "case": "character: start-up (compression 0, focus +8)",
+  "signal": "pink -18",
+  "residual_db": -27.16,
+  "worst_second_db": -22.47,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "character: compression +50, focus -30 / pink -18": {
+  "case": "character: compression +50, focus -30",
+  "signal": "pink -18",
+  "residual_db": -25.84,
+  "worst_second_db": -20.97,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "character: compression -50, focus +50 / pink -18": {
+  "case": "character: compression -50, focus +50",
+  "signal": "pink -18",
+  "residual_db": -25.53,
+  "worst_second_db": -25.32,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "doubler: mix 0.1, stereo 1 / pink -18": {
+  "case": "doubler: mix 0.1, stereo 1",
+  "signal": "pink -18",
+  "residual_db": -32.32,
+  "worst_second_db": -31.33,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "doubler: mix 1, stereo 0.5 / pink -18": {
+  "case": "doubler: mix 1, stereo 0.5",
+  "signal": "pink -18",
+  "residual_db": -19.37,
+  "worst_second_db": -18.14,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "reverb: room, start-up values / pink -18": {
+  "case": "reverb: room, start-up values",
+  "signal": "pink -18",
+  "residual_db": -90.63,
+  "worst_second_db": -88.02,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "reverb: room, mix 1, filter 3.5 kHz / pink -18": {
+  "case": "reverb: room, mix 1, filter 3.5 kHz",
+  "signal": "pink -18",
+  "residual_db": -72.82,
+  "worst_second_db": -69.54,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "full chain: start-up (\"lead\") / pink -18": {
+  "case": "full chain: start-up (\"lead\")",
+  "signal": "pink -18",
+  "residual_db": -26.89,
+  "worst_second_db": -22.34,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "full chain: start-up, 44.1 kHz / pink -18": {
+  "case": "full chain: start-up, 44.1 kHz",
+  "signal": "pink -18",
+  "residual_db": -27.06,
+  "worst_second_db": -23.06,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "full chain: start-up, 96 kHz / pink -18": {
+  "case": "full chain: start-up, 96 kHz",
+  "signal": "pink -18",
+  "residual_db": -23.77,
+  "worst_second_db": -18.2,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "path: every stage off / sweep -12": {
+  "case": "path: every stage off",
+  "signal": "sweep -12",
+  "residual_db": -340.73,
+  "worst_second_db": -334.81,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "gains: in -6, out +4 / sweep -12": {
+  "case": "gains: in -6, out +4",
+  "signal": "sweep -12",
+  "residual_db": -143.79,
+  "worst_second_db": -143.76,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "eq: start-up values / sweep -12": {
+  "case": "eq: start-up values",
+  "signal": "sweep -12",
+  "residual_db": -137.91,
+  "worst_second_db": -137.52,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "eq: low -7.5, high +9 / sweep -12": {
+  "case": "eq: low -7.5, high +9",
+  "signal": "sweep -12",
+  "residual_db": -127.56,
+  "worst_second_db": -127.91,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "rider: start-up values / sweep -12": {
+  "case": "rider: start-up values",
+  "signal": "sweep -12",
+  "residual_db": -123.44,
+  "worst_second_db": -122.91,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "rider: amount 1, floor -50, speed 0.01 / sweep -12": {
+  "case": "rider: amount 1, floor -50, speed 0.01",
+  "signal": "sweep -12",
+  "residual_db": -113.19,
+  "worst_second_db": -112.92,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "character: start-up (compression 0, focus +8) / sweep -12": {
+  "case": "character: start-up (compression 0, focus +8)",
+  "signal": "sweep -12",
+  "residual_db": -17.07,
+  "worst_second_db": -14.9,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "character: compression +50, focus -30 / sweep -12": {
+  "case": "character: compression +50, focus -30",
+  "signal": "sweep -12",
+  "residual_db": -20.49,
+  "worst_second_db": -15.51,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "character: compression -50, focus +50 / sweep -12": {
+  "case": "character: compression -50, focus +50",
+  "signal": "sweep -12",
+  "residual_db": -16.06,
+  "worst_second_db": -15.71,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "doubler: mix 0.1, stereo 1 / sweep -12": {
+  "case": "doubler: mix 0.1, stereo 1",
+  "signal": "sweep -12",
+  "residual_db": -25.24,
+  "worst_second_db": -22.79,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "doubler: mix 1, stereo 0.5 / sweep -12": {
+  "case": "doubler: mix 1, stereo 0.5",
+  "signal": "sweep -12",
+  "residual_db": -11.27,
+  "worst_second_db": -8.12,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "reverb: room, start-up values / sweep -12": {
+  "case": "reverb: room, start-up values",
+  "signal": "sweep -12",
+  "residual_db": -91.53,
+  "worst_second_db": -88.2,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "reverb: room, mix 1, filter 3.5 kHz / sweep -12": {
+  "case": "reverb: room, mix 1, filter 3.5 kHz",
+  "signal": "sweep -12",
+  "residual_db": -73.95,
+  "worst_second_db": -71.12,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "full chain: start-up (\"lead\") / sweep -12": {
+  "case": "full chain: start-up (\"lead\")",
+  "signal": "sweep -12",
+  "residual_db": -16.79,
+  "worst_second_db": -13.81,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "full chain: start-up, 44.1 kHz / sweep -12": {
+  "case": "full chain: start-up, 44.1 kHz",
+  "signal": "sweep -12",
+  "residual_db": -17.02,
+  "worst_second_db": -16.17,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "full chain: start-up, 96 kHz / sweep -12": {
+  "case": "full chain: start-up, 96 kHz",
+  "signal": "sweep -12",
+  "residual_db": -14.9,
+  "worst_second_db": -9.76,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "path: every stage off / drums -6": {
+  "case": "path: every stage off",
+  "signal": "drums -6",
+  "residual_db": -329.26,
+  "worst_second_db": -323.75,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "gains: in -6, out +4 / drums -6": {
+  "case": "gains: in -6, out +4",
+  "signal": "drums -6",
+  "residual_db": -143.5,
+  "worst_second_db": -143.49,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "eq: start-up values / drums -6": {
+  "case": "eq: start-up values",
+  "signal": "drums -6",
+  "residual_db": -136.69,
+  "worst_second_db": -136.66,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "eq: low -7.5, high +9 / drums -6": {
+  "case": "eq: low -7.5, high +9",
+  "signal": "drums -6",
+  "residual_db": -129.02,
+  "worst_second_db": -129.01,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "rider: start-up values / drums -6": {
+  "case": "rider: start-up values",
+  "signal": "drums -6",
+  "residual_db": -103.01,
+  "worst_second_db": -103.19,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "rider: amount 1, floor -50, speed 0.01 / drums -6": {
+  "case": "rider: amount 1, floor -50, speed 0.01",
+  "signal": "drums -6",
+  "residual_db": -96.54,
+  "worst_second_db": -96.31,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "character: start-up (compression 0, focus +8) / drums -6": {
+  "case": "character: start-up (compression 0, focus +8)",
+  "signal": "drums -6",
+  "residual_db": -20.76,
+  "worst_second_db": -20.95,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "character: compression +50, focus -30 / drums -6": {
+  "case": "character: compression +50, focus -30",
+  "signal": "drums -6",
+  "residual_db": -15.05,
+  "worst_second_db": -15.09,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "character: compression -50, focus +50 / drums -6": {
+  "case": "character: compression -50, focus +50",
+  "signal": "drums -6",
+  "residual_db": -25.23,
+  "worst_second_db": -25.42,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "doubler: mix 0.1, stereo 1 / drums -6": {
+  "case": "doubler: mix 0.1, stereo 1",
+  "signal": "drums -6",
+  "residual_db": -28.56,
+  "worst_second_db": -28.93,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "doubler: mix 1, stereo 0.5 / drums -6": {
+  "case": "doubler: mix 1, stereo 0.5",
+  "signal": "drums -6",
+  "residual_db": -15.93,
+  "worst_second_db": -16.31,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "reverb: room, start-up values / drums -6": {
+  "case": "reverb: room, start-up values",
+  "signal": "drums -6",
+  "residual_db": -91.73,
+  "worst_second_db": -89.86,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "reverb: room, mix 1, filter 3.5 kHz / drums -6": {
+  "case": "reverb: room, mix 1, filter 3.5 kHz",
+  "signal": "drums -6",
+  "residual_db": -74.33,
+  "worst_second_db": -72.03,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "full chain: start-up (\"lead\") / drums -6": {
+  "case": "full chain: start-up (\"lead\")",
+  "signal": "drums -6",
+  "residual_db": -20.99,
+  "worst_second_db": -21.23,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "full chain: start-up, 44.1 kHz / drums -6": {
+  "case": "full chain: start-up, 44.1 kHz",
+  "signal": "drums -6",
+  "residual_db": -20.15,
+  "worst_second_db": -20.35,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "full chain: start-up, 96 kHz / drums -6": {
+  "case": "full chain: start-up, 96 kHz",
+  "signal": "drums -6",
+  "residual_db": -20.81,
+  "worst_second_db": -20.46,
+  "worst_at_s": 5,
+  "renderer": "model"
+ },
+ "path: every stage off / music -10": {
+  "case": "path: every stage off",
+  "signal": "music -10",
+  "residual_db": -336.01,
+  "worst_second_db": -330.0,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "gains: in -6, out +4 / music -10": {
+  "case": "gains: in -6, out +4",
+  "signal": "music -10",
+  "residual_db": -143.52,
+  "worst_second_db": -143.51,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "eq: start-up values / music -10": {
+  "case": "eq: start-up values",
+  "signal": "music -10",
+  "residual_db": -137.64,
+  "worst_second_db": -137.57,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "eq: low -7.5, high +9 / music -10": {
+  "case": "eq: low -7.5, high +9",
+  "signal": "music -10",
+  "residual_db": -128.93,
+  "worst_second_db": -128.85,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "rider: start-up values / music -10": {
+  "case": "rider: start-up values",
+  "signal": "music -10",
+  "residual_db": -114.29,
+  "worst_second_db": -113.58,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "rider: amount 1, floor -50, speed 0.01 / music -10": {
+  "case": "rider: amount 1, floor -50, speed 0.01",
+  "signal": "music -10",
+  "residual_db": -107.82,
+  "worst_second_db": -106.99,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "character: start-up (compression 0, focus +8) / music -10": {
+  "case": "character: start-up (compression 0, focus +8)",
+  "signal": "music -10",
+  "residual_db": -23.58,
+  "worst_second_db": -22.5,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "character: compression +50, focus -30 / music -10": {
+  "case": "character: compression +50, focus -30",
+  "signal": "music -10",
+  "residual_db": -20.83,
+  "worst_second_db": -19.53,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "character: compression -50, focus +50 / music -10": {
+  "case": "character: compression -50, focus +50",
+  "signal": "music -10",
+  "residual_db": -28.55,
+  "worst_second_db": -26.68,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "doubler: mix 0.1, stereo 1 / music -10": {
+  "case": "doubler: mix 0.1, stereo 1",
+  "signal": "music -10",
+  "residual_db": -39.04,
+  "worst_second_db": -38.44,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "doubler: mix 1, stereo 0.5 / music -10": {
+  "case": "doubler: mix 1, stereo 0.5",
+  "signal": "music -10",
+  "residual_db": -27.17,
+  "worst_second_db": -26.05,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "reverb: room, start-up values / music -10": {
+  "case": "reverb: room, start-up values",
+  "signal": "music -10",
+  "residual_db": -92.33,
+  "worst_second_db": -88.69,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "reverb: room, mix 1, filter 3.5 kHz / music -10": {
+  "case": "reverb: room, mix 1, filter 3.5 kHz",
+  "signal": "music -10",
+  "residual_db": -73.47,
+  "worst_second_db": -70.96,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "full chain: start-up (\"lead\") / music -10": {
+  "case": "full chain: start-up (\"lead\")",
+  "signal": "music -10",
+  "residual_db": -23.63,
+  "worst_second_db": -22.6,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "full chain: start-up, 44.1 kHz / music -10": {
+  "case": "full chain: start-up, 44.1 kHz",
+  "signal": "music -10",
+  "residual_db": -23.37,
+  "worst_second_db": -21.69,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "full chain: start-up, 96 kHz / music -10": {
+  "case": "full chain: start-up, 96 kHz",
+  "signal": "music -10",
+  "residual_db": -20.9,
+  "worst_second_db": -19.72,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: lead / pink -18": {
+  "case": "preset: lead",
+  "signal": "pink -18",
+  "residual_db": -26.89,
+  "worst_second_db": -22.34,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: lead / drums -6": {
+  "case": "preset: lead",
+  "signal": "drums -6",
+  "residual_db": -20.99,
+  "worst_second_db": -21.23,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "preset: lead / music -10": {
+  "case": "preset: lead",
+  "signal": "music -10",
+  "residual_db": -23.38,
+  "worst_second_db": -22.38,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "preset: up front / pink -18": {
+  "case": "preset: up front",
+  "signal": "pink -18",
+  "residual_db": -27.0,
+  "worst_second_db": -22.23,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: up front / drums -6": {
+  "case": "preset: up front",
+  "signal": "drums -6",
+  "residual_db": -20.91,
+  "worst_second_db": -21.02,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "preset: up front / music -10": {
+  "case": "preset: up front",
+  "signal": "music -10",
+  "residual_db": -23.36,
+  "worst_second_db": -22.32,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "preset: wide image / pink -18": {
+  "case": "preset: wide image",
+  "signal": "pink -18",
+  "residual_db": -12.04,
+  "worst_second_db": -11.64,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: wide image / drums -6": {
+  "case": "preset: wide image",
+  "signal": "drums -6",
+  "residual_db": -16.49,
+  "worst_second_db": -16.78,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: wide image / music -10": {
+  "case": "preset: wide image",
+  "signal": "music -10",
+  "residual_db": -19.8,
+  "worst_second_db": -19.21,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "preset: short phase / pink -18": {
+  "case": "preset: short phase",
+  "signal": "pink -18",
+  "residual_db": -11.53,
+  "worst_second_db": -11.17,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: short phase / drums -6": {
+  "case": "preset: short phase",
+  "signal": "drums -6",
+  "residual_db": -16.28,
+  "worst_second_db": -16.41,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: short phase / music -10": {
+  "case": "preset: short phase",
+  "signal": "music -10",
+  "residual_db": -16.93,
+  "worst_second_db": -16.4,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "preset: wide and wet / pink -18": {
+  "case": "preset: wide and wet",
+  "signal": "pink -18",
+  "residual_db": -12.12,
+  "worst_second_db": -11.42,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: wide and wet / drums -6": {
+  "case": "preset: wide and wet",
+  "signal": "drums -6",
+  "residual_db": -12.59,
+  "worst_second_db": -12.56,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "preset: wide and wet / music -10": {
+  "case": "preset: wide and wet",
+  "signal": "music -10",
+  "residual_db": -11.83,
+  "worst_second_db": -10.45,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: wide lead / pink -18": {
+  "case": "preset: wide lead",
+  "signal": "pink -18",
+  "residual_db": -20.97,
+  "worst_second_db": -19.06,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: wide lead / drums -6": {
+  "case": "preset: wide lead",
+  "signal": "drums -6",
+  "residual_db": -19.77,
+  "worst_second_db": -20.02,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "preset: wide lead / music -10": {
+  "case": "preset: wide lead",
+  "signal": "music -10",
+  "residual_db": -22.24,
+  "worst_second_db": -21.93,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "preset: backing stack / pink -18": {
+  "case": "preset: backing stack",
+  "signal": "pink -18",
+  "residual_db": -18.6,
+  "worst_second_db": -17.03,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: backing stack / drums -6": {
+  "case": "preset: backing stack",
+  "signal": "drums -6",
+  "residual_db": -19.04,
+  "worst_second_db": -19.09,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "preset: backing stack / music -10": {
+  "case": "preset: backing stack",
+  "signal": "music -10",
+  "residual_db": -19.0,
+  "worst_second_db": -18.76,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: big cave / pink -18": {
+  "case": "preset: big cave",
+  "signal": "pink -18",
+  "residual_db": -13.06,
+  "worst_second_db": -12.56,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: big cave / drums -6": {
+  "case": "preset: big cave",
+  "signal": "drums -6",
+  "residual_db": -14.83,
+  "worst_second_db": -14.92,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "preset: big cave / music -10": {
+  "case": "preset: big cave",
+  "signal": "music -10",
+  "residual_db": -14.24,
+  "worst_second_db": -13.23,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: doubler alone / pink -18": {
+  "case": "preset: doubler alone",
+  "signal": "pink -18",
+  "residual_db": -17.82,
+  "worst_second_db": -16.59,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: doubler alone / drums -6": {
+  "case": "preset: doubler alone",
+  "signal": "drums -6",
+  "residual_db": -13.6,
+  "worst_second_db": -14.01,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: doubler alone / music -10": {
+  "case": "preset: doubler alone",
+  "signal": "music -10",
+  "residual_db": -25.99,
+  "worst_second_db": -24.8,
+  "worst_at_s": 1,
+  "renderer": "model"
+ },
+ "preset: soft room / pink -18": {
+  "case": "preset: soft room",
+  "signal": "pink -18",
+  "residual_db": -26.88,
+  "worst_second_db": -22.09,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: soft room / drums -6": {
+  "case": "preset: soft room",
+  "signal": "drums -6",
+  "residual_db": -20.62,
+  "worst_second_db": -20.79,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "preset: soft room / music -10": {
+  "case": "preset: soft room",
+  "signal": "music -10",
+  "residual_db": -23.39,
+  "worst_second_db": -22.57,
+  "worst_at_s": 2,
+  "renderer": "model"
+ },
+ "preset: hard squeeze / pink -18": {
+  "case": "preset: hard squeeze",
+  "signal": "pink -18",
+  "residual_db": -22.42,
+  "worst_second_db": -19.34,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: hard squeeze / drums -6": {
+  "case": "preset: hard squeeze",
+  "signal": "drums -6",
+  "residual_db": -4.37,
+  "worst_second_db": -4.28,
+  "worst_at_s": 0,
+  "renderer": "model"
+ },
+ "preset: hard squeeze / music -10": {
+  "case": "preset: hard squeeze",
+  "signal": "music -10",
+  "residual_db": -21.1,
+  "worst_second_db": -19.59,
+  "worst_at_s": 0,
+  "renderer": "model"
+ }
+}

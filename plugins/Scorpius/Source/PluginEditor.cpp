@@ -182,7 +182,7 @@ ScorpiusEditor::ScorpiusEditor (ScorpiusProcessor& p) : AudioProcessorEditor (p)
     color.onChange = [choose] (int i) { choose (sc::id::driveColor, i, 3); };
     mode.onChange = [choose] (int i) { choose (sc::id::compMode, i, 2); };
     freq.onChange = [choose] (int i) { choose (sc::id::harmFreq, i, 2); };
-    for (auto* pid : sc::presetIds()) s.addParameterListener (pid, this);
+    for (auto* pid : sc::presetIds) s.addParameterListener (pid, this);
 
     sidechain.external = proc.sidechainExternal.load();
     sidechain.onChange = [this] (bool ext) { proc.sidechainExternal = ext; };
@@ -231,7 +231,7 @@ ScorpiusEditor::~ScorpiusEditor()
 {
     readoutClock.stopTimer();
     content.removeMouseListener (&hoverTracker);
-    for (auto* pid : sc::presetIds()) proc.apvts.removeParameterListener (pid, this);
+    for (auto* pid : sc::presetIds) proc.apvts.removeParameterListener (pid, this);
 }
 
 void ScorpiusEditor::toggleParam (const char* pid)
@@ -482,7 +482,7 @@ void ScorpiusEditor::sampleReadouts()
     for (int i = 0; i < 4; ++i) meters[i]->sampleRms (*taps[i], running);
 }
 
-// the stripe's light follows the processor's level (dsp/Light.h); when the host stops calling the processor the level
+// the stripe's light follows the processor's level (Light.h); when the host stops calling the processor the level
 // stays where it was, so the editor lets it fall as after a stop
 void ScorpiusEditor::stepStripe (bool playing, float dt)
 {

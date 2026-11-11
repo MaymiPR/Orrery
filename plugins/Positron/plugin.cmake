@@ -105,10 +105,6 @@ if(ORRERY_TOOLS)
             juce::juce_recommended_config_flags)
     endforeach()
 
-    # the band gain computer as a plain C library for the fitting scripts (nulltest/charsim_lib.py)
-    add_library(charsim SHARED ${PO_DIR}/tools/CharSim.cpp)
-    target_include_directories(charsim PRIVATE ${PO_DIR}/Source)
-    set_target_properties(charsim PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/charsim)
     if(WIN32)
         add_dependencies(ci_targets PositronSnapshot)      # ci.yml's screenshot artefact is made on Windows
     endif()
