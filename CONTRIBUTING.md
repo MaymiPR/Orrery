@@ -90,7 +90,7 @@ unsigned and the notes say so.
 | `shared/` | the static library `OrreryShared`: the UI library (theme, controls, metal knob, the host-keys hand-back `HostFocus`), the I/O level meter, the plug-ins' FFT and the deterministic math (`dsp/Fft.h`, `dsp/Math.h`), the Instrument Sans font |
 | `tools/` | hosts for the reference plug-ins: offline renders (RefRender), editor films and screenshots (RefCapture), parameter lists (ParamDump), the keyboard-focus check (FocusCheck); the host test (`HostTest.cpp`) and the editor snapshot tool (`Snapshot.cpp`), built per plug-in |
 | `tests/regress/` | the render regression's cases and golden renders |
-| `scripts/` | `bump_version.py`, `release_notes.py`, `render_regress.py`, `make_site.py`, `check_repo.py`, `check.ps1`, `check.sh`, `build_native.py` (the null tests' native helpers); `nulltest/ref_state_lib.py`, the reader of the originals' saved state that the harnesses import |
+| `scripts/` | `bump_version.py`, `release_notes.py`, `render_regress.py`, `make_site.py`, `check_repo.py`, `check.ps1`, `check.sh`, `make_screenshots.py` (`docs/screenshots/` from each plug-in's snapshot tool), `build_native.py` (the null tests' native helpers); `nulltest/ref_state_lib.py`, the reader of the originals' saved state that the harnesses import |
 | `measurements/` | the published measurement data per plug-in (`measurements/<Id>/`) |
 | `packaging/` | the installers; `plugins.txt` lists the plug-ins they hold |
 | `docs/` | the build guide, `branding/` (banners, icon, social preview, `colours.json`), `screenshots/` |
@@ -123,7 +123,8 @@ The results are in each plug-in's NULLTESTS.md.
 ## Screenshots
 
 `docs/screenshots/` holds the committed set. Each file comes from a plug-in's Snapshot tool
-(`build/<Id>Snapshot_artefacts/Release/<Id>Snapshot`) with these options:
+(`build/<Id>Snapshot_artefacts/Release/<Id>Snapshot`) with these options; `python scripts/make_screenshots.py` writes
+the three editors, their classic-style views and `hero.png`, and the two sheets below are cut from renders by hand:
 
 | File | How it is made |
 |---|---|

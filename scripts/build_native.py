@@ -2,14 +2,14 @@
 build/native/<Id>/<Stem>.dll (Windows, MSVC through vcvars64) or build/native/<Id>/<Stem>.so (Linux and macOS, cc or
 c++; MSVC's __declspec(dllexport) is defined away there). The Python scripts load them from build/native/. A C++
 helper compiles as C++17 with its plug-in's Source/ on the include path, so it can wrap a block of the plug-in's own
-DSP (Positron's CharSim.cpp: dsp/BandDynamics.h). Standard library only.
+DSP (an include of dsp/<Block>.h). Standard library only.
 
     python scripts/build_native.py                 # every helper
-    python scripts/build_native.py Positron        # the helpers of one plug-in
+    python scripts/build_native.py <Id>            # the helpers of one plug-in
     python scripts/build_native.py --list          # what would be built, and where
 
 A helper that a fit compares with a fitted constant keeps the floating-point mode it was fitted with: FAST_MATH lists
-the ones built with fast floating point (MSVC /fp:fast, cc -ffast-math); none in this suite.
+the ones built with fast floating point (MSVC /fp:fast, cc -ffast-math), as (plug-in id, helper stem) pairs.
 """
 import argparse, glob, os, shutil, subprocess, sys, tempfile
 

@@ -1,12 +1,12 @@
-// Renders an Orrery plug-in's editor to a PNG for the docs and the layout comparison with the reference
-// (docs/screenshots/README.md). One source for the plug-ins that need nothing more: each such plugin.cmake builds it
-// with its own sources as <Stem>Snapshot (Scorpius and Wraith keep their own tools/Snapshot.cpp for films and
-// mouse-driven checks).
+// Renders the editor of one Orrery plug-in to a PNG for the docs and the layout comparison with the reference
+// (docs/screenshots/README.md). One source for every plug-in of the suite whose editor needs nothing more: each
+// plugin.cmake builds it with its own sources as <Stem>Snapshot (a plug-in that needs more keeps its own
+// plugins/<Id>/tools/Snapshot.cpp).
 //   <Stem>Snapshot out.png [--scale=2] [--size=W] [paramID=value ...] [--levels=inDb,outDb] [--<option> ...]
 // --scale renders through the editor's UI scale, as a host at that zoom would; --size resizes the open editor to W px
 // wide as a host or the corner grip would (the constrainer keeps the proportions). Parameter values are in real units
 // (dB, 0..1); --levels freezes the meters of an editor that offers it, and any other --option goes to the editor's
-// orrery::SnapshotHooks (Positron: --audio, --ext, --anti, --classic).
+// snapshot hooks (shared/ui/Widgets.h SnapshotHooks::snapshotOption), for a view only the editor can set.
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <cmath>
 #include <iostream>

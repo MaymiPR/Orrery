@@ -4,13 +4,15 @@
 // releases load unchanged. One source for every plug-in of the suite: each plugin.cmake builds it as <Stem>HostTest
 // and registers it with ctest on its VST3 and its saved states.
 //
-//   <Stem>HostTest <plugin.vst3> [state-x.y.z.bin ...]
+//   <Stem>HostTest <plugin.vst3> [--property <name>=<value> ...] [state-x.y.z.bin ...]
 //   <Stem>HostTest <plugin.vst3> --save-state <state-x.y.z.bin>
 //
 // --save-state writes a project state with every parameter away from its default, plus a .txt beside it with each
 // parameter's name and the text this version shows for it. plugins/<Id>/tests/data holds one per release that changed
 // a parameter or its reading; the test loads each into the current build and compares the texts. An instrument (no
-// audio input) is played a note where an effect is fed noise.
+// audio input) is played a note where an effect is fed noise. --property sets a root property of the plug-in's own
+// state in every instance the checks load (a sampler's sample file: --property samplePath=<sine.wav>), so an
+// instrument that is silent until it has content plays.
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <cmath>
@@ -20,6 +22,39 @@
 namespace
 {
 constexpr int bs = 512;
+
+// --property name=value: root properties of the plug-in's own state that every instance starts with.
+juce::StringPairArray properties;
+
+// The plug-in's own state (a JUCE plug-in's XML) sits in the VST3 component state, followed by JUCE's private data;
+// sets the --property values there.
+void applyProperties (juce::AudioPluginInstance& p)
+{
+    if (properties.size() == 0)
+        return;
+    juce::MemoryBlock state;
+    p.getStateInformation (state);
+    auto head = juce::AudioProcessor::getXmlFromBinary (state.getData(), (int) state.getSize());
+    auto* comp = head != nullptr ? head->getChildByName ("IComponent") : nullptr;
+    if (comp == nullptr)
+        return;
+    juce::MemoryBlock compData;
+    compData.fromBase64Encoding (comp->getAllSubText());
+    auto ours = juce::AudioProcessor::getXmlFromBinary (compData.getData(), (int) compData.getSize());
+    if (ours == nullptr)
+        return;
+    const auto oursSize = 8 + (size_t) juce::ByteOrder::littleEndianInt (static_cast<const char*> (compData.getData()) + 4);
+    for (auto& key : properties.getAllKeys())
+        ours->setAttribute (key, properties[key]);
+    juce::MemoryBlock newComp;
+    juce::AudioProcessor::copyXmlToBinary (*ours, newComp);
+    newComp.append (static_cast<const char*> (compData.getData()) + oursSize, compData.getSize() - oursSize);
+    comp->deleteAllTextElements();
+    comp->addTextElement (newComp.toBase64Encoding());
+    juce::MemoryBlock out;
+    juce::AudioProcessor::copyXmlToBinary (*head, out);
+    p.setStateInformation (out.getData(), (int) out.getSize());
+}
 
 std::unique_ptr<juce::AudioPluginInstance> load (const juce::String& path, double rate = 48000.0)
 {
@@ -33,16 +68,22 @@ std::unique_ptr<juce::AudioPluginInstance> load (const juce::String& path, doubl
     {
         p->setPlayConfigDetails (p->getTotalNumInputChannels(), p->getTotalNumOutputChannels(), rate, bs);
         p->prepareToPlay (rate, bs);
+        applyProperties (*p);
     }
     return p;
 }
 
 bool isInstrument (juce::AudioPluginInstance& p) { return p.getTotalNumInputChannels() == 0; }
 
-// The program list a VST3 plug-in with factory programs offers the host as one more parameter ("Program"): choosing a
-// program sets the other parameters, and a project restores those, not the program's index, so the save and reload
-// checks leave it out.
-bool isProgramList (juce::AudioProcessorParameter& prm) { return prm.getName (128) == "Program"; }
+// Parameters a project does not restore, which the save and reload checks leave out: the program list a VST3 plug-in
+// with factory programs offers the host ("Program": choosing a program sets the other parameters, and a project
+// restores those, not the program's index), and the MIDI controllers JUCE's VST3 wrapper offers an instrument as
+// parameters ("MIDI CC 0|1" ...: they pass controller changes through and hold no state).
+bool notInProject (juce::AudioProcessorParameter& prm)
+{
+    const auto name = prm.getName (128);
+    return name == "Program" || name.startsWith ("MIDI CC ");
+}
 
 juce::AudioProcessorParameter* findParam (juce::AudioPluginInstance& p, const juce::String& name)
 {
@@ -101,14 +142,14 @@ int saveState (const juce::String& pluginPath, const juce::File& out)
     if (p == nullptr) { std::cerr << "cannot load " << pluginPath << "\n"; return 1; }
     int i = 0;
     for (auto* prm : p->getParameters())
-        if (prm->isAutomatable() && prm != p->getBypassParameter() && ! isProgramList (*prm))
+        if (prm->isAutomatable() && prm != p->getBypassParameter() && ! notInProject (*prm))
             prm->setValueNotifyingHost ((float) std::fmod (0.137 + 0.618034 * i++, 1.0));
     render (*p, 4);                                         // the processor takes the changes
     juce::MemoryBlock state;
     p->getStateInformation (state);
     juce::StringArray lines;
     for (auto* prm : p->getParameters())
-        if (prm->isAutomatable() && ! isProgramList (*prm)) lines.add (prm->getName (128) + "\t" + prm->getText (prm->getValue(), 128));
+        if (prm->isAutomatable() && ! notInProject (*prm)) lines.add (prm->getName (128) + "\t" + prm->getText (prm->getValue(), 128));
     if (! out.getParentDirectory().createDirectory() || ! out.replaceWithData (state.getData(), state.getSize())
         || ! out.withFileExtension (".txt").replaceWithText (lines.joinIntoString ("\n") + "\n", false, false, "\n"))
         return 1;
@@ -158,11 +199,24 @@ int main (int argc, char** argv)
         return saveState (argv[1], juce::File::getCurrentWorkingDirectory().getChildFile (argv[3]));
     if (argc < 2)
     {
-        std::cerr << "usage: HostTest <plugin.vst3> [state-x.y.z.bin ...]\n"
+        std::cerr << "usage: HostTest <plugin.vst3> [--property <name>=<value> ...] [state-x.y.z.bin ...]\n"
                      "       HostTest <plugin.vst3> --save-state <state-x.y.z.bin>\n";
         return 2;
     }
     const juce::String pluginPath (argv[1]);
+    juce::StringArray states;
+    for (int i = 2; i < argc; ++i)
+    {
+        if (juce::String (argv[i]) == "--property" && i + 1 < argc)
+        {
+            const juce::String pair (argv[++i]);
+            properties.set (pair.upToFirstOccurrenceOf ("=", false, false), pair.fromFirstOccurrenceOf ("=", false, false));
+        }
+        else
+        {
+            states.add (argv[i]);
+        }
+    }
     int failures = 0;
     auto check = [&failures] (bool ok, const juce::String& what)
     {
@@ -186,7 +240,7 @@ int main (int argc, char** argv)
     // 2. Save and reload into a new instance: the host's view of every parameter, then the sound
     juce::Random rng (7);
     for (auto* prm : a->getParameters())
-        if (prm->isAutomatable() && prm != a->getBypassParameter() && ! isProgramList (*prm)) prm->setValueNotifyingHost (rng.nextFloat());
+        if (prm->isAutomatable() && prm != a->getBypassParameter() && ! notInProject (*prm)) prm->setValueNotifyingHost (rng.nextFloat());
     render (*a, 4);
     juce::MemoryBlock saved;
     a->getStateInformation (saved);
@@ -194,7 +248,7 @@ int main (int argc, char** argv)
     b->setStateInformation (saved.getData(), (int) saved.getSize());
     int mismatches = 0;
     for (int i = 0; i < a->getParameters().size(); ++i)
-        if (! isProgramList (*a->getParameters()[i])
+        if (! notInProject (*a->getParameters()[i])
             && a->getParameters()[i]->getCurrentValueAsText() != b->getParameters()[i]->getCurrentValueAsText())
         {
             ++mismatches;
@@ -240,8 +294,8 @@ int main (int argc, char** argv)
     }
 
     // 6. Projects saved by earlier releases
-    for (int i = 2; i < argc; ++i)
-        checkSavedState (pluginPath, juce::File::getCurrentWorkingDirectory().getChildFile (argv[i]), check);
+    for (auto& stateFile : states)
+        checkSavedState (pluginPath, juce::File::getCurrentWorkingDirectory().getChildFile (stateFile), check);
 
     std::cout << (failures == 0 ? juce::String ("ALL PASSED") : juce::String (failures) + " FAILED") << "\n";
     return failures == 0 ? 0 : 1;
