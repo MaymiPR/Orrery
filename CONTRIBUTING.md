@@ -15,14 +15,15 @@ nobody's words are quoted in a file, a commit message, a tag or release notes.
 One exception, approved on 2026-11-01 and listed in `.provenance`: Wraith's room and plate reverb responses
 (`plugins/Wraith/resources/ir/`) are measured from The Spirit's output with impulses and run by convolution, because its reverbs
 are recordings that a model cannot null. They are measurements of its output, not its files;
-`plugins/Wraith/nulltest/record_plate.py` and `pack_reverb.py` make them.
+`plugins/Wraith/nulltest/render_plate.py` and `plugins/Wraith/scripts/pack_reverb.py` make them.
 
 ## Build
 
 Requirements and the commands per platform are in the [build guide](docs/BUILDING.md), the Windows installer
 included. The default configuration (`-DORRERY_TOOLS=ON`) also builds the hosts for the reference plug-ins
-(`tools/`), each plug-in's offline renderer (PoRender, ScRender, WrRender), its editor snapshot tool and Positron's
-`charsim` library for the fits (`plugins/Positron/tools/CharSim.cpp`), under `build/<tool>_artefacts/Release/`.
+(`tools/`), each plug-in's offline renderer (PoRender, ScRender, WrRender) and its editor snapshot tool, under
+`build/<tool>_artefacts/Release/`. `python scripts/build_native.py` builds the null tests' native helpers
+(`plugins/<Id>/nulltest/native/`, Positron's band gain computer for the fits) into `build/native/<Id>/`.
 `-DORRERY_DEV_COPY=ON` (the default) also copies each VST3 to `build/plugins/<Product name>.vst3`, the folder a DAW's
 plug-in junction points at. The code in `shared/` is built once, as the static library `OrreryShared`, which every
 plug-in, test, snapshot and renderer links.
@@ -85,11 +86,11 @@ unsigned and the notes say so.
 
 | Path | What it holds |
 |---|---|
-| `plugins/<Id>/` | one plug-in: `Source/`, `resources/` (Positron's glass, Wraith's measured reverb responses), `tests/` (with `data/`, the saved-state fixtures), `tools/` (its renderer; Scorpius's and Wraith's own snapshot tools), `scripts/` (the scripts that write its resources and measure its editor), `nulltest/` (the harness; needs the original installed), README, RESEARCH, MEASUREMENTS, NULLTESTS |
-| `shared/` | the static library `OrreryShared`: the UI library (theme, controls, metal knob, the host-keys hand-back `HostFocus`), the I/O level meter, the Instrument Sans font |
+| `plugins/<Id>/` | one plug-in: `Source/`, `resources/` (Positron's glass, Wraith's measured reverb responses), `tests/` (with `data/`, the saved-state fixtures), `tools/` (its renderer; Scorpius's and Wraith's own snapshot tools), `scripts/` (the scripts that write its resources and measure its editor), `nulltest/` (the harness, with `native/` for its C++ helpers; needs the original installed), README, RESEARCH, MEASUREMENTS, NULLTESTS |
+| `shared/` | the static library `OrreryShared`: the UI library (theme, controls, metal knob, the host-keys hand-back `HostFocus`), the I/O level meter, the plug-ins' FFT and the deterministic math (`dsp/Fft.h`, `dsp/Math.h`), the Instrument Sans font |
 | `tools/` | hosts for the reference plug-ins: offline renders (RefRender), editor films and screenshots (RefCapture), parameter lists (ParamDump), the keyboard-focus check (FocusCheck); the host test (`HostTest.cpp`) and the editor snapshot tool (`Snapshot.cpp`), built per plug-in |
 | `tests/regress/` | the render regression's cases and golden renders |
-| `scripts/` | `bump_version.py`, `release_notes.py`, `render_regress.py`, `make_site.py`, `check_repo.py`, `check.ps1`, `check.sh`; `nulltest/ref_state_lib.py`, the reader of the originals' saved state that the harnesses import |
+| `scripts/` | `bump_version.py`, `release_notes.py`, `render_regress.py`, `make_site.py`, `check_repo.py`, `check.ps1`, `check.sh`, `build_native.py` (the null tests' native helpers); `nulltest/ref_state_lib.py`, the reader of the originals' saved state that the harnesses import |
 | `measurements/` | the published measurement data per plug-in (`measurements/<Id>/`) |
 | `packaging/` | the installers; `plugins.txt` lists the plug-ins they hold |
 | `docs/` | the build guide, `branding/` (banners, icon, social preview, `colours.json`), `screenshots/` |

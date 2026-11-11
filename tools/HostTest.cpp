@@ -39,6 +39,11 @@ std::unique_ptr<juce::AudioPluginInstance> load (const juce::String& path, doubl
 
 bool isInstrument (juce::AudioPluginInstance& p) { return p.getTotalNumInputChannels() == 0; }
 
+// The program list a VST3 plug-in with factory programs offers the host as one more parameter ("Program"): choosing a
+// program sets the other parameters, and a project restores those, not the program's index, so the save and reload
+// checks leave it out.
+bool isProgramList (juce::AudioProcessorParameter& prm) { return prm.getName (128) == "Program"; }
+
 juce::AudioProcessorParameter* findParam (juce::AudioPluginInstance& p, const juce::String& name)
 {
     for (auto* prm : p.getParameters())
@@ -96,14 +101,14 @@ int saveState (const juce::String& pluginPath, const juce::File& out)
     if (p == nullptr) { std::cerr << "cannot load " << pluginPath << "\n"; return 1; }
     int i = 0;
     for (auto* prm : p->getParameters())
-        if (prm->isAutomatable() && prm != p->getBypassParameter())
+        if (prm->isAutomatable() && prm != p->getBypassParameter() && ! isProgramList (*prm))
             prm->setValueNotifyingHost ((float) std::fmod (0.137 + 0.618034 * i++, 1.0));
     render (*p, 4);                                         // the processor takes the changes
     juce::MemoryBlock state;
     p->getStateInformation (state);
     juce::StringArray lines;
     for (auto* prm : p->getParameters())
-        if (prm->isAutomatable()) lines.add (prm->getName (128) + "\t" + prm->getText (prm->getValue(), 128));
+        if (prm->isAutomatable() && ! isProgramList (*prm)) lines.add (prm->getName (128) + "\t" + prm->getText (prm->getValue(), 128));
     if (! out.getParentDirectory().createDirectory() || ! out.replaceWithData (state.getData(), state.getSize())
         || ! out.withFileExtension (".txt").replaceWithText (lines.joinIntoString ("\n") + "\n", false, false, "\n"))
         return 1;
@@ -181,7 +186,7 @@ int main (int argc, char** argv)
     // 2. Save and reload into a new instance: the host's view of every parameter, then the sound
     juce::Random rng (7);
     for (auto* prm : a->getParameters())
-        if (prm->isAutomatable() && prm != a->getBypassParameter()) prm->setValueNotifyingHost (rng.nextFloat());
+        if (prm->isAutomatable() && prm != a->getBypassParameter() && ! isProgramList (*prm)) prm->setValueNotifyingHost (rng.nextFloat());
     render (*a, 4);
     juce::MemoryBlock saved;
     a->getStateInformation (saved);
@@ -189,7 +194,8 @@ int main (int argc, char** argv)
     b->setStateInformation (saved.getData(), (int) saved.getSize());
     int mismatches = 0;
     for (int i = 0; i < a->getParameters().size(); ++i)
-        if (a->getParameters()[i]->getCurrentValueAsText() != b->getParameters()[i]->getCurrentValueAsText())
+        if (! isProgramList (*a->getParameters()[i])
+            && a->getParameters()[i]->getCurrentValueAsText() != b->getParameters()[i]->getCurrentValueAsText())
         {
             ++mismatches;
             std::cout << "      differs: " << a->getParameters()[i]->getName (128) << " = " << a->getParameters()[i]->getCurrentValueAsText()
@@ -219,7 +225,7 @@ int main (int argc, char** argv)
             e->releaseResources();
             e->setPlayConfigDetails (e->getTotalNumInputChannels(), e->getTotalNumOutputChannels(), rate, bs);
             e->prepareToPlay (rate, bs);
-            const auto y = render (*e, 20);
+            const auto y = render (*e, 200);                   // over 1 s: a wet-only delay is silent at first
             fine = fine && allFinite (y) && rms (y) > 1.0e-4f;
         }
         check (fine, "host rate 96, 44.1 and 48 kHz in one session: every render finite and not silent");

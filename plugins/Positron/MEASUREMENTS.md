@@ -172,7 +172,7 @@ shaper (3.9). What shows it:
   does at 60 Hz.
 
 `fit_character.py` fits mix, the shaper, threshold, ratio, knee, attack and release per band and amount node to
-tone staircases and bursts; `charsim.dll` (built from BandDynamics.h) is the gain computer the fits call.
+tone staircases and bursts; `CharSim.dll` (`nulltest/native/CharSim.cpp` over BandDynamics.h, built by `scripts/build_native.py`) is the gain computer the fits call.
 
 ### 3.9 The shaper is a sine; the band laws (`nulltest/ident_lib.py`, `fit_bandlaw.py`, `fit_music.py`)
 

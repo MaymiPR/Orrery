@@ -1,10 +1,10 @@
-"""ctypes wrapper of build/charsim/Release/charsim.dll (tools/CharSim.cpp): one character band's gain computer,
-exactly the plug-in's (Source/dsp/BandDynamics.h)."""
+"""ctypes wrapper of build/native/Positron/CharSim.dll (nulltest/native/CharSim.cpp, built by scripts/build_native.py):
+one character band's gain computer, exactly the plug-in's (Source/dsp/BandDynamics.h)."""
 import ctypes, os
 import numpy as np
 import po_ref
 
-_lib = ctypes.CDLL(os.path.join(po_ref.ROOT, 'build', 'charsim', 'Release', 'charsim.dll'))
+_lib = ctypes.CDLL(os.path.join(po_ref.ROOT, 'build', 'native', 'Positron', 'CharSim' + ('.dll' if os.name == 'nt' else '.so')))
 _D = ctypes.POINTER(ctypes.c_double)
 _lib.band_gain.argtypes = [_D, _D, ctypes.c_int, ctypes.c_double, _D, ctypes.c_int, ctypes.c_int, _D, _D]
 NAMES = ['makeup', 'mix', 'cubic', 'thresh', 'ratio', 'knee', 'attack', 'release', 'side', 'gainAttack', 'gainRelease',
