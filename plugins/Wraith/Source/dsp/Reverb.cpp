@@ -1,11 +1,10 @@
 #include "Reverb.h"
+#include <algorithm>
 #include <WraithIR.h>
-#include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
-#include <thread>
-
-using namespace juce;
+#include <vector>
 
 namespace wr::dsp
 {
@@ -14,19 +13,19 @@ namespace
 // the responses for one rate (scripts/pack_reverb.py): per reverb a length, then L and R interleaved as 16-bit floats
 struct Packed { double fs; const char* data; int size; };
 
-float half (uint16 h)
+float half (std::uint16_t h)
 {
-    const uint32 s = (uint32) (h & 0x8000u) << 16, e = (h >> 10) & 0x1fu, m = h & 0x3ffu;
-    uint32 f;
+    const std::uint32_t s = (std::uint32_t) (h & 0x8000u) << 16, e = (h >> 10) & 0x1fu, m = h & 0x3ffu;
+    std::uint32_t f;
     if (e == 0)
     {
         if (m == 0) f = s;
         else
         {
             int ee = -1;
-            uint32 mm = m;
+            std::uint32_t mm = m;
             do { ++ee; mm <<= 1; } while ((mm & 0x400u) == 0);
-            f = s | ((uint32) (127 - 15 - ee) << 23) | ((mm & 0x3ffu) << 13);
+            f = s | ((std::uint32_t) (127 - 15 - ee) << 23) | ((mm & 0x3ffu) << 13);
         }
     }
     else if (e == 31) f = s | 0x7f800000u | (m << 13);
@@ -52,54 +51,28 @@ Packed nearestPacked (double fs)
 void Reverb::prepare (double fs, int block)
 {
     const auto pk = nearestPacked (fs);
-    const auto* p = reinterpret_cast<const uint8*> (pk.data);
+    const auto* p = reinterpret_cast<const unsigned char*> (pk.data);
     const auto* end = p + pk.size;
-    const juce::dsp::ProcessSpec spec { fs, (uint32) jmax (1, block), 2 };
-    int want[2] {};
     for (size_t t = 0; t < conv.size(); ++t)
     {
         conv[t].reset();
         if (p + 4 > end) continue;
-        uint32 n;
+        std::uint32_t n;
         std::memcpy (&n, p, 4);
         p += 4;
         if (n == 0 || p + (size_t) n * 4 > end) continue;
-        AudioBuffer<float> ir (2, (int) n);
-        for (int i = 0; i < (int) n; ++i)
+        std::vector<float> left (n), right (n);
+        for (size_t i = 0; i < n; ++i)
         {
-            uint16 v[2];
-            std::memcpy (v, p + (size_t) i * 4, 4);
-            ir.setSample (0, i, half (v[0]));
-            ir.setSample (1, i, half (v[1]));
+            std::uint16_t v[2];
+            std::memcpy (v, p + i * 4, 4);
+            left[i] = half (v[0]);
+            right[i] = half (v[1]);
         }
         p += (size_t) n * 4;
-        want[t] = (int) (0.99 * n * fs / pk.fs);                     // (its length at this rate, less a margin)
-        conv[t] = std::make_unique<juce::dsp::Convolution> (juce::dsp::Convolution::NonUniform { 256 });
-        conv[t]->prepare (spec);
-        conv[t]->loadImpulseResponse (std::move (ir), pk.fs, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::no,
-                                      juce::dsp::Convolution::Normalise::no);
+        conv[t] = std::make_unique<Convolution>();
+        conv[t]->prepare (left.data(), right.data(), (int) n, pk.fs, fs, std::max (1, block));
     }
-    // the responses load on a background thread and are swapped in during processing (with a short crossfade): run
-    // silence through every engine until each holds its whole response, so the first real block already has it
-    buf.setSize (2, jmax (1, block));
-    const auto t0 = Time::getMillisecondCounter();
-    for (;;)
-    {
-        bool ready = true;
-        for (size_t t = 0; t < conv.size(); ++t)
-            if (conv[t] != nullptr)
-            {
-                buf.clear();
-                juce::dsp::AudioBlock<float> blk (buf);
-                conv[t]->process (juce::dsp::ProcessContextReplacing<float> (blk));
-                ready = ready && conv[t]->getCurrentIRSize() >= want[t];
-            }
-        if (ready || Time::getMillisecondCounter() - t0 > 20000) break;
-        std::this_thread::sleep_for (std::chrono::milliseconds (2));
-    }
-    for (int i = 0; i < (int) (0.2 * fs) / jmax (1, block) + 2; ++i)    // (past the crossfade)
-        for (auto& c : conv)
-            if (c != nullptr) { buf.clear(); juce::dsp::AudioBlock<float> blk (buf); c->process (juce::dsp::ProcessContextReplacing<float> (blk)); }
     reset();
 }
 
@@ -112,17 +85,13 @@ void Reverb::reset()
 
 void Reverb::process (const float* l, const float* r, float* wl, float* wr, int n, int type)
 {
-    type = jlimit (0, 1, type);
+    type = std::clamp (type, 0, 1);
     if (conv[(size_t) type] == nullptr) type = 0;
     auto& c = conv[(size_t) type];
-    if (c == nullptr) { FloatVectorOperations::clear (wl, n); FloatVectorOperations::clear (wr, n); return; }
+    if (c == nullptr) { std::fill (wl, wl + n, 0.0f); std::fill (wr, wr + n, 0.0f); return; }
     if (type != running) { running = type; c->reset(); }
-    buf.setSize (2, n, false, false, true);
-    buf.copyFrom (0, 0, l, n);
-    buf.copyFrom (1, 0, r, n);
-    juce::dsp::AudioBlock<float> blk (buf);
-    c->process (juce::dsp::ProcessContextReplacing<float> (blk));
-    FloatVectorOperations::copy (wl, buf.getReadPointer (0), n);
-    FloatVectorOperations::copy (wr, buf.getReadPointer (1), n);
+    std::copy (l, l + n, wl);
+    std::copy (r, r + n, wr);
+    c->process (wl, wr, n);
 }
 }

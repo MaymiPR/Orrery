@@ -141,6 +141,17 @@ static PositronProcessor* makeProcessor (double fs, int block)
     return p;
 }
 
+// Params.h's lists: every parameter of the layout in allIds, in the order the host sees them, the presets' a subset
+static void testLayout()
+{
+    std::unique_ptr<PositronProcessor> p (makeProcessor (48000.0, 512));
+    CHECK (p->getParameters().size() == po::numParams);
+    CHECK (p->getBypassParameter() != nullptr);
+    for (int i = 0; i < po::numParams; ++i)
+        if (auto* r = dynamic_cast<juce::RangedAudioParameter*> (p->getParameters()[i])) CHECK (r->getParameterID() == po::allIds[i]);
+    for (auto* pid : po::presetIds) CHECK (p->apvts.getParameter (pid) != nullptr && juce::String (pid) != po::id::bypass);
+}
+
 static void setParam (PositronProcessor& p, const char* name, float displayed)
 {
     for (auto* q : p.getParameters())
@@ -439,6 +450,7 @@ int main (int argc, char** argv)
     juce::ScopedJuceInitialiser_GUI init;
     if (argc > 1 && juce::String (argv[1]) == "benchplugin") { benchPlugin(); return 0; }
     if (argc > 2 && juce::String (argv[1]) == "render") { renderPlugin (argv[2], argc, argv); return 0; }
+    testLayout();
     testBiquads();
     testFracDelay();
     testFirBank();

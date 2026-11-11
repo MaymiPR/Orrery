@@ -39,15 +39,17 @@ inline constexpr const char* compMode = "compMode";
 inline constexpr const char* bypass = "bypass";
 }
 
+inline constexpr int numParams = 28;
+// every parameter in the order the host sees them (createLayout)
+inline constexpr const char* const allIds[numParams] { id::inputGain, id::driveOn, id::driveHiPass, id::harmOn, id::harmFreq,
+    id::harmAmount, id::compOn, id::compAmount, id::liftOn, id::liftAmount, id::eqOn, id::eq40, id::eq100, id::eq1k, id::eq3k,
+    id::eq10k, id::subOn, id::subLevel, id::lowOn, id::lowLevel, id::loudOn, id::loudLevel, id::gritOn, id::gritLevel,
+    id::outputGain, id::driveColor, id::compMode, id::bypass };
 // every parameter a preset (and the A / B compare) holds: all but the host bypass
-inline const std::vector<const char*>& presetIds()
-{
-    static const std::vector<const char*> ids { id::inputGain, id::driveOn, id::driveHiPass, id::harmOn, id::harmFreq, id::harmAmount,
-        id::compOn, id::compAmount, id::liftOn, id::liftAmount, id::eqOn, id::eq40, id::eq100, id::eq1k, id::eq3k, id::eq10k,
-        id::subOn, id::subLevel, id::lowOn, id::lowLevel, id::loudOn, id::loudLevel, id::gritOn, id::gritLevel, id::outputGain,
-        id::driveColor, id::compMode };
-    return ids;
-}
+inline constexpr const char* const presetIds[numParams - 1] { id::inputGain, id::driveOn, id::driveHiPass, id::harmOn,
+    id::harmFreq, id::harmAmount, id::compOn, id::compAmount, id::liftOn, id::liftAmount, id::eqOn, id::eq40, id::eq100,
+    id::eq1k, id::eq3k, id::eq10k, id::subOn, id::subLevel, id::lowOn, id::lowLevel, id::loudOn, id::loudLevel, id::gritOn,
+    id::gritLevel, id::outputGain, id::driveColor, id::compMode };
 
 // the five harmonic EQ bands, left to right on the panel's bottom row and as the host lists them
 inline constexpr const char* eqIds[5] { id::eq40, id::eq100, id::eq1k, id::eq3k, id::eq10k };

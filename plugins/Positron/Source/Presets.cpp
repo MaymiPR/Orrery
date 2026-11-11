@@ -5,9 +5,6 @@ using namespace juce;
 
 namespace po
 {
-static const char* const presetParams[] { id::eqLow, id::eqMid, id::eqHigh, id::eqBypass, id::character, id::characterBypass,
-                                          id::limiterGain, id::limiterBypass };
-
 File PresetManager::userFolder()
 {
     return File::getSpecialLocation (File::userDocumentsDirectory).getChildFile ("Positron").getChildFile ("Presets");
@@ -26,14 +23,14 @@ void PresetManager::load (const Entry& e)
 {
     if (e.factory)
     {
-        for (auto* pid : presetParams)
+        for (auto* pid : presetIds)
             if (auto* p = apvts.getParameter (pid)) p->setValueNotifyingHost (p->getDefaultValue());
     }
     else
     {
         auto xml = parseXML (e.file);
         if (xml == nullptr || ! xml->hasTagName ("PositronPreset")) return;
-        for (auto* pid : presetParams)
+        for (auto* pid : presetIds)
             if (auto* p = dynamic_cast<RangedAudioParameter*> (apvts.getParameter (pid)))
                 if (xml->hasAttribute (pid))
                     p->setValueNotifyingHost (p->convertTo0to1 ((float) xml->getDoubleAttribute (pid)));
@@ -55,7 +52,7 @@ bool PresetManager::save (const String& name)
 {
     if (name.trim().isEmpty()) return false;
     XmlElement xml ("PositronPreset");
-    for (auto* pid : presetParams)
+    for (auto* pid : presetIds)
         if (auto* p = dynamic_cast<RangedAudioParameter*> (apvts.getParameter (pid)))
             xml.setAttribute (pid, (double) p->convertFrom0to1 (p->getValue()));
     const auto f = fileFor (name.trim());

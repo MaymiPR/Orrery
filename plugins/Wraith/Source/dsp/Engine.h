@@ -11,7 +11,7 @@
 
 // The whole audio path (MEASUREMENTS.md):
 //   input gain -> rider -> character -> eq -> reverb -> doubler -> output gain
-// Plain C++ apart from the reverb's convolutions (juce_dsp). The host bypass gives the input unchanged
+// Plain C++. The host bypass gives the input unchanged
 // (the reference reports no latency). Parameters arrive once per block in Params; the engine runs in 128-sample
 // chunks and smooths every continuous parameter at that control rate, as the reference does.
 namespace wr::dsp

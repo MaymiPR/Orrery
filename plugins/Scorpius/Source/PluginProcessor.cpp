@@ -282,7 +282,7 @@ sc::dsp::Params ScorpiusProcessor::engineParams() const
 ValueTree ScorpiusProcessor::captureSlot() const
 {
     ValueTree t ("SLOT");
-    for (auto* pid : sc::presetIds())
+    for (auto* pid : sc::presetIds)
         if (auto* p = apvts.getParameter (pid)) t.setProperty (pid, p->getValue(), nullptr);
     t.setProperty ("preset", presets.currentName(), nullptr);
     return t;
@@ -290,7 +290,7 @@ ValueTree ScorpiusProcessor::captureSlot() const
 
 void ScorpiusProcessor::applySlot (const ValueTree& t)
 {
-    for (auto* pid : sc::presetIds())
+    for (auto* pid : sc::presetIds)
         if (auto* p = apvts.getParameter (pid))
             if (t.hasProperty (pid))
             {

@@ -21,7 +21,7 @@
 //   - the glass: the band's light reflected in its lower rim, two dotted lines of reflected light (y 282.25 and 304,
 //     segments ending at the same places on both, closer together to the right) and bright spots at the ends of the
 //     lower one;
-//   - its brightness follows a level the processor keeps (dsp/Light.h: the input's peak, taken when it jumps and when
+//   - its brightness follows a level the processor keeps (Light.h: the input's peak, taken when it jumps and when
 //     the sound stops, falling at 50 dB/s): dark below -72 dBFS, full from -40 dBFS up, ((dB + 72) / 32)^1.25 between,
 //     eased over ~30 ms on screen; with the particle animation off (settings), the stripe stays dark.
 // Our own style (settings, "SCORPIUS"): two scorpions drawn in gold light in the middle of the tube, back to back
@@ -30,7 +30,7 @@
 // with toothed fingers, resting on the ground. Their outlines are neon (a halo, a glow and a thin core, gold on the
 // body and paler towards the claws and the sting) with sparks running along them, a faint glow fills their
 // bodies, and the whole of their light blooms as neon does in a photograph. They sway and breathe; on every kick
-// (dsp/Kick.h) their tails strike forwards over their heads with a pulse of light running up them. They shed gold
+// (Kick.h) their tails strike forwards over their heads with a pulse of light running up them. They shed gold
 // motes all the time, more the louder the music and on each beat, which drift off them, flow round them rather than
 // across their lines, and stream out to the black holes past the ends as the CLASSIC style's particles do (the same
 // pull, funnel and thinning). Their light is reflected in the glass's lower rim. When the transport stops they fade
@@ -44,7 +44,7 @@ class Stripe : public juce::Component
 public:
     Stripe();
     void paint (juce::Graphics&) override;
-    // on the editor's clock: the light's level (dBFS, dsp/Light.h), whether it jumped up since the last frame (a
+    // on the editor's clock: the light's level (dBFS, Light.h), whether it jumped up since the last frame (a
     // beat), whether the animation is on
     void setInput (float levelDb, bool beat, bool animated);
     // the snapshot tool: one still frame at a brightness (0 ... 1)
@@ -54,7 +54,7 @@ public:
     void setStyle (Style);
     // the low and mid bands' levels (linear, as the circles read them: Visuals.h)
     void setBands (float lows, float mids);
-    // ours: a kick (dsp/Kick.h), for the scorpions' tails
+    // ours: a kick (Kick.h), for the scorpions' tails
     void kick();
     // ours: whether the host's transport runs (and it calls the processor): stopped, the scorpions' light fades as
     // fast as the CLASSIC style's does

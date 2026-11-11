@@ -22,6 +22,15 @@ inline constexpr const char* limiterBypass = "limiterBypass";      // 0 / 1
 inline constexpr const char* bypass = "bypass";                    // host bypass, Off / On
 }
 
+inline constexpr int numParams = 11;
+// every parameter in the order the processor caches them (PluginProcessor.cpp raw[])
+inline constexpr const char* const allIds[numParams] { id::inputGain, id::outputGain, id::eqLow, id::eqMid, id::eqHigh,
+                                                       id::eqBypass, id::character, id::characterBypass, id::limiterGain,
+                                                       id::limiterBypass, id::bypass };
+// what a preset stores: the EQ, character and limiter controls (the reference's presets leave the gains as they are)
+inline constexpr const char* const presetIds[] { id::eqLow, id::eqMid, id::eqHigh, id::eqBypass, id::character,
+                                                 id::characterBypass, id::limiterGain, id::limiterBypass };
+
 // Limiter Input Gain taper: dB at normalised 0, 0.025, ..., 1 (the reference's display, RESEARCH.md); linear between.
 inline constexpr std::array<float, 41> limiterTaper {
     0.000f, 0.221f, 0.445f, 0.671f, 0.901f, 1.135f, 1.371f, 1.611f, 1.854f, 2.101f, 2.351f, 2.605f, 2.863f, 3.124f,
