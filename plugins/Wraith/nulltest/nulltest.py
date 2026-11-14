@@ -3,7 +3,9 @@ residual (reference - ours) in dB re the reference's output. Both renders are la
 reported latency (both report 0).
 
     python nulltest.py                 # every case, our processor via WrRender (fast)
-    python nulltest.py --vst3          # our built VST3 through RefRender (the shipped binary)
+    python nulltest.py --ours vst3     # the reference against our built VST3 through RefRender (the shipped binary)
+    python nulltest.py --vst3          # our built VST3 against our renderer, without the reference: the check
+                                       # script's null step (--fs 96000 for another rate, --threshold -110)
     python nulltest.py --only preset   # cases whose name contains 'preset'
     python nulltest.py --report        # write NULLTESTS.md from results.json (never hand-edit that file; the published
                                        # copy of results.json is measurements/Wraith/nulltest/results.json)
@@ -105,6 +107,50 @@ def plate_ref(mono, state, cache, no_plate):
     return y
 
 
+EQUAL_DB = -120.0               # the built VST3 against the renderer: a case above this fails (--threshold)
+
+
+def equal_check(named_jobs, render, needs, fs, threshold):
+    """The exit status of --vst3: every job through the renderer and through the built VST3 (hosted by RefRender),
+    the residual (renderer - VST3) in dB re the renderer's output over the whole render. 0 when every case is at or
+    below threshold, 1 when one is above it, 2 when a tool is not built or no case matches. No reference is loaded
+    and no results file is written."""
+    missing = [what for what, path in needs if not os.path.exists(path)]
+    if missing:
+        print('not built: ' + ', '.join(missing) + ': nothing compared')
+        return 2
+    if not named_jobs:
+        print('no case matches: nothing compared')
+        return 2
+    jobs = [j for _, j in named_jobs]
+    model, built = render(jobs, 'model'), render(jobs, 'ours')
+    worst = -300.0
+    for (name, _), a, b in zip(named_jobs, model, built):
+        a, b = np.asarray(a, np.float64), np.asarray(b, np.float64)
+        n = min(a.shape[-1], b.shape[-1])
+        e, d = np.sum(a[..., :n] ** 2), np.sum((a[..., :n] - b[..., :n]) ** 2)
+        silent = e < 1e-12
+        r = 0.0 if silent else -300.0 if d == 0 else max(-300.0, 10 * np.log10(d / e))
+        worst = max(worst, r)
+        print(f"{'same' if r <= threshold else 'FAIL'} {r:8.1f} dB  {name}" + ("  (the renderer's output is silent)" if silent else ''),
+              flush=True)
+    print(f'{len(jobs)} cases at {fs} Hz, the VST3 against the renderer: worst {worst:.1f} dB (limit {threshold:g})')
+    return 0 if worst <= threshold else 1
+
+
+def check_vst3(only=None, fs=None, threshold=None):
+    """Every case of CASES on two of the signals, at fs."""
+    fs = fs or FS
+    named = []
+    for sname in ('pink -18', 'music -10'):
+        x = nl.stereo(SIGNALS[sname][0](fs))
+        named += [(f'{cname} / {sname}', ours_job(x, settings)) for cname, settings in CASES
+                  if not only or only in f'{cname} / {sname}']
+    needs = (('the renderer', h.OURS_EXE), ('RefRender', h.EXE), ('the VST3', h.PLUGINS['ours'][0]))
+    return equal_check(named, lambda jobs, plugin: h.render_many(jobs, plugin, fs=fs), needs, fs,
+                       EQUAL_DB if threshold is None else threshold)
+
+
 def run(vst3=False, only=None, cache=True, no_plate=False, tune=None):
     results = {}
     ours = 'ours' if vst3 else 'model'
@@ -190,7 +236,7 @@ NOTES = """\
 - **Presets** follow from their stages: the ones with the doubler land at -10 to -26 dB, the ones without it where the
   character section does (-21 to -27 dB), except the one with the rider at 0.97 into full compression on drums
   (-4.4 dB), where the two together do not null.
-- **Our VST3 equals our renderer:** `nulltest.py --vst3` gives the same numbers to the printed digit, and
+- **Our VST3 equals our renderer:** `nulltest.py --ours vst3` gives the same numbers to the printed digit, and
   `first_null.py` finds the two equal at -333 dB at the start-up preset.
 """
 
@@ -204,7 +250,7 @@ def report(results):
             f'48 kHz unless the case says otherwise, block 512, the first {PRE / FS:.1f} s skipped. Stages are isolated with the',
             'reference\'s own power buttons. Presets are loaded on the reference from its own saved states.', '',
             'Reproduce: `python nulltest/nulltest.py` (our processor through tools/WrRender) and',
-            '`python nulltest/nulltest.py --vst3` (the built VST3 through tools/RefRender). The reference renders stay local.', '',
+            '`python nulltest/nulltest.py --ours vst3` (the built VST3 through tools/RefRender). The reference renders stay local.', '',
             '| Case | Signal | Residual (dB) | Worst second (dB) |', '|---|---|---|---|']
     for r in results.values():
         rows.append(f"| {r['case']} | {r['signal']} | {r['residual_db']:.1f} | {r['worst_second_db']:.1f} |")
@@ -235,7 +281,11 @@ def report(results):
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument('--vst3', action='store_true')
+    ap.add_argument('--vst3', action='store_true', help='our built VST3 against our renderer; no reference needed')
+    ap.add_argument('--ours', choices=('model', 'vst3'), default='model',
+                    help='the reference against our renderer (model, the default) or our built VST3 (vst3)')
+    ap.add_argument('--fs', type=int, default=None, help=f'--vst3: the sample rate (default {FS})')
+    ap.add_argument('--threshold', type=float, default=None, help=f'--vst3: the residual a case may reach, in dB (default {EQUAL_DB:g})')
     ap.add_argument('--only', default=None)
     ap.add_argument('--report', action='store_true', help='write NULLTESTS.md from results.json without rendering')
     ap.add_argument('--no-cache', action='store_true')
@@ -243,11 +293,16 @@ if __name__ == '__main__':
     ap.add_argument('--tune', default=None, help='a tuning file (JSON, constants by name) for our processor')
     ap.add_argument('--out', default=None, help='results file name in nulltest/ (default results.json / results_vst3.json)')
     a = ap.parse_args()
+    if not a.vst3 and (a.fs is not None or a.threshold is not None):
+        ap.error('--fs and --threshold belong to --vst3')
+    if a.vst3:
+        raise SystemExit(check_vst3(a.only, a.fs, a.threshold))
+    vst3 = a.ours == 'vst3'
     if a.report:
         report(json.load(open(RESULTS)))
     else:
-        res = run(a.vst3, a.only, not a.no_cache, a.no_plate, json.load(open(a.tune)) if a.tune else None)
-        out = os.path.join(HERE, a.out) if a.out else RESULTS if not a.vst3 else RESULTS.replace('.json', '_vst3.json')
+        res = run(vst3, a.only, not a.no_cache, a.no_plate, json.load(open(a.tune)) if a.tune else None)
+        out = os.path.join(HERE, a.out) if a.out else RESULTS if not vst3 else RESULTS.replace('.json', '_vst3.json')
         if a.only and os.path.exists(out):       # a partial run updates its cases in the full results
             res = dict(json.load(open(out)), **res)
         json.dump(res, open(out, 'w'), indent=1)
