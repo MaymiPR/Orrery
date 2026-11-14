@@ -1,8 +1,8 @@
 Orrery: third-party software
 ==================================
 
-The Orrery plug-ins are open source under the GNU Affero General Public License v3
-(LICENSE). They include the following third-party software, under these licenses.
+Orrery is free software under the GNU Affero General Public License v3
+(LICENSE). It includes the following third-party software, under these licenses.
 
 ------------------------------------------------------------------------------
 JUCE (https://juce.com), used under the GNU Affero General Public License v3, like Orrery itself: see LICENSE.
@@ -898,7 +898,6 @@ Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrumen
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
 https://scripts.sil.org/OFL
-
 
 -----------------------------------------------------------
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
