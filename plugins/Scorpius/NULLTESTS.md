@@ -22,7 +22,7 @@ Reproduce: `python nulltest/nulltest.py` (our processor through tools/ScRender) 
 | default | -29.7 | -36.6 | -25.8 | -33.9 |
 | colour c (drive colour c, compression mode a) | -32.6 | -40.4 | -24.9 | -37.0 |
 | no compression | -29.8 | -36.6 | -25.8 | -33.6 |
-| loud path | -29.7 | -34.9 | -25.8 | -33.2 |
+| loud path | -29.7 | -35.0 | -25.8 | -33.2 |
 | deep low end | -29.5 | -35.5 | -26.0 | -33.6 |
 | all parallel | -29.7 | -36.7 | -25.6 | -33.8 |
 | grit only | -32.9 | -36.6 | -33.4 | -35.1 |

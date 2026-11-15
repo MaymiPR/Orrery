@@ -263,7 +263,7 @@ def main():
         sys.exit(__doc__)
     res = run(plugin)
     out = RESULTS if plugin == 'model' else RESULTS.replace('.json', '_vst3.json')
-    json.dump(res, open(out, 'w'), indent=1)
+    open(out, 'w', encoding='utf-8', newline='\n').write(json.dumps(res, indent=1) + '\n')
     print('wrote', out)
 
 
