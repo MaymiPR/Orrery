@@ -4,6 +4,9 @@
                                        # (model: our processor through tools/ScRender, the default; ours: the built
                                        # VST3, written to results_vst3.json)
     python nulltest.py --report        # write NULLTESTS.md from results.json (never hand-edit that file)
+    python nulltest.py --vst3 [--fs 96000] [--only text] [--threshold -110]
+                                       # our built VST3 against our renderer, without the reference: the check
+                                       # script's null step
 
 The cases: the factory presets and a few settings on the drum-like signal and the local track at every rate
 (null_chain.py's table), quiet material where the shared expander acts (null_quiet.py) and the EQ and compression
@@ -44,6 +47,48 @@ def nulls(jobs, plugin, fs=48000):
     ref = o.render_many(jobs, fs=fs, cache=True)
     ours = o.render_many(jobs, plugin=plugin, fs=fs)
     return [round(float(o.null_db(r, m)), 2) for r, m in zip(ref, ours)]
+
+
+EQUAL_DB = -120.0               # the built VST3 against the renderer: a case above this fails (--threshold)
+
+
+def equal_check(named_jobs, render, needs, fs, threshold):
+    """The exit status of --vst3: every job through the renderer and through the built VST3 (hosted by RefRender),
+    the residual (renderer - VST3) in dB re the renderer's output over the whole render. 0 when every case is at or
+    below threshold, 1 when one is above it, 2 when a tool is not built or no case matches. No reference is loaded
+    and no results file is written."""
+    missing = [what for what, path in needs if not os.path.exists(path)]
+    if missing:
+        print('not built: ' + ', '.join(missing) + ': nothing compared')
+        return 2
+    if not named_jobs:
+        print('no case matches: nothing compared')
+        return 2
+    jobs = [j for _, j in named_jobs]
+    model, built = render(jobs, 'model'), render(jobs, 'ours')
+    worst = -300.0
+    for (name, _), a, b in zip(named_jobs, model, built):
+        a, b = np.asarray(a, np.float64), np.asarray(b, np.float64)
+        n = min(a.shape[-1], b.shape[-1])
+        e, d = np.sum(a[..., :n] ** 2), np.sum((a[..., :n] - b[..., :n]) ** 2)
+        silent = e < 1e-12
+        r = 0.0 if silent else -300.0 if d == 0 else max(-300.0, 10 * np.log10(d / e))
+        worst = max(worst, r)
+        print(f"{'same' if r <= threshold else 'FAIL'} {r:8.1f} dB  {name}" + ("  (the renderer's output is silent)" if silent else ''),
+              flush=True)
+    print(f'{len(jobs)} cases at {fs} Hz, the VST3 against the renderer: worst {worst:.1f} dB (limit {threshold:g})')
+    return 0 if worst <= threshold else 1
+
+
+def check_vst3(only=None, fs=None, threshold=None):
+    """Every setting of null_chain.SETTINGS on pink noise at two levels, at fs."""
+    fs = fs or o.FS
+    X = {'pink -18': o.noise(4.0, -18, fs=fs, seed=5, pink=True), 'pink -6': o.noise(4.0, -6, fs=fs, seed=7, pink=True)}
+    named = [(f'{name} / {sname}', dict(x=x, **s)) for name, s in C.SETTINGS.items() for sname, x in X.items()
+             if not only or only in f'{name} / {sname}']
+    needs = (('the renderer', o.SCEXE), ('RefRender', o.EXE), ('the VST3', o.PLUGINS['ours'][0]))
+    return equal_check(named, lambda jobs, plugin: o.render_many(jobs, plugin=plugin, fs=fs), needs, fs,
+                       EQUAL_DB if threshold is None else threshold)
 
 
 def run(plugin):
@@ -203,6 +248,13 @@ def report(res):
 
 def main():
     a = sys.argv[1:]
+    if '--vst3' in a:
+        import argparse
+        ap = argparse.ArgumentParser(description='Our built VST3 against our renderer; no reference needed.')
+        ap.add_argument('--vst3', action='store_true'); ap.add_argument('--only', default=None)
+        ap.add_argument('--fs', type=int, default=None); ap.add_argument('--threshold', type=float, default=None)
+        v = ap.parse_args(a)
+        sys.exit(check_vst3(v.only, v.fs, v.threshold))
     if a[:1] == ['--report']:
         report(json.load(open(RESULTS)))
         return

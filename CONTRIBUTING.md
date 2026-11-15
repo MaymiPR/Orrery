@@ -114,9 +114,9 @@ scripts that write under `Source/` or `resources/` sit in `plugins/<Id>/scripts/
 
 | Plug-in | Entry points |
 |---|---|
-| Positron | `first_null.py` (the self-check of the harness, the hosts and the build), `nulltest.py` (every case; `--vst3` for the built binary; `--report` writes NULLTESTS.md), `null_stress.py` (the stress grid), `null_track.py` (a music file of one's own) |
-| Scorpius | `first_null.py` (the self-check), `nulltest.py` (every case of `null_chain.py`, `null_quiet.py` and `null_modules.py`; `ours` for the built binary; `--report` writes NULLTESTS.md), `probe_autom.py` (automation) |
-| Wraith | `first_null.py` (the self-check of the harness, the hosts and the build), `nulltest.py` (every case; `--vst3`; `--report` writes NULLTESTS.md) |
+| Positron | `first_null.py` (the self-check of the harness, the hosts and the build), `nulltest.py` (every case; `--ours vst3` for the built binary; `--vst3`, the built VST3 against the renderer; `--report` writes NULLTESTS.md), `null_stress.py` (the stress grid), `null_track.py` (a music file of one's own) |
+| Scorpius | `first_null.py` (the self-check), `nulltest.py` (every case of `null_chain.py`, `null_quiet.py` and `null_modules.py`; `ours` for the built binary; `--vst3`, the built VST3 against the renderer; `--report` writes NULLTESTS.md), `probe_autom.py` (automation) |
+| Wraith | `first_null.py` (the self-check of the harness, the hosts and the build), `nulltest.py` (every case; `--ours vst3`; `--vst3`, the built VST3 against the renderer; `--report` writes NULLTESTS.md) |
 
 The results are in each plug-in's NULLTESTS.md.
 

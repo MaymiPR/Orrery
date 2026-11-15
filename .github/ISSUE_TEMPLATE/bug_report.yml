@@ -27,7 +27,7 @@ body:
     attributes:
       label: Plug-in and version
       description: The logo menu at the top of the plug-in shows the version.
-      placeholder: "Positron 1.x.y"
+      placeholder: "Positron, Scorpius or Wraith 1.x.y"
     validations:
       required: true
   - type: dropdown

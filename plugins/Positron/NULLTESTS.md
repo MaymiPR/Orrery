@@ -8,7 +8,7 @@ the reference's delay settles after loading. Signals are synthetic and generated
 isolated with the reference's own power buttons. A mastered demo track is also tested (below); the track itself is not
 in the repository.
 
-Reproduce: `python nulltest/nulltest.py` (our processor through tools/PoRender) and `python nulltest/nulltest.py --vst3`
+Reproduce: `python nulltest/nulltest.py` (our processor through tools/PoRender) and `python nulltest/nulltest.py --ours vst3`
 (the built VST3 through tools/RefRender). The reference renders stay local (git-ignored). The column 1.1.1 is our processor as released in version 1.1.1.
 
 | Case | Signal | 1.1.1 (dB) | Residual, ours (dB) | Residual, VST3 build (dB) |

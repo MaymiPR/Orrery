@@ -9,9 +9,11 @@
 # key goes through the editor's normal key handling, and the host gets every
 # key the editor does not use.
 #
-# Run at configure time on the fetched JUCE (never on a JUCE of your own given
-# with FETCHCONTENT_SOURCE_DIR_JUCE); it changes the file once and recognises
-# its own change afterwards, by the marker or by the two functions it adds.
+# Run at configure time on the JUCE the build uses, fetched or supplied with
+# FETCHCONTENT_SOURCE_DIR_JUCE: it changes that JUCE's source file in place.
+# The JUCE is therefore this repository's own copy under build/_deps, never
+# another project's checkout. It changes the file once and recognises its own
+# change afterwards, by the marker or by the two functions it adds.
 #   cmake -DJUCE_DIR=<juce source> -P PatchJuceVst3Keys.cmake
 
 set(file "${JUCE_DIR}/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.cpp")

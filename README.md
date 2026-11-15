@@ -11,6 +11,7 @@
   <img alt="Formats: VST3, CLAP, AU" src="https://img.shields.io/badge/formats-VST3%20%7C%20CLAP%20%7C%20AU-25202f">
   <img alt="Platforms: Windows, macOS, Linux" src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-25202f">
   <a href="LICENSE"><img alt="License: AGPL v3" src="https://img.shields.io/badge/license-AGPL--3.0-9b6cff"></a>
+  <a href="https://claude.com/claude-code"><img alt="Built with Claude Code" src="https://img.shields.io/badge/built%20with-Claude%20Code-D97757?logo=claude&logoColor=white"></a>
 </p>
 
 # Orrery

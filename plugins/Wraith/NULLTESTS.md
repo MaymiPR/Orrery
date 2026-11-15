@@ -7,7 +7,7 @@ difference is a tenth of the signal's amplitude, -60 dB is inaudible in practice
 reference's own power buttons. Presets are loaded on the reference from its own saved states.
 
 Reproduce: `python nulltest/nulltest.py` (our processor through tools/WrRender) and
-`python nulltest/nulltest.py --vst3` (the built VST3 through tools/RefRender). The reference renders stay local.
+`python nulltest/nulltest.py --ours vst3` (the built VST3 through tools/RefRender). The reference renders stay local.
 
 | Case | Signal | Residual (dB) | Worst second (dB) |
 |---|---|---|---|
@@ -167,5 +167,5 @@ Median -23.8 dB over 97 cases; worst -4.4 dB (preset: hard squeeze / drums -6).
 - **Presets** follow from their stages: the ones with the doubler land at -10 to -26 dB, the ones without it where the
   character section does (-21 to -27 dB), except the one with the rider at 0.97 into full compression on drums
   (-4.4 dB), where the two together do not null.
-- **Our VST3 equals our renderer:** `nulltest.py --vst3` gives the same numbers to the printed digit, and
+- **Our VST3 equals our renderer:** `nulltest.py --ours vst3` gives the same numbers to the printed digit, and
   `first_null.py` finds the two equal at -333 dB at the start-up preset.

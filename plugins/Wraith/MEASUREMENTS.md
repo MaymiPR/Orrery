@@ -18,7 +18,7 @@ are in [NULLTESTS.md](NULLTESTS.md), cited here by case name; the controls and p
 | Determinism | two renders of one input through the default state are identical (-600 dB); parameters apply before the first block: a 400 ms settle changes nothing at 48 kHz |
 | Settle at 44.1 kHz | the reverb's response loads asynchronously at 44.1 kHz only: without a settle the tail is missing (-149 dBFS after an impulse, the dry path alone); after 1 s it is there (-72 dBFS, as at 48 kHz); every 44.1 kHz render with the reverb on uses `settle=1000` |
 | Plate | the original plays its plate only with its editor open (a saved state with the plate selected plays the room's filter alone in an offline host, its wet signal silent), so plate cases are real-time captures, with the editor open, after 6 s of silence while the plate loads |
-| VST3 check | `nulltest.py --vst3` gives the renderer's numbers to the printed digit; `first_null.py` finds the VST3 and the renderer equal at -333 dB at the start-up preset |
+| VST3 check | `nulltest.py --ours vst3` gives the renderer's numbers to the printed digit; `first_null.py` finds the VST3 and the renderer equal at -333 dB at the start-up preset |
 
 Data and plots live in `measurements/Wraith/` and the renders in `reference/Wraith/`, both git-ignored. This file is
 the published record; every number in it is reproduced by the script its section names.
