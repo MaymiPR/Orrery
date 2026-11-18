@@ -117,6 +117,7 @@ void ScorpiusProcessor::prepareToPlay (double sampleRate, int block)
                 toOuter[c].prepareRational (f->p, f->q, false, *f->up);
             }
             inner[c].reserve ((size_t) block48 * 2);
+            outer[c].reserve ((size_t) jmax (1, block) * 4 + 1024);      // what a block leaves and adds, with room
             keyInner[c].reserve ((size_t) block48 * 2);
         }
         // the delay the reference has at this rate (measured; reported a little short above 48 kHz, as it does):

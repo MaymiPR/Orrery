@@ -303,13 +303,19 @@ void ScorpiusEditor::endLiveResize()
 
 void ScorpiusEditor::parameterChanged (const String& pid, float)
 {
-    const bool gain = pid == sc::id::inputGain || pid == sc::id::outputGain, fromInput = pid == sc::id::inputGain;
-    MessageManager::callAsync ([safe = Component::SafePointer<ScorpiusEditor> (this), gain, fromInput]
-    {
-        if (safe == nullptr) return;
-        if (gain && safe->linkSource == nullptr) safe->mirror (fromInput);      // automation, presets: keep the link
-        safe->updateFromParams();
-    });
+    // called on the thread that changed the parameter, the audio thread under automation: flags only, no message, no
+    // allocation. The timer takes them on the message thread and reads the values there, after every listener ran.
+    if (pid == sc::id::inputGain) inputGainChanged.store (true);
+    else if (pid == sc::id::outputGain) outputGainChanged.store (true);
+    else paramsChanged.store (true);
+}
+
+void ScorpiusEditor::takeParameterChanges()
+{
+    const bool in = inputGainChanged.exchange (false), out = outputGainChanged.exchange (false);
+    const bool other = paramsChanged.exchange (false);
+    if (linkSource == nullptr) { if (in) mirror (true); if (out) mirror (false); }      // automation, presets: keep the link
+    if (in || out || other) updateFromParams();
 }
 
 void ScorpiusEditor::beginLink (Slider& src)
@@ -440,6 +446,7 @@ String ScorpiusEditor::caption (const Slider& k, const String& name) const
 void ScorpiusEditor::timerCallback()
 {
     if (getProperties().getWithDefault ("liveResize", false) && Time::getMillisecondCounter() - lastResizeMs > 150) endLiveResize();
+    takeParameterChanges();
     if (frozen) return;
     inMeter[0].update (proc.inMeter.left);
     inMeter[1].update (proc.inMeter.right);

@@ -40,6 +40,9 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   now stays under half the sample rate. Nothing changes at 44.1 kHz and above.
 - **Saved editor scale:** a project whose saved scale is outside 50 to 200 %, or not a number, opens inside that
   range (all three plug-ins).
+- **Automation with the editor open:** an automated parameter no longer posts a message from the audio thread per
+  change; the editor picks the change up at its next frame (all three plug-ins). Scorpius's rate conversion no
+  longer allocates in the first blocks at a sample rate other than 48 kHz.
 
 ## 1.2.1 (2026-11-04)
 

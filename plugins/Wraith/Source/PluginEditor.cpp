@@ -292,15 +292,19 @@ void WraithEditor::endLiveResize()
 
 void WraithEditor::parameterChanged (const String& pid, float)
 {
-    // called from the thread that changed the parameter: update on the message thread (and read the values there,
-    // after every listener ran: inside the callback the raw value can still be the old one)
-    const bool gain = pid == wr::id::inputGain || pid == wr::id::outputGain, fromInput = pid == wr::id::inputGain;
-    MessageManager::callAsync ([safe = Component::SafePointer<WraithEditor> (this), gain, fromInput]
-    {
-        if (safe == nullptr) return;
-        if (gain && safe->linkSource == nullptr) safe->mirror (fromInput);      // automation, presets: keep the link
-        safe->updateFromParams();
-    });
+    // called on the thread that changed the parameter, the audio thread under automation: flags only, no message, no
+    // allocation. The timer takes them on the message thread and reads the values there, after every listener ran.
+    if (pid == wr::id::inputGain) inputGainChanged.store (true);
+    else if (pid == wr::id::outputGain) outputGainChanged.store (true);
+    else paramsChanged.store (true);
+}
+
+void WraithEditor::takeParameterChanges()
+{
+    const bool in = inputGainChanged.exchange (false), out = outputGainChanged.exchange (false);
+    const bool other = paramsChanged.exchange (false);
+    if (linkSource == nullptr) { if (in) mirror (true); if (out) mirror (false); }      // automation, presets: keep the link
+    if (in || out || other) updateFromParams();
 }
 
 void WraithEditor::beginLink (Slider& src)
@@ -422,6 +426,7 @@ void WraithEditor::setTestLevels (float inDb, float outDb, float inBarDb, float 
 void WraithEditor::timerCallback()
 {
     if (getProperties().getWithDefault ("liveResize", false) && Time::getMillisecondCounter() - lastResizeMs > 150) endLiveResize();
+    takeParameterChanges();
     if (frozen) return;
     const double now = Time::getMillisecondCounterHiRes() * 0.001;
     const float dt = (float) jlimit (0.0, 0.2, now - lastTick);
