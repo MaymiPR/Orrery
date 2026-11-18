@@ -104,9 +104,9 @@ better: -60 dB is inaudible in practice.
 | | Positron | Scorpius | Wraith |
 |---|---|---|---|
 | Mastered track, default settings | -49.6 dB | -25.8 dB | not tested (a vocal chain) |
-| Synthetic music / drums, default settings | -62 to -74 dB | -29.7 dB (drums) | -23.6 dB (music), -21.0 dB (drums) |
-| Best parts | EQ, crossover, signal path: -79 to -87 dB | EQ, sub, rate converters: -50 to -70 dB | gains, EQ, gain rider, reverb: -63 to -143 dB |
-| Weakest part | the character section on loud, dense material (-44 to -48 dB) | the drive on loud, dense material (the reason for the default's -24 to -28 dB) | the character section (a fitted model, -15 to -29 dB) and the doubler fully wet (-11 to -27 dB) |
+| Synthetic music / drums, default settings | -57 to -75 dB | -29.7 dB (drums) | -23.6 dB (music), -21.0 dB (drums) |
+| Best parts | EQ, crossover, signal path: -79 to -87 dB | single EQ bands, sub, rate converters: -51 to -110 dB | gains, EQ, gain rider, reverb: -63 to -143 dB |
+| Weakest part | the character section on loud, dense material (-43 to -48 dB) | the drive on loud, dense material (the reason for the default's -22 to -30 dB) | the character section (a fitted model, -15 to -29 dB) and the doubler fully wet (-11 to -27 dB) |
 
 Every case is listed in each plug-in's NULLTESTS.md ([Positron](plugins/Positron/NULLTESTS.md),
 [Scorpius](plugins/Scorpius/NULLTESTS.md), [Wraith](plugins/Wraith/NULLTESTS.md)), and how the originals were measured in its MEASUREMENTS.md.

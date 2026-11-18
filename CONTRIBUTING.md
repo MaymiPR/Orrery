@@ -48,8 +48,10 @@ Each command returns non-zero on a failure.
 over and the proof on a private repository, where no workflow runs. It closes a running host, runs
 `check_repo.py` and the lint tools it finds on the PATH (a missing tool is reported, never installed), configures
 when `build/CMakeCache.txt` is missing, builds `ci_targets` into a log, counts warnings by the same rule as the
-workflows and fails above zero, asserts the VST3 is newer than the build start, runs `ctest` and the render
-regression, and prints one `CHECK` line with the counts. Switches: `-SkipBuild`, `-SkipTests`, `-KeepFl`.
+workflows and fails above zero, asserts each VST3 is newer than the sources it is built from, runs `ctest` and the
+render regression, and prints one `CHECK` line with every step as `ok`, `skipped`, `incomplete` or `fail`. On
+request it also runs pluginval, the keyboard-focus check and the comparison of each built VST3 with its renderer
+(`-Pluginval`, `-FocusCheck`, `-NullCheck`); the script's header lists every switch.
 
 ## Changing the code
 
@@ -94,7 +96,7 @@ unsigned and the notes say so.
 | `measurements/` | the published measurement data per plug-in (`measurements/<Id>/`) |
 | `packaging/` | the installers; `plugins.txt` lists the plug-ins they hold |
 | `docs/` | the build guide, `branding/` (banners, icon, social preview, `colours.json`), `screenshots/` |
-| `.github/` | `workflows/` (Lint, CI, Build and release, Release checklist, Landing page), the issue forms, the pull request template, `RELEASE_CHECKLIST.md`, `dependabot.yml`, CODEOWNERS |
+| `.github/` | `workflows/` (Lint, CI, Build and release, Release checklist, Landing page), the issue forms, the pull request template, `RELEASE_CHECKLIST.md`, CODEOWNERS |
 | `local.example.yaml` | the keys of `local.yaml` (git-ignored): the references' VST3 files and names, the interpreters, the tool folders |
 | `requirements.txt`, `requirements-train.txt` | the Python packages of the scripts; the second adds PyTorch for Scorpius's learned blocks |
 

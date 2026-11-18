@@ -26,6 +26,13 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   last bit; Scorpius's editor analyses sit beside its processor; Positron's band gain computer for the fits is a null
   test's native helper (`scripts/build_native.py`).
 
+### Fixed
+
+- **Documents:** the ranges of the README's "How close" table and of Scorpius's page are the ones the published
+  results give (Positron's defaults on synthetic material -57 to -75 dB, Scorpius's default preset on loud material
+  -22 to -30 dB, its single EQ bands, sub and rate converters -51 to -110 dB); file names that no longer exist are
+  corrected.
+
 ## 1.2.1 (2026-11-04)
 
 ### Highlights

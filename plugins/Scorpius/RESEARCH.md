@@ -246,7 +246,7 @@ the middle, streamers flowing outwards, tall coloured pillars, the glass's refle
   times; twice when the host gives no tempo), easing to a new tempo over ~0.5 s; the brightness still follows the
   level in real time.
 
-**SCORPIUS** (the default; `Source/ui/Sky.cpp`): two scorpions in neon light, our own drawing.
+**SCORPIUS** (the default; `Source/ui/Stripe.cpp`): two scorpions in neon light, our own drawing.
 
 - **The scorpions:** back to back and mirrored in the middle of the tube, side on, tails arched over their backs
   towards each other, claws outwards (each drawn in its own units, ~145 × 35, scaled 0.84 into the tube, the backs of
