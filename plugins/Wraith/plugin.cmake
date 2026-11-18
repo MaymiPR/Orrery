@@ -113,4 +113,7 @@ if(ORRERY_TOOLS)
         add_dependencies(ci_targets WraithSnapshot)      # ci.yml's screenshot artefact is made on Windows
     endif()
     add_dependencies(ci_targets WrRender)          # the render regression
+    # the renderer refuses what it cannot do: a jobs file that is not there ends with a non-zero exit code
+    add_test(NAME WrRenderMissingJobs COMMAND WrRender no-such-jobs-file.txt)
+    set_tests_properties(WrRenderMissingJobs PROPERTIES WILL_FAIL TRUE)
 endif()

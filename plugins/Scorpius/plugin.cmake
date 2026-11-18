@@ -96,4 +96,7 @@ if(ORRERY_TOOLS)
         add_dependencies(ci_targets ScorpiusSnapshot)      # ci.yml's screenshot artefact is made on Windows
     endif()
     add_dependencies(ci_targets ScRender)          # the render regression
+    # the renderer refuses what it cannot do: a jobs file that is not there ends with a non-zero exit code
+    add_test(NAME ScRenderMissingJobs COMMAND ScRender no-such-jobs-file.txt)
+    set_tests_properties(ScRenderMissingJobs PROPERTIES WILL_FAIL TRUE)
 endif()

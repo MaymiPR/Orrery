@@ -109,4 +109,7 @@ if(ORRERY_TOOLS)
         add_dependencies(ci_targets PositronSnapshot)      # ci.yml's screenshot artefact is made on Windows
     endif()
     add_dependencies(ci_targets PoRender)          # the render regression
+    # the renderer refuses what it cannot do: a jobs file that is not there ends with a non-zero exit code
+    add_test(NAME PoRenderMissingJobs COMMAND PoRender no-such-jobs-file.txt)
+    set_tests_properties(PoRenderMissingJobs PROPERTIES WILL_FAIL TRUE)
 endif()
