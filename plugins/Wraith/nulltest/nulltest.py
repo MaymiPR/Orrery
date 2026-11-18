@@ -233,7 +233,7 @@ NOTES = """\
 
 {doubler_metric}
 
-- **Presets** follow from their stages: the ones with the doubler land at -10 to -26 dB, the ones without it where the
+- **Presets** follow from their stages: the ones with the doubler land at -11 to -26 dB, the ones without it where the
   character section does (-21 to -27 dB), except the one with the rider at 0.97 into full compression on drums
   (-4.4 dB), where the two together do not null.
 - **Our VST3 equals our renderer:** `nulltest.py --ours vst3` gives the same numbers to the printed digit, and

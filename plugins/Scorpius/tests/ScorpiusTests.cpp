@@ -5,6 +5,7 @@
 // ScorpiusTests benchkernel: the models' matrix kernel alone;  ScorpiusTests render out.f32 [id=value ...]: drums
 // through the plug-in, to compare builds sample for sample.
 #include <cmath>
+#include <limits>
 #include <cstdio>
 #include "PluginProcessor.h"
 #include "dsp/Convolver.h"
@@ -428,6 +429,61 @@ static void testEngine()
 }
 
 // seconds of CPU per 60 s of stereo at 48 kHz, in blocks of 512
+// a saved scale outside the editor's range, or not a number, never reaches the editor as it is
+static void testStateScaleIsLimited()
+{
+    for (float bad : { 0.0f, -1.0f, 100.0f, std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::infinity() })
+    {
+        ScorpiusProcessor p;
+        p.uiScale = bad;
+        MemoryBlock mb;
+        p.getStateInformation (mb);
+        ScorpiusProcessor q;
+        q.setStateInformation (mb.getData(), (int) mb.getSize());
+        const float s = q.uiScale.load();
+        CHECK (std::isfinite (s) && s >= 0.5f && s <= 2.0f);
+    }
+}
+
+// blocks the host did not announce: none, and twice the prepared size at a rate that is converted. The modules run in
+// pieces of the prepared size, so the longer block gives the samples the same input gives in announced blocks.
+static void testUnannouncedBlocks()
+{
+    for (double fs : { 48000.0, 44100.0 })
+    {
+        std::vector<float> out[2];
+        for (int pass = 0; pass < 2; ++pass)
+        {
+            ScorpiusProcessor p;
+            p.setRateAndBufferSizeDetails (fs, 512);
+            p.prepareToPlay (fs, 512);
+            MidiBuffer midi;
+            if (pass == 1) { AudioBuffer<float> none (2, 0); p.processBlock (none, midi); }
+            const int total = 8192, block = pass == 0 ? 512 : 1024;
+            AudioBuffer<float> buf (2, block);
+            for (int pos = 0; pos < total; pos += block)
+            {
+                for (int i = 0; i < block; ++i)
+                {
+                    const float v = 0.4f * (float) std::sin (2.0 * MathConstants<double>::pi * 110.0 * (pos + i) / fs);
+                    buf.setSample (0, i, v); buf.setSample (1, i, v);
+                }
+                p.processBlock (buf, midi);
+                for (int i = 0; i < block; ++i) out[pass].push_back (buf.getSample (0, i));
+            }
+        }
+        bool finite = true;
+        double err = 0.0;
+        for (size_t i = 0; i < out[0].size(); ++i)
+        {
+            finite = finite && std::isfinite (out[1][i]);
+            err = std::max (err, (double) std::abs (out[0][i] - out[1][i]));
+        }
+        CHECK (finite);
+        CHECK (err < 1.0e-3);
+    }
+}
+
 static void bench()
 {
     using namespace sc::dsp;
@@ -676,6 +732,8 @@ int main (int argc, char** argv)
     testKick();
     testConvolver();
     testEngine();
+    testStateScaleIsLimited();
+    testUnannouncedBlocks();
     testValueEntry();
     std::printf ("%d checks, %d failed\n", checks, failures);
     return failures == 0 ? 0 : 1;

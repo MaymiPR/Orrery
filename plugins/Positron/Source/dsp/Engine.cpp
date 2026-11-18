@@ -104,6 +104,7 @@ void Engine::updateEq (const double* glide)
 
 void Engine::process (float* l, float* r, const float* scL, const float* scR, int n, const Params& p)
 {
+    if (n <= 0) return;             // a host's call without samples: nothing to do (and nothing divides by n below)
     const double eqTarget[3] { p.eqLowDb, p.eqMidDb, p.eqHighDb };
     const double limTarget = std::pow (10.0, p.limiterGainDb / 20.0);
     if (first)

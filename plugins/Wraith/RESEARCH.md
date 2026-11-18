@@ -94,7 +94,7 @@ Not host parameters (L3, L4):
   triangle that follows the filter and mix), two knobs, room / plate buttons. **output**: a meter with readouts and the
   gain knob. A power button above each of character, eq, doubler, reverb.
 - A switched-off section goes dark (L4: character off).
-- Ours keeps this layout (positions, sizes and hit areas measured on L4, `Source/ui/Look.h`) and draws every part in
+- Ours keeps this layout (positions, sizes and hit areas measured on L4, `Source/ui/Theme.h`) and draws every part in
   code in the suite's own look (`shared/ui/Theme.h`): violet-black cards on true black for the plates, wells for the
   slots, holes and screens, the suite's knob (a gold value arc, a pearl pointer) for every knob, gold-to-pearl bars for
   the meters on the original's scale, gold toggles for the power, rider and room / plate buttons, and the displays'

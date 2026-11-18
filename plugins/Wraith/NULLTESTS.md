@@ -164,7 +164,7 @@ Median -23.8 dB over 97 cases; worst -4.4 dB (preset: hard squeeze / drums -6).
   | music -10, Stereo 0.5 | 0.44 | 1.19 | 0.997 | 0.996 | -0.05 |
   | music -10, Stereo 1 | 0.44 | 1.19 | 0.988 | 0.983 | -0.04 |
 
-- **Presets** follow from their stages: the ones with the doubler land at -10 to -26 dB, the ones without it where the
+- **Presets** follow from their stages: the ones with the doubler land at -11 to -26 dB, the ones without it where the
   character section does (-21 to -27 dB), except the one with the rider at 0.97 into full compression on drums
   (-4.4 dB), where the two together do not null.
 - **Our VST3 equals our renderer:** `nulltest.py --ours vst3` gives the same numbers to the printed digit, and

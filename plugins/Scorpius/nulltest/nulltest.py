@@ -124,7 +124,7 @@ def span(vals, digits=0):
 
 HEADER = """# Null tests
 
-The same signal and settings through the reference (Cradle Orion, VST3) and through Scorpius. The residual is
+The same signal and settings through the reference (Cradle Orion 1.2.1, VST3) and through Scorpius. The residual is
 reference minus ours, in dB re the reference's output energy. Lower is better: -20 dB means the difference is a tenth
 of the signal's amplitude, -60 dB is inaudible in practice. Both renders are compensated by each plug-in's reported
 latency, block 512; the first 0.1 s is skipped (the reference ramps its settings in over the first ~5 ms). Settings
@@ -194,14 +194,14 @@ and its mid. For comparison the same setting held still nulls at the "steady" va
 
 ## What the numbers say
 
-- **The fixed parts are close to exact** (EQ, sub, the rate converters: -50 to -70 dB): these are the reference's own
-  filters, identified from its responses.
+- **The fixed parts are close to exact** (single EQ bands, sub, the rate converters: -51 to -110 dB; all five EQ
+  bands together -46 to -48 dB): these are the reference's own filters, identified from its responses.
 - **Everything but the drive** nulls at -44 … -51 dB together (the default preset with the drive off): the
   compressor applies its gain before its filters (as the reference), lift and harmonics are learned (harmonics at
   four amounts, interpolated).
 - **The whole plug-in is limited by the drive**, which the reference runs as a learned model of its own and which
   Scorpius learns from the reference's input and output: on loud program material the default preset nulls at about
-  -22 to -27 dB, 10 … 12 dB lower at -32 to -37 dB. Loud, dense material is the hard part: a linear filter explains
+  -22 to -30 dB, 10 … 12 dB lower at -33 to -37 dB. Loud, dense material is the hard part: a linear filter explains
   only 3 dB of the drive's output there, and even a model trained on one loud piece alone reaches only -21 (8
   channels) to -26 dB (16) on it.
 - **Above 48 kHz** (88.2, 96, 176.4, 192 kHz) Scorpius runs the reference's own converters, identified from its

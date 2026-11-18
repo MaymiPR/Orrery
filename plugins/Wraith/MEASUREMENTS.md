@@ -11,7 +11,7 @@ are in [NULLTESTS.md](NULLTESTS.md), cited here by case name; the controls and p
 | Reference | Cradle The Spirit 1.0.3, VST3, Windows |
 | Offline host | `tools/RefRender`: a fresh instance per job, latency compensated by the original's report (0) |
 | Editor host | `tools/RefCapture`: real-time captures with the editor open (`record=1`), states saved by the original itself (`savestates=`) |
-| Harness | `nulltest/wr_ref.py`; the structure probe (`structprobe.py`), the measurement battery (`measure_suite.py`, at 48, 44.1 and 96 kHz) and `nullrun.py` driven through a target file |
+| Harness | `nulltest/wr_ref.py`; a structure probe, a measurement battery (at 48, 44.1 and 96 kHz) and null runs driven through it |
 | Rate, block | 48 kHz, block 512 |
 | Start state | the factory preset "lead" (RESEARCH.md, Presets); the stage under test keeps that preset's values and every other stage is switched off with its own power button (the five State parameters) |
 | Skip | the first 0.1 s of every render |
@@ -23,7 +23,7 @@ are in [NULLTESTS.md](NULLTESTS.md), cited here by case name; the controls and p
 Data and plots live in `measurements/Wraith/` and the renders in `reference/Wraith/`, both git-ignored. This file is
 the published record; every number in it is reproduced by the script its section names.
 
-## 1. Path, latency and structure (`structprobe.py`, `measure_suite.py`, `probe_plate_presets.py`)
+## 1. Path, latency and structure (`probe_plate_presets.py`)
 
 | Quantity | Value | Method | Residual or confidence |
 |---|---|---|---|

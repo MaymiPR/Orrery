@@ -25,6 +25,24 @@ static AudioProcessorParameter* findParam (AudioProcessor& p, const String& name
     return nullptr;
 }
 
+// a message and the exit code of a run that could not do what it was asked
+static int fail (const String& message)
+{
+    std::printf ("%s\n", message.toRawUTF8());
+    std::fflush (stdout);
+    return 1;
+}
+
+// whether the whole text is one finite number (a malformed number is refused, it never reads as 0)
+static bool isNumber (const String& text)
+{
+    const auto t = text.trim();
+    if (t.isEmpty()) return false;
+    char* end = nullptr;
+    const double v = std::strtod (t.toRawUTF8(), &end);
+    return end != nullptr && *end == 0 && std::isfinite (v);
+}
+
 int main (int argc, char** argv)
 {
     ScopedJuceInitialiser_GUI init;
@@ -37,13 +55,23 @@ int main (int argc, char** argv)
     po::dsp::Tuning base = defaults;
     for (int i = 1; i < args.size(); ++i)
     {
-        if (args[i].startsWith ("fs=")) fs = args[i].substring (3).getDoubleValue();
-        if (args[i].startsWith ("block=")) block = args[i].substring (6).getIntValue();
+        if (args[i].startsWith ("fs="))
+        {
+            if (! isNumber (args[i].substring (3)) || args[i].substring (3).getDoubleValue() <= 0.0) return fail ("malformed number in '" + args[i] + "'");
+            fs = args[i].substring (3).getDoubleValue();
+        }
+        if (args[i].startsWith ("block="))
+        {
+            if (! isNumber (args[i].substring (6)) || args[i].substring (6).getIntValue() < 1) return fail ("malformed number in '" + args[i] + "'");
+            block = args[i].substring (6).getIntValue();
+        }
         if (args[i].startsWith ("tuning=") && base.load (args[i].substring (7).toRawUTF8()) != 0) return 1;
     }
 
+    const File jobsFile (File::getCurrentWorkingDirectory().getChildFile (args[0]));
+    if (! jobsFile.existsAsFile()) return fail ("cannot read the jobs file " + args[0]);
     StringArray lines;
-    File (File::getCurrentWorkingDirectory().getChildFile (args[0])).readLines (lines);
+    jobsFile.readLines (lines);
     for (auto& line : lines)
     {
         auto tok = StringArray::fromTokens (line, " ", "\"");
@@ -63,6 +91,7 @@ int main (int argc, char** argv)
             else if (a.startsWith ("tune:"))
             {
                 const auto kv = a.substring (5);
+                if (! isNumber (kv.fromFirstOccurrenceOf ("=", false, false))) return fail ("malformed number in '" + a + "'");
                 if (! po::dsp::tuning().set (kv.upToFirstOccurrenceOf ("=", false, false).toStdString(), kv.fromFirstOccurrenceOf ("=", false, false).getDoubleValue()))
                     { std::printf ("unknown tuning key in '%s'\n", a.toRawUTF8()); return 1; }
             }
@@ -83,9 +112,15 @@ int main (int argc, char** argv)
             auto name = body.upToFirstOccurrenceOf ("=", false, false);
             const auto val = body.fromFirstOccurrenceOf ("=", false, false);
             int at = -1;
-            if (isAuto) { at = name.fromFirstOccurrenceOf ("@", false, false).getIntValue(); name = name.upToFirstOccurrenceOf ("@", false, false); }
+            if (isAuto)
+            {
+                if (! isNumber (name.fromFirstOccurrenceOf ("@", false, false))) return fail ("malformed number in '" + a + "'");
+                at = name.fromFirstOccurrenceOf ("@", false, false).getIntValue();
+                name = name.upToFirstOccurrenceOf ("@", false, false);
+            }
             auto* p = findParam (proc, name);
-            if (p == nullptr) { std::printf ("  no parameter '%s'\n", name.toRawUTF8()); continue; }
+            if (p == nullptr) return fail ("  no parameter '" + name + "'");
+            if (! isParam && ! isNumber (val)) return fail ("malformed number in '" + a + "'");
             const float v = isParam ? p->getValueForText (val) : val.getFloatValue();
             if (isAuto) autom.insert ({ at, { p, v } });
             else p->setValueNotifyingHost (v);
@@ -94,7 +129,10 @@ int main (int argc, char** argv)
         proc.setRateAndBufferSizeDetails (fs, block);    // (setPlayConfigDetails would reset the side-chain bus)
         proc.prepareToPlay (fs, block);
 
+        if (! File::getCurrentWorkingDirectory().getChildFile (tok[0]).existsAsFile()) return fail ("cannot read the input " + tok[0]);
         const auto in = readF32 (tok[0]);
+        if (scPath.isNotEmpty() && ! File::getCurrentWorkingDirectory().getChildFile (scPath).existsAsFile())
+            return fail ("cannot read the side-chain input " + scPath);
         const auto sc = scPath.isNotEmpty() ? readF32 (scPath) : std::vector<float>();
         const int latency = raw ? 0 : proc.getLatencySamples();
         const int n = (int) (in.size() / 2);
@@ -126,7 +164,8 @@ int main (int argc, char** argv)
         File f (File::getCurrentWorkingDirectory().getChildFile (tok[1]));
         f.deleteFile();
         FileOutputStream os (f);
-        os.write (out.data(), out.size() * sizeof (float));
+        if (! os.openedOk() || ! os.write (out.data(), out.size() * sizeof (float))) return fail ("cannot write the output " + tok[1]);
+        os.flush();
         std::printf ("job %s: %d frames, latency %d\n", tok[1].toRawUTF8(), n, latency);
         std::fflush (stdout);
     }

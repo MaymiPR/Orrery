@@ -107,6 +107,10 @@ private:
     void mirror (bool fromInput);
     orrery::MetalKnob* linkSource = nullptr;
     bool mirroring = false;
+    // set by parameterChanged on whichever thread changed a parameter (the audio thread under automation), taken
+    // by the timer on the message thread
+    std::atomic<bool> paramsChanged { false }, inputGainChanged { false }, outputGainChanged { false };
+    void takeParameterChanges();
 
     PositronProcessor& proc;
     Content content { *this };

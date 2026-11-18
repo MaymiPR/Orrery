@@ -309,13 +309,19 @@ void PositronEditor::endLiveResize()
 
 void PositronEditor::parameterChanged (const String& id, float)
 {
-    const bool gain = id == po::id::inputGain || id == po::id::outputGain, fromInput = id == po::id::inputGain;
-    MessageManager::callAsync ([safe = Component::SafePointer<PositronEditor> (this), gain, fromInput]
-    {
-        if (safe == nullptr) return;
-        if (! gain) safe->updateFromParams();
-        else if (safe->linkSource == nullptr) safe->mirror (fromInput);    // automation, presets: keep the link
-    });
+    // called on the thread that changed the parameter, the audio thread under automation: flags only, no message, no
+    // allocation. The timer takes them on the message thread and reads the values there, after every listener ran.
+    if (id == po::id::inputGain) inputGainChanged.store (true);
+    else if (id == po::id::outputGain) outputGainChanged.store (true);
+    else paramsChanged.store (true);
+}
+
+void PositronEditor::takeParameterChanges()
+{
+    const bool in = inputGainChanged.exchange (false), out = outputGainChanged.exchange (false);
+    const bool other = paramsChanged.exchange (false);
+    if (linkSource == nullptr) { if (in) mirror (true); if (out) mirror (false); }      // automation, presets: keep the link
+    if (other) updateFromParams();
 }
 
 void PositronEditor::updateFromParams()
@@ -447,6 +453,7 @@ void PositronEditor::timerCallback()
 {
     // a resize has settled (no new size for 150 ms): render the per-scale images sharp at the final size
     if (getProperties().getWithDefault ("liveResize", false) && Time::getMillisecondCounter() - lastResizeMs > 150) endLiveResize();
+    takeParameterChanges();
     if (frozen) return;
     updateMeter (inMeter[0], proc.inL);
     updateMeter (inMeter[1], proc.inR);

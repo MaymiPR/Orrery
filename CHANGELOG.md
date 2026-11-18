@@ -26,6 +26,27 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   last bit; Scorpius's editor analyses sit beside its processor; Positron's band gain computer for the fits is a null
   test's native helper (`scripts/build_native.py`).
 
+### Fixed
+
+- **Documents:** the ranges of the README's "How close" table and of Scorpius's page are the ones the published
+  results give (Positron's defaults on synthetic material -57 to -75 dB, Scorpius's default preset on loud material
+  -22 to -30 dB, its single EQ bands, sub and rate converters -51 to -110 dB); file names that no longer exist are
+  corrected.
+- **Positron, a call without samples:** a host's call with a block of no samples (a parameter flush) no longer
+  divides by zero.
+- **Scorpius, a longer block than announced:** at a sample rate other than 48 kHz a host block longer than the
+  announced size no longer writes past the modules' buffers; the modules run it in pieces of the announced size.
+- **Wraith, the reverb at low sample rates:** below 40 kHz the reverb's high-cut at its top values went unstable; it
+  now stays under half the sample rate. Nothing changes at 44.1 kHz and above.
+- **Saved editor scale:** a project whose saved scale is outside 50 to 200 %, or not a number, opens inside that
+  range (all three plug-ins).
+- **Automation with the editor open:** an automated parameter no longer posts a message from the audio thread per
+  change; the editor picks the change up at its next frame (all three plug-ins). Scorpius's rate conversion no
+  longer allocates in the first blocks at a sample rate other than 48 kHz.
+- **Offline renderers:** PoRender, ScRender and WrRender end with a non-zero exit code and a message on a jobs
+  file, an input or a side-chain file they cannot read, an output they cannot write, an unknown parameter and a
+  malformed number, where they reported success before.
+
 ## 1.2.1 (2026-11-04)
 
 ### Highlights

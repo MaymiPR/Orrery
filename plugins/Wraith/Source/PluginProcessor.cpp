@@ -167,13 +167,20 @@ void WraithProcessor::getStateInformation (MemoryBlock& dest)
     if (auto xml = state.createXml()) copyXmlToBinary (*xml, dest);
 }
 
+// the editor's scale as a state gives it: inside the editors' range (50 to 200 %), 100 % when it is not a number
+static float scaleFromState (const juce::var& v)
+{
+    const float s = (float) v;
+    return std::isfinite (s) ? juce::jlimit (0.5f, 2.0f, s) : 1.0f;
+}
+
 void WraithProcessor::setStateInformation (const void* data, int size)
 {
     if (auto xml = getXmlFromBinary (data, size))
         if (xml->hasTagName (apvts.state.getType()))
         {
             auto tree = ValueTree::fromXml (*xml);
-            uiScale = (float) tree.getProperty ("uiScale", 1.0f);
+            uiScale = scaleFromState (tree.getProperty ("uiScale", 1.0f));
             presets.setCurrentName (tree.getProperty ("preset", "lead").toString());
             slot = jlimit (0, 1, (int) tree.getProperty ("compare", 0));
             ioLink = (int) tree.getProperty ("ioLink", 0) != 0;
