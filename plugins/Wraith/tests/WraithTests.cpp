@@ -3,6 +3,7 @@
 // NULLTESTS.md). Add a test per block as Phase 4 adds the blocks: a filter's gain at a frequency, a detector's time
 // constant, a table's end points, the latency, the state of a saved project from the last release.
 #include <cmath>
+#include <limits>
 #include <cstdio>
 #include <random>
 #include <vector>
@@ -153,6 +154,59 @@ static void testTapers()
     CHECK_NEAR (norm (wr::id::riderSpeed, 0.003f), 0.222222, 1e-5);
 }
 
+// a saved scale outside the editor's range, or not a number, never reaches the editor as it is
+static void testStateScaleIsLimited()
+{
+    for (float bad : { 0.0f, -1.0f, 100.0f, std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::infinity() })
+    {
+        WraithProcessor p;
+        p.uiScale = bad;
+        MemoryBlock mb;
+        p.getStateInformation (mb);
+        WraithProcessor q;
+        q.setStateInformation (mb.getData(), (int) mb.getSize());
+        const float s = q.uiScale.load();
+        CHECK (std::isfinite (s) && s >= 0.5f && s <= 2.0f);
+    }
+}
+
+// a host may call with no samples (a parameter flush): nothing happens, nothing divides by the block length
+static void testEmptyBlock()
+{
+    WraithProcessor p;
+    p.prepareToPlay (48000.0, 512);
+    AudioBuffer<float> buf (2, 0);
+    MidiBuffer midi;
+    p.processBlock (buf, midi);
+    const auto y = run (p, sine (1000.0, 48000.0, 4800));
+    bool finite = true;
+    for (auto v : y) finite = finite && std::isfinite (v);
+    CHECK (finite);
+}
+
+// the reverb's high-cut at its top value stays below half of a low host rate: the output stays finite and bounded
+static void testReverbFilterAtLowRate()
+{
+    for (double fs : { 32000.0, 22050.0 })
+    {
+        WraithProcessor p;
+        p.prepareToPlay (fs, 512);
+        setReal (p, wr::id::reverbOn, 1.0f);
+        setReal (p, wr::id::reverbMix, 0.5f);
+        setReal (p, wr::id::reverbFilter, 20000.0f);
+        std::mt19937 rng (7);
+        std::uniform_real_distribution<float> u (-0.25f, 0.25f);
+        std::vector<float> x ((size_t) fs);
+        for (auto& v : x) v = u (rng);
+        const auto y = run (p, x);
+        float peak = 0.0f;
+        bool finite = true;
+        for (auto v : y) { finite = finite && std::isfinite (v); peak = std::max (peak, std::abs (v)); }
+        CHECK (finite);
+        CHECK (peak < 4.0f);
+    }
+}
+
 static void testExtremeInput()
 {
     WraithProcessor p;
@@ -234,6 +288,9 @@ int main()
     testGains();
     testBypassIsDelayedInput();
     testStateRoundTrip();
+    testStateScaleIsLimited();
+    testEmptyBlock();
+    testReverbFilterAtLowRate();
     testStartupPreset();
     testTapers();
     testExtremeInput();

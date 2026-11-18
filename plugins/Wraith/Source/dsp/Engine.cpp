@@ -97,7 +97,7 @@ void Engine::processChunk (float* l, float* r, int n, const Params& p, const flo
         const double fc = revFilterHz.next();
         if (p.reverbOn)
         {
-            if (! exactly (fc, revFilterMade)) { revFilterMade = fc; revLp[0].c = revLp[1].c = Coeffs::lowPass (fs, fc, tun.revQ); }
+            if (! exactly (fc, revFilterMade)) { revFilterMade = fc; revLp[0].c = revLp[1].c = Coeffs::lowPass (fs, std::min (fc, 0.49 * fs), tun.revQ); }
             const double m = revMix.at (i);
             xl = (1.0 - m) * xl + m * revLp[0].process (wetL[i]);
             xr = (1.0 - m) * xr + m * revLp[1].process (wetR[i]);

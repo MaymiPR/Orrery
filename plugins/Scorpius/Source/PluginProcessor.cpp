@@ -98,6 +98,7 @@ void ScorpiusProcessor::prepareToPlay (double sampleRate, int block)
     const int block48 = (int) std::ceil (jmax (1, block) * 48000.0 / sampleRate) + 8;
     engine.prepare (48000.0, block48);
     silence.assign ((size_t) block48, 0.0f);
+    enginePiece = jmax (1, block48 - 8);
     if (resampling)
     {
         for (int c = 0; c < 2; ++c)
@@ -254,7 +255,7 @@ std::pair<double, int> ScorpiusProcessor::referenceDelay (double fs)
 void ScorpiusProcessor::runEngine (float* l, float* r, int n, const float* keyL, const float* keyR)
 {
     const auto params = engineParams();
-    const int most = jmax (1, (int) silence.size() - 8);
+    const int most = enginePiece;            // (not the size of silence, which grows with a longer block than announced)
     for (int pos = 0; pos < n; )
     {
         const int len = jmin (n - pos, most);
@@ -335,13 +336,20 @@ void ScorpiusProcessor::getStateInformation (MemoryBlock& dest)
     if (auto xml = state.createXml()) copyXmlToBinary (*xml, dest);
 }
 
+// the editor's scale as a state gives it: inside the editors' range (50 to 200 %), 100 % when it is not a number
+static float scaleFromState (const juce::var& v)
+{
+    const float s = (float) v;
+    return std::isfinite (s) ? juce::jlimit (0.5f, 2.0f, s) : 1.0f;
+}
+
 void ScorpiusProcessor::setStateInformation (const void* data, int size)
 {
     if (auto xml = getXmlFromBinary (data, size))
         if (xml->hasTagName (apvts.state.getType()))
         {
             auto tree = ValueTree::fromXml (*xml);
-            uiScale = (float) tree.getProperty ("uiScale", 1.0f);
+            uiScale = scaleFromState (tree.getProperty ("uiScale", 1.0f));
             animation = (int) tree.getProperty ("animation", 1) != 0;
             particleStyle = jlimit (0, 1, (int) tree.getProperty ("particleStyle", 1));
             presets.setCurrentName (tree.getProperty ("preset", sc::PresetManager::defaultName()).toString());

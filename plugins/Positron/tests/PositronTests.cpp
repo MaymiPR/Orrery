@@ -3,6 +3,7 @@
 // PositronTests benchplugin: the whole plug-in's share of a core;  PositronTests render out.f32 [Name=value ...]:
 // drums through the plug-in, to compare builds sample for sample.
 #include <cmath>
+#include <limits>
 #include <cstdio>
 #include <random>
 #include <vector>
@@ -298,6 +299,32 @@ static void testStateRoundTrip()
     CHECK (b->sidechainExternal.load());
 }
 
+// a saved scale outside the editor's range, or not a number, never reaches the editor as it is
+static void testStateScaleIsLimited()
+{
+    for (float bad : { 0.0f, -1.0f, 100.0f, std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::infinity() })
+    {
+        std::unique_ptr<PositronProcessor> a (makeProcessor (48000.0, 512));
+        a->uiScale = bad;
+        juce::MemoryBlock mb;
+        a->getStateInformation (mb);
+        std::unique_ptr<PositronProcessor> b (makeProcessor (48000.0, 512));
+        b->setStateInformation (mb.getData(), (int) mb.getSize());
+        const float s = b->uiScale.load();
+        CHECK (std::isfinite (s) && s >= 0.5f && s <= 2.0f);
+    }
+}
+
+// a host may call with no samples (a parameter flush): nothing happens, nothing divides by the block length
+static void testEmptyBlock()
+{
+    std::unique_ptr<PositronProcessor> p (makeProcessor (48000.0, 512));
+    juce::AudioBuffer<float> buf (2, 0);
+    juce::MidiBuffer midi;
+    p->processBlock (buf, midi);
+    CHECK (buf.getNumSamples() == 0);
+}
+
 // A / B (as Scorpius's reference has it): the arrow copies the active setting over the other; an unused setting starts as a copy of the one
 // in use; switching keeps each setting's changes; the state keeps both and which one is active
 static float param (PositronProcessor& p, const char* name)
@@ -461,6 +488,8 @@ int main (int argc, char** argv)
     testCharacterSmallSignal();
     testSidechain();
     testStateRoundTrip();
+    testStateScaleIsLimited();
+    testEmptyBlock();
     testCompare();
     testSilenceAndExtremes();
     testShortTermLoudness();
