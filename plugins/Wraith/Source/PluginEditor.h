@@ -110,6 +110,8 @@ private:
     // by the timer on the message thread
     std::atomic<bool> paramsChanged { false }, inputGainChanged { false }, outputGainChanged { false };
     void takeParameterChanges();
+    void takeStateLoad();
+    int shownStateLoads = 0;
 
     // sections
     wr::ui::PowerPill power[4];                 // character, eq, doubler, reverb

@@ -151,6 +151,7 @@ ScorpiusEditor::ScorpiusEditor (ScorpiusProcessor& p) : AudioProcessorEditor (p)
     ioLinkButton.onClick = [this]
     {
         proc.ioLink = ! proc.ioLink.load();
+        proc.stateEdited();
         ioLinkButton.active = proc.ioLink.load();
         ioLinkButton.repaint();
         if (proc.ioLink.load())                    // linking snaps the output to the input's opposite
@@ -185,7 +186,7 @@ ScorpiusEditor::ScorpiusEditor (ScorpiusProcessor& p) : AudioProcessorEditor (p)
     for (auto* pid : sc::presetIds) s.addParameterListener (pid, this);
 
     sidechain.external = proc.sidechainExternal.load();
-    sidechain.onChange = [this] (bool ext) { proc.sidechainExternal = ext; };
+    sidechain.onChange = [this] (bool ext) { proc.sidechainExternal = ext; proc.stateEdited(); };
     compare.slot = proc.compareSlot();
     compare.onSelect = [this] (int slot)
     {
@@ -198,6 +199,7 @@ ScorpiusEditor::ScorpiusEditor (ScorpiusProcessor& p) : AudioProcessorEditor (p)
     compare.onCopy = [this]
     {
         proc.copyCompareSlot();
+        proc.stateEdited();
         toast.show (proc.compareSlot() == 0 ? "A copied to B." : "B copied to A.");
     };
     presetBox.onClick = [this] { if (dropList != nullptr) closePopups(); else showPresetList(); };
@@ -219,6 +221,7 @@ ScorpiusEditor::ScorpiusEditor (ScorpiusProcessor& p) : AudioProcessorEditor (p)
     orrery::noFocus (*grip);
     addAndMakeVisible (*grip);
     grip->setAlwaysOnTop (true);
+    shownStateLoads = proc.stateLoads.load();
     setUiScale (proc.uiScale.load());
     animateChanges = true;
     startTimerHz (60);                   // (the animations' clock: the reference's stripe never repeats a frame in a film at 36
@@ -308,6 +311,22 @@ void ScorpiusEditor::parameterChanged (const String& pid, float)
     if (pid == sc::id::inputGain) inputGainChanged.store (true);
     else if (pid == sc::id::outputGain) outputGainChanged.store (true);
     else paramsChanged.store (true);
+}
+
+// A state the host loaded while the editor is open (a preset recall, an undo): everything the constructor read once
+// is read again, on the message thread
+void ScorpiusEditor::takeStateLoad()
+{
+    const int loads = proc.stateLoads.load();
+    if (loads == shownStateLoads) return;
+    shownStateLoads = loads;
+    ioLinkButton.active = proc.ioLink.load();
+    sidechain.external = proc.sidechainExternal.load();
+    compare.slot = proc.compareSlot();
+    presetBox.text = proc.presets.currentName();
+    if (std::abs (proc.uiScale.load() - scale) > 1.0e-4f) setUiScale (proc.uiScale.load());
+    updateFromParams();
+    repaint();
 }
 
 void ScorpiusEditor::takeParameterChanges()
@@ -448,6 +467,7 @@ String ScorpiusEditor::caption (const Slider& k, const String& name) const
 void ScorpiusEditor::timerCallback()
 {
     if (getProperties().getWithDefault ("liveResize", false) && Time::getMillisecondCounter() - lastResizeMs > 150) endLiveResize();
+    takeStateLoad();
     takeParameterChanges();
     if (frozen) return;
     inMeter[0].update (proc.inMeter.left);

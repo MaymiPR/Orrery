@@ -95,6 +95,8 @@ private:
     // by the timer on the message thread
     std::atomic<bool> paramsChanged { false }, inputGainChanged { false }, outputGainChanged { false };
     void takeParameterChanges();
+    void takeStateLoad();
+    int shownStateLoads = 0;
 
     ScorpiusProcessor& proc;
     Content content { *this };

@@ -268,6 +268,37 @@ static void testDamagedStateIsRefused()
     CHECK (before == after);
 }
 
+// An open editor follows a state the host loads (a preset recall, an undo): its size and its top bar, which shows the
+// compare slot, the preset, INT / EXT, I/O LINK and the scale, are those of an editor opened after the load
+static void testEditorFollowsStateLoad()
+{
+    PositronProcessor source;
+    source.ioLink = true;
+    source.sidechainExternal = true;
+    source.uiScale = 1.25f;
+    juce::MemoryBlock state;
+    source.getStateInformation (state);
+    PositronProcessor p;
+    auto tick = [] (juce::AudioProcessorEditor* e)
+    {
+        if (auto* typed = dynamic_cast<PositronEditor*> (e)) ((juce::Timer*) typed)->timerCallback();      // the timer is a private base
+    };
+    std::unique_ptr<juce::AudioProcessorEditor> open (p.createEditor());
+    tick (open.get());
+    p.setStateInformation (state.getData(), (int) state.getSize());
+    tick (open.get());
+    std::unique_ptr<juce::AudioProcessorEditor> fresh (p.createEditor());
+    tick (fresh.get());
+    CHECK (open->getWidth() == fresh->getWidth() && open->getHeight() == fresh->getHeight());
+    const juce::Rectangle<int> bar (0, 0, juce::jmin (open->getWidth(), fresh->getWidth()), 30);
+    const auto a = open->createComponentSnapshot (bar), b = fresh->createComponentSnapshot (bar);
+    bool same = a.getWidth() == b.getWidth() && a.getHeight() == b.getHeight();
+    for (int y = 0; same && y < a.getHeight(); ++y)
+        for (int x = 0; same && x < a.getWidth(); ++x)
+            same = a.getPixelAt (x, y) == b.getPixelAt (x, y);
+    CHECK (same);
+}
+
 static void testBypassIsDelayedInput()
 {
     std::unique_ptr<PositronProcessor> p (makeProcessor (48000.0, 256));
@@ -595,6 +626,7 @@ int main (int argc, char** argv)
     testStateScaleIsLimited();
     testEmptyBlock();
     testLowRates();
+    testEditorFollowsStateLoad();
     testNonFiniteInputDoesNotLatch();
     testDamagedStateIsRefused();
     testLinkKeepsInputUnderOutputAutomation();

@@ -399,6 +399,37 @@ static void testDamagedStateIsRefused()
     CHECK (before == after);
 }
 
+// An open editor follows a state the host loads (a preset recall, an undo): its size and its top bar, which shows the
+// compare slot, the preset, INT / EXT, I/O LINK and the scale, are those of an editor opened after the load
+static void testEditorFollowsStateLoad()
+{
+    WraithProcessor source;
+    source.ioLink = true;
+    source.sidechainExternal = true;
+    source.uiScale = 1.25f;
+    MemoryBlock state;
+    source.getStateInformation (state);
+    WraithProcessor p;
+    auto tick = [] (AudioProcessorEditor* e)
+    {
+        if (auto* typed = dynamic_cast<WraithEditor*> (e)) ((Timer*) typed)->timerCallback();      // the timer is a private base
+    };
+    std::unique_ptr<AudioProcessorEditor> open (p.createEditor());
+    tick (open.get());
+    p.setStateInformation (state.getData(), (int) state.getSize());
+    tick (open.get());
+    std::unique_ptr<AudioProcessorEditor> fresh (p.createEditor());
+    tick (fresh.get());
+    CHECK (open->getWidth() == fresh->getWidth() && open->getHeight() == fresh->getHeight());
+    const Rectangle<int> bar (0, 0, jmin (open->getWidth(), fresh->getWidth()), 30);
+    const auto a = open->createComponentSnapshot (bar), b = fresh->createComponentSnapshot (bar);
+    bool same = a.getWidth() == b.getWidth() && a.getHeight() == b.getHeight();
+    for (int y = 0; same && y < a.getHeight(); ++y)
+        for (int x = 0; same && x < a.getWidth(); ++x)
+            same = a.getPixelAt (x, y) == b.getPixelAt (x, y);
+    CHECK (same);
+}
+
 static void testSidechainWithoutBus()
 {
     // EXT with the side-chain bus not connected keeps listening to the input: the same output as INT
@@ -434,6 +465,7 @@ int main()
     testCompare();
     testIoLink();
     testTailLength();
+    testEditorFollowsStateLoad();
     testNonFiniteInputDoesNotLatch();
     testDamagedStateIsRefused();
     testReverbRingIsDropped();

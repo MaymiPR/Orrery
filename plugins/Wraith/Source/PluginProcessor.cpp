@@ -201,6 +201,7 @@ void WraithProcessor::setStateInformation (const void* data, int size)
             slotUsed[slot] = true;
             slotUsed[1 - slot] = other.isValid();
             slots[1 - slot] = other.isValid() ? other.createCopy() : slots[slot].createCopy();
+            ++stateLoads;
         }
 }
 

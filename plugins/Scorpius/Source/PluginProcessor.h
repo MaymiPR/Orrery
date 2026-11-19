@@ -59,6 +59,11 @@ public:
     // Sidechain INT / EXT (ours, as Positron's top bar; the reference has no side-chain): EXT takes the
     // compressor's detector from the side-chain bus instead of the signal it compresses
     std::atomic<bool> sidechainExternal { false };
+    // counted up by every state the host loads: an open editor compares it with the count it last showed
+    std::atomic<int> stateLoads { 0 };
+    // the editor changed a part of the state that is no parameter (the scale, the link, INT / EXT, a compare copy):
+    // the host marks its project changed
+    void stateEdited() { updateHostDisplay (ChangeDetails().withNonParameterStateChanged (true)); }
 
     // meters: input (after the input gain) and output, L R; the compression module's gain reduction (positive dB)
     orrery::LevelMeter inMeter, outMeter;

@@ -70,6 +70,11 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   hosts too; a block longer than announced no longer allocates for the input meters.
 - **Scorpius:** the wide vector code runs only where the operating system saves its registers; the parameter
   values are no longer looked up by name in every block.
+- **An open editor after a preset recall or an undo in the host:** the A / B slot, the preset name, INT / EXT,
+  I/O LINK and the scale now follow the loaded state at once (they kept their old values until the editor was
+  reopened). Changing INT / EXT or I/O LINK, or copying A to B, marks the host's project as changed.
+- **A preset saved under a name with a character a file cannot hold:** the menu shows the name the file got, so
+  previous and next step from it.
 - **Low sample rates:** Positron no longer crashes when prepared at a host rate of 34 kHz or less with
   oversampling on, and renders finite audio down to 8 kHz at every ratio; Scorpius reports its real delay under
   about 30 kHz (22.05 kHz: 24 samples, where it reported 19). Nothing changes at 44.1 kHz and above.
