@@ -19,6 +19,7 @@ import scipy.signal as sg
 import sc_ref as o
 import null_chain as C
 import null_modules as N
+import probe_autom as A
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RESULTS = os.path.join(HERE, 'results.json')
@@ -106,9 +107,11 @@ def run(plugin):
     for name, spec in (('default', {}), ('drive alone', dict(params=o.ONLY('drive', hipass=1)))):
         res['quiet'][name] = dict(zip(X, nulls([dict(x=x, **spec) for x in X.values()], plugin)))
         print(f'quiet {name:12s}', '  '.join(f'{v:7.1f}' for v in res['quiet'][name].values()), flush=True)
+    res['quiet']['grit only'] = dict(zip(X, nulls([dict(x=x, **C.SETTINGS['grit only']) for x in X.values()], plugin)))
     for name, spec in N.CASES.items():
         res['modules'][name] = dict(zip(sig, nulls([dict(x=x, **spec) for x in sig.values()], plugin)))
         print(f'module {name:12s}', '  '.join(f'{v:7.1f}' for v in res['modules'][name].values()), flush=True)
+    res['autom'] = A.table(plugin=plugin)
     return res
 
 
@@ -143,23 +146,30 @@ Where the shared expander acts (below about -58 dBFS peak; MEASUREMENTS.md 3): t
 noise. The expander reads the end of the group and its mid, starts open when created with lift on, and lift gives no
 DC on silence:"""
 
-# The module rows that come from cases of their own (null_modules.py's sub, harmonics, loud, lift, drive, grit and low
-# runs), the learned blocks, the automation table (probe_autom.py), the conclusions and the CPU figures.
-MODULE_ROWS = """| sub | -65 … -72 |
-| harmonics (learned), amount 1 / 0.8 / 0.6 / 0.3 | -50 … -65 / -55 … -71 / -59 … -67 / -66 … -67 |
-{compression}
-| loud, level 1 | -31 … -39 |
-| lift (learned) | -43.5 … -51.5 |
-| drive colour a, hi-pass on (learned, the default) | -25.9 … -35.6 |
-| drive colour a, hi-pass off (learned) | -25.9 … -36.3 |
-| grit (learned), level 1 / 0.731 | -27 … -31 / -33 … -37 |
-| low, tones and chords | -38 … -46 |
-| low, music | about 0 (the octave's polarity slips against the reference's) |"""
+def module_rows(m, comp):
+    """the rows of "Module by module" after the EQ's, from the module cases of null_modules.py"""
+    row = lambda title, *names: f'| {title} | ' + ' / '.join(span(m[n].values(), 1) for n in names) + ' |'
+    return '\n'.join([
+        row('sub, level 1', 'sub 1'),
+        row('harmonics (learned), amount 1 / 0.8 / 0.6 / 0.3', 'harm 1', 'harm 0.8', 'harm 0.6', 'harm 0.3'),
+        comp,
+        row('loud, level 1', 'loud 1'),
+        row('lift (learned), amount 1', 'lift 1'),
+        row('drive colour a, hi-pass on (learned, the default)', 'drive a hp on'),
+        row('drive colour a, hi-pass off (learned)', 'drive a hp off'),
+        row('grit (learned), level 1 / 0.731', 'grit 1', 'grit 0.731'),
+        row('low, level 1 (not a null: the octave keeps its shape and level, its polarity slips against the reference\'s)', 'low 1'),
+        '| low, tones and chords | -38 … -46 (measured with an earlier build and typed in: no published result file) |'])
 
-GRIT = """\
-The preset "grit only" on the same quiet signals nulls at -62 … -65 dB (-36 dB on the track at -60), because its
-models leave no DC on silence (-45 … -58 with models that do). These figures were measured with an earlier build
-and are typed in: no published result file backs them yet."""
+
+def autom_table(a):
+    """the automation table from probe_autom.table()"""
+    rows = ['| Change | Around the jumps, block 512 (dB) | Block 64 (dB) | Steady, block 512 (dB) |', '|---|---|---|---|']
+    for name, row in a.items():
+        b, s = row['512'], row['64']
+        rows.append(f"| {A.title(name)} | {b['jump1']:.1f} / {b['jump2']:.1f} | {s['jump1']:.1f} / {s['jump2']:.1f} | {cell(b['steady'])} |")
+    return '\n'.join(rows)
+
 
 NOTES = """\
 The learned drive models on held-out pieces of their training material (up to +4 dBFS peak), mean (loudest piece):
@@ -176,23 +186,13 @@ a second pass the same way: -35.4 (-26.1) held out, hi-pass off.
 ## Automation
 
 A parameter jumps at 1 s and back at 2 s on the drums at -12 dB, one module on (`python nulltest/probe_autom.py`):
-the null in the 0.15 s around each jump, at host blocks of 512 / 64 samples. Each cell reads without → with the
-reference's control rate (chunked amount smoothing, switches at the block start; MEASUREMENTS.md 12), modules switched
-on starting from silence with the expander closed (MEASUREMENTS.md 3, 12) and the expander reading the end of the group
-and its mid. For comparison the same setting held still leaves the "steady" value. The table was measured with an
-earlier build and is typed in: no published result file backs it yet.
+the residual in the 0.15 s around the jump and around the jump back, at host blocks of 512 and 64 samples, and in the
+same window of the stretch between them, where the setting is held (a module switched off there passes its input, as
+the reference's does: exact). Scorpius follows the reference's control rate
+(chunked amount smoothing, switches at the block start; MEASUREMENTS.md 12), switches a module on from silence with
+the expander closed (MEASUREMENTS.md 3, 12) and reads the expander at the end of the group and its mid.
 
-| Change | Around the jumps, block 512 (dB) | Block 64 (dB) | Steady |
-|---|---|---|---|
-| compression amount 0.2 ↔ 0.9 | -41.7 / -40.1 → -60.4 / -60.5 | -46.6 / -42.1 → -60.5 / -59.3 | -61.4 |
-| lift amount 0.2 ↔ 0.9 | -43.3 / -37.4 → -48.9 / -57.7 | -44.8 / -41.5 → -48.9 / -55.3 | -51.7 |
-| harmonics amount 0.2 ↔ 0.9 | -23.5 / -19.7 → -33.6 / -31.5 | -22.9 / -25.4 → -29.4 / -28.9 | -68.5 |
-| compression off / on | -28.6 / -22.2 → -70.4 / -59.3 | -28.5 / -28.7 → -70.0 / -57.6 | |
-| lift off / on | -28.7 / -19.8 → -61.3 / -53.9 | -29.3 / -26.0 → -61.3 / -52.7 | |
-| harmonics off / on | -22.8 / -27.4 → -78.4 / -69.0 | -25.5 / -29.3 → -78.2 / -70.1 | |
-| EQ off / on | -23.6 / -29.6 → -54.0 / -53.7 | -27.3 / -25.7 → -54.0 / -54.6 | |
-| drive off / on | -18.6 / -8.3 → -43.0 / -30.8 | -16.1 / -8.2 → -42.2 / -28.2 | |
-| EQ 1 kHz 0.6 ↔ 4.8 dB | -43.8 / -43.1 (unchanged) | -42.9 / -49.9 | -52.7 |
+{autom}
 
 ## What the numbers say
 
@@ -231,13 +231,52 @@ def results_for_report():
     return RESULTS
 
 
+def extra_sections():
+    """The track and the stress sections, from results_track.json and results_stress.json: the published copies
+    (measurements/Scorpius/nulltest/), else the local ones; nothing for a file that is in neither place."""
+    def load(name):
+        for folder in (os.path.join(o.ROOT, 'measurements', 'Scorpius', 'nulltest'), HERE):
+            if os.path.exists(os.path.join(folder, name)):
+                return json.load(open(os.path.join(folder, name)))
+        return None
+    words = lambda vals: (f'{sum(1 for v in vals if v < -60)} a null, {sum(1 for v in vals if -60 <= v < -40)} close, '
+                          f'{sum(1 for v in vals if -40 <= v < -20)} a model, {sum(1 for v in vals if v >= -20)} not a null')
+    out = []
+    tr = load('results_track.json')
+    if tr:
+        out += ['## A mastered track', '',
+                'A demo track (a loud, dense future-house mix; local only, not in the repository) through the reference and the built VST3 at the track\'s own rate, block 512, with the settings a user would try (`python nulltest/null_track.py`). The worst second is the loudest part.', '',
+                '| Setting | Residual (dB) | Worst second (dB) |', '|---|---|---|']
+        out += [f"| {name} | {v['residual_dB']} | {v['worst_second_dB']} |" for name, v in tr.items()]
+        out += ['', 'By the scale: ' + words([v['residual_dB'] for v in tr.values()]) + '.', '']
+    st = load('results_stress.json')
+    if st:
+        vals = list(st.values())
+        out += ['## Stress tests', '',
+                f'`python nulltest/null_stress.py`: {len(vals)} cases over the settings, levels, signals, parameter automation, sample',
+                f'rates and block sizes. Median {np.median(vals):.1f} dB, worst {max(vals):.1f} dB; by the scale: {words(vals)}.', '',
+                '| Run | Group | Cases | Median (dB) | Worst (dB), case |', '|---|---|---|---|---|']
+        groups = {}
+        for key, v in st.items():
+            run, group, case = key.split(' | ')
+            groups.setdefault((run, group), []).append((v, case))
+        for (run, group), items in groups.items():
+            worst = max(items)
+            out.append(f'| {run} | {group} | {len(items)} | {np.median([v for v, _ in items]):.1f} | {worst[0]:.1f}, {worst[1]} |')
+        first = next(iter(groups))[0]
+        out += ['', f'Every case of the run "{first}":', '', '| Group | Case | Residual (dB) |', '|---|---|---|']
+        out += [f"| {key.split(' | ')[1]} | {key.split(' | ')[2]} | {v:.2f} |" for key, v in st.items() if key.startswith(first + ' | ')]
+        out.append('')
+    return out
+
+
 def scale_line(res):
     """the cases of the published tables by the scale's four words"""
     vals = [v for group in ('presets', 'quiet', 'modules') for row in res[group].values() for v in row.values()]
     n = lambda lo, hi: sum(1 for v in vals if lo <= v < hi)
     return ('The words used for a residual: a null below -60 dB, close from -40 to -60 dB, a model from -20 to -40 dB, '
             f'not a null above -20 dB. Of the {len(vals)} measured cases of the three tables read from the results '
-            f'(presets, quiet material, the EQ and compression rows), {n(-1e9, -60)} are a null, {n(-60, -40)} close, '
+            f'(presets, quiet material, the modules), {n(-1e9, -60)} are a null, {n(-60, -40)} close, '
             f'{n(-40, -20)} a model and {n(-20, 1e9)} not a null.')
 
 
@@ -254,18 +293,17 @@ def report(res):
     rows += ['', QUIET_TEXT, '', '| Signal | default | drive colour a alone (hi-pass on) |', '|---|---|---|']
     for k, title in QUIET_TITLES.items():
         rows.append(f"| {title} | {q['default'][k]:.1f} | {q['drive alone'][k]:.1f} |")
-    rows += ['', GRIT]
+    rows += ['', f'The preset "grit only" on the same quiet signals: {span(q["grit only"].values(), 1)} dB.']
     m = res['modules']
     one = [v for n in ('eq 1k 6', 'eq 40 6', 'eq 100 6', 'eq 3k 6', 'eq 10k 6') for v in m[n].values()]
     comp = (f"| compression, mode b / a (the gain corrected by a learned model) | {span(m['comp b'].values(), 1)} / "
             f"{span(m['comp a'].values(), 1)} |")
     rows += ['', '## Module by module', '',
-             "Each module alone (the others off with the reference's own power buttons), on the same four signals. The EQ",
-             'and compression rows are read from the published results; the other rows were measured with earlier builds',
-             'and are typed in, with no published result file behind them yet:', '',
+             "Each module alone (the others off with the reference's own power buttons), on the same four signals:", '',
              '| Module | Residual (dB) |', '|---|---|',
              f'| EQ, one band at +6 dB | {span(one)} |', f"| EQ, all bands at +4 dB | {span(m['eq all 4'].values())} |",
-             MODULE_ROWS.format(compression=comp), '', NOTES, '']
+             module_rows(m, comp), '', NOTES.replace('{autom}', autom_table(res['autom'])), '']
+    rows += extra_sections()
     open(REPORT, 'w', encoding='utf-8', newline='\n').write('\n'.join(rows))
     print('wrote', REPORT)
 

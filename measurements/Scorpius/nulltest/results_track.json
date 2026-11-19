@@ -1,0 +1,72 @@
+{
+ "default": {
+  "residual_dB": -25.39,
+  "worst_second_dB": -20.32,
+  "worst_at_s": 30
+ },
+ "preset colour c": {
+  "residual_dB": -23.99,
+  "worst_second_dB": -16.93,
+  "worst_at_s": 41
+ },
+ "preset no compression": {
+  "residual_dB": -25.06,
+  "worst_second_dB": -15.65,
+  "worst_at_s": 67
+ },
+ "preset loud path": {
+  "residual_dB": -25.42,
+  "worst_second_dB": -20.54,
+  "worst_at_s": 30
+ },
+ "preset deep low end": {
+  "residual_dB": -25.59,
+  "worst_second_dB": -20.22,
+  "worst_at_s": 30
+ },
+ "preset all parallel": {
+  "residual_dB": -25.35,
+  "worst_second_dB": -20.53,
+  "worst_at_s": 30
+ },
+ "preset grit only": {
+  "residual_dB": -33.83,
+  "worst_second_dB": -25.15,
+  "worst_at_s": 14
+ },
+ "preset all off": {
+  "residual_dB": -57.27,
+  "worst_second_dB": -46.21,
+  "worst_at_s": 68
+ },
+ "drive off": {
+  "residual_dB": -41.79,
+  "worst_second_dB": -29.78,
+  "worst_at_s": 67
+ },
+ "harm off": {
+  "residual_dB": -25.38,
+  "worst_second_dB": -20.08,
+  "worst_at_s": 30
+ },
+ "lift off": {
+  "residual_dB": -25.18,
+  "worst_second_dB": -19.95,
+  "worst_at_s": 30
+ },
+ "eq off": {
+  "residual_dB": -25.39,
+  "worst_second_dB": -20.32,
+  "worst_at_s": 30
+ },
+ "comp switched off at 20 s, on at 40 s": {
+  "residual_dB": -25.29,
+  "worst_second_dB": -19.05,
+  "worst_at_s": 30
+ },
+ "drive switched off at 20 s, on at 40 s": {
+  "residual_dB": -27.97,
+  "worst_second_dB": -22.75,
+  "worst_at_s": 15
+ }
+}

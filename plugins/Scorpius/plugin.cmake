@@ -94,6 +94,9 @@ if(ORRERY_TOOLS)
     target_link_libraries(ScRender PRIVATE OrreryShared juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags)
     if(WIN32)
         add_dependencies(ci_targets ScorpiusSnapshot)      # ci.yml's screenshot artefact is made on Windows
+        # the tool fails on a picture it cannot write (a folder that is not there)
+        add_test(NAME ScorpiusSnapshotCannotWrite COMMAND ScorpiusSnapshot no-such-folder/out.png)
+        set_tests_properties(ScorpiusSnapshotCannotWrite PROPERTIES WILL_FAIL TRUE)
     endif()
     add_dependencies(ci_targets ScRender)          # the render regression
     # the renderer refuses what it cannot do: a jobs file that is not there ends with a non-zero exit code

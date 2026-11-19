@@ -137,7 +137,8 @@ int main (int argc, char** argv)
     juce::File f (juce::File::getCurrentWorkingDirectory().getChildFile (argv[1]));
     f.deleteFile();
     juce::FileOutputStream os (f);
-    juce::PNGImageFormat().writeImageToStream (img, os);
+    const bool written = os.openedOk() && juce::PNGImageFormat().writeImageToStream (img, os);
     ed.reset();
+    if (! written) { std::cerr << "WraithSnapshot: cannot write " << f.getFullPathName() << std::endl; return 1; }
     return 0;
 }

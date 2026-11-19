@@ -252,6 +252,45 @@ def results_for_report():
     return RESULTS
 
 
+def extra_sections():
+    """The track and the stress sections, from results_track.json and results_stress.json: the published copies
+    (measurements/Wraith/nulltest/), else the local ones; nothing for a file that is in neither place."""
+    def load(name):
+        for folder in (os.path.join(h.ROOT, 'measurements', 'Wraith', 'nulltest'), HERE):
+            if os.path.exists(os.path.join(folder, name)):
+                return json.load(open(os.path.join(folder, name)))
+        return None
+    words = lambda vals: (f'{sum(1 for v in vals if v < -60)} a null, {sum(1 for v in vals if -60 <= v < -40)} close, '
+                          f'{sum(1 for v in vals if -40 <= v < -20)} a model, {sum(1 for v in vals if v >= -20)} not a null')
+    out = []
+    tr = load('results_track.json')
+    if tr:
+        out += ['## A mastered track', '',
+                'A demo track (a loud, dense future-house mix; local only, not in the repository) through the reference and the built VST3 at the track\'s own rate, block 512 (`python nulltest/null_track.py`). The track is a full mix, not a vocal: a stress case for a vocal chain.', '',
+                '| Setting | Residual (dB) | Worst second (dB) |', '|---|---|---|']
+        out += [f"| {name} | {v['residual_dB']} | {v['worst_second_dB']} |" for name, v in tr.items()]
+        out += ['', 'By the scale: ' + words([v['residual_dB'] for v in tr.values()]) + '.', '']
+    st = load('results_stress.json')
+    if st:
+        vals = list(st.values())
+        out += ['## Stress tests', '',
+                f'`python nulltest/null_stress.py`: {len(vals)} cases over the settings, levels, signals, parameter automation, sample',
+                f'rates and block sizes. Median {np.median(vals):.1f} dB, worst {max(vals):.1f} dB; by the scale: {words(vals)}.', '',
+                '| Run | Group | Cases | Median (dB) | Worst (dB), case |', '|---|---|---|---|---|']
+        groups = {}
+        for key, v in st.items():
+            run, group, case = key.split(' | ')
+            groups.setdefault((run, group), []).append((v, case))
+        for (run, group), items in groups.items():
+            worst = max(items)
+            out.append(f'| {run} | {group} | {len(items)} | {np.median([v for v, _ in items]):.1f} | {worst[0]:.1f}, {worst[1]} |')
+        first = next(iter(groups))[0]
+        out += ['', f'Every case of the run "{first}":', '', '| Group | Case | Residual (dB) |', '|---|---|---|']
+        out += [f"| {key.split(' | ')[1]} | {key.split(' | ')[2]} | {v:.2f} |" for key, v in st.items() if key.startswith(first + ' | ')]
+        out.append('')
+    return out
+
+
 def report(results):
     sig_desc = '; '.join(f'**{k}**: {d}' for k, (_, d) in SIGNALS.items())
     rows = ['# Null tests', '',
@@ -290,6 +329,7 @@ def report(results):
              f'not a null above -20 dB. Of the {len(vals)} cases, {n(-1e9, -60)} are a null, {n(-60, -40)} close, '
              f'{n(-40, -20)} a model and {n(-20, 1e9)} not a null.')
     rows += ['', '## What the numbers say', '', textwrap.fill(scale, 118), '', notes, '']
+    rows += extra_sections()
     open(REPORT, 'w', encoding='utf-8', newline='\n').write('\n'.join(rows))
     print('wrote', REPORT)
 

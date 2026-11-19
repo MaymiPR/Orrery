@@ -111,6 +111,9 @@ if(ORRERY_TOOLS)
     endforeach()
     if(WIN32)
         add_dependencies(ci_targets WraithSnapshot)      # ci.yml's screenshot artefact is made on Windows
+        # the tool fails on a picture it cannot write (a folder that is not there)
+        add_test(NAME WraithSnapshotCannotWrite COMMAND WraithSnapshot no-such-folder/out.png)
+        set_tests_properties(WraithSnapshotCannotWrite PROPERTIES WILL_FAIL TRUE)
     endif()
     add_dependencies(ci_targets WrRender)          # the render regression
     # the renderer refuses what it cannot do: a jobs file that is not there ends with a non-zero exit code

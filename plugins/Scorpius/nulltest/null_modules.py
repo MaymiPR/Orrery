@@ -32,6 +32,18 @@ CASES = {
     'eq all 4': dict(params=EQ(**{'40Hz': 4, '100Hz': 4, '1kHz': 4, '3kHz': 4, '10kHz': 4})),
     'comp a': dict(params={**o.ONLY('comp'), 'Comp Amount': 1}, hidden={'ids.compression.mode': 'Mode A'}),
     'comp b': dict(params={**o.ONLY('comp'), 'Comp Amount': 1}, hidden={'ids.compression.mode': 'Mode B'}),
+    'sub 1': dict(params={**o.ONLY('sub'), 'Par Sub Level': 1}),
+    'harm 1': dict(params={**o.ONLY('harm'), 'Harm Amount': 1}),
+    'harm 0.8': dict(params={**o.ONLY('harm'), 'Harm Amount': 0.8}),
+    'harm 0.6': dict(params={**o.ONLY('harm'), 'Harm Amount': 0.6}),
+    'harm 0.3': dict(params={**o.ONLY('harm'), 'Harm Amount': 0.3}),
+    'loud 1': dict(params={**o.ONLY('loud'), 'Par Loud Level': 1}),
+    'lift 1': dict(params={**o.ONLY('lift'), 'Lift Amount': 1}),
+    'drive a hp on': dict(params=o.ONLY('drive', hipass=1)),
+    'drive a hp off': dict(params=o.ONLY('drive', hipass=0)),
+    'grit 1': dict(params={**o.ONLY('grit'), 'Par Grit Level': 1}),
+    'grit 0.731': dict(params={**o.ONLY('grit'), 'Par Grit Level': 0.731}),
+    'low 1': dict(params={**o.ONLY('low'), 'Par Low Level': 1}),
 }
 
 
