@@ -1,0 +1,101 @@
+{
+ "target": "Positron",
+ "settings": {
+  "params": {},
+  "norm": {},
+  "isolate": null,
+  "tune": null
+ },
+ "ours": "ours",
+ "fs": 48000,
+ "block": 512,
+ "skip_s": 2.0,
+ "secs": 6.0,
+ "label": "startup",
+ "time": "2026-11-18 21:13",
+ "cases": {
+  "noise": {
+   "residual_db": -60.3,
+   "lag": 0,
+   "residual_aligned_db": -60.3,
+   "worst_second_db": -60.04,
+   "worst_at_s": 3,
+   "bands_db": {
+    "63": -64.7,
+    "125": -66.2,
+    "250": -55.2,
+    "500": -54.0,
+    "1k": -54.6,
+    "2k": -57.8,
+    "4k": -65.4,
+    "8k": -61.9,
+    "16k": -62.0
+   },
+   "render_s": 2.1
+  },
+  "sweep": {
+   "residual_db": -60.2,
+   "lag": 0,
+   "residual_aligned_db": -60.2,
+   "worst_second_db": -55.85,
+   "worst_at_s": 3,
+   "bands_db": {
+    "63": -59.6,
+    "125": -61.7,
+    "250": -68.4,
+    "500": -72.9,
+    "1k": -70.1,
+    "2k": -68.7,
+    "4k": -59.3,
+    "8k": -55.9,
+    "16k": -55.8
+   },
+   "render_s": 2.1
+  },
+  "drums": {
+   "residual_db": -68.36,
+   "lag": 0,
+   "residual_aligned_db": -68.36,
+   "worst_second_db": -68.36,
+   "worst_at_s": 0,
+   "bands_db": {
+    "63": -68.8,
+    "125": -72.3,
+    "250": -66.7,
+    "500": -59.3,
+    "1k": -60.5,
+    "2k": -61.5,
+    "4k": -71.6,
+    "8k": -79.9,
+    "16k": -80.1
+   },
+   "render_s": 2.0
+  },
+  "music": {
+   "residual_db": -75.01,
+   "lag": 0,
+   "residual_aligned_db": -75.01,
+   "worst_second_db": -73.22,
+   "worst_at_s": 0,
+   "bands_db": {
+    "63": -78.9,
+    "125": -65.7,
+    "250": -68.1,
+    "500": -65.4,
+    "1k": -66.7,
+    "2k": -67.3,
+    "4k": -73.8,
+    "8k": -78.1,
+    "16k": -77.8
+   },
+   "render_s": 2.1
+  }
+ },
+ "median_db": -64.33,
+ "worst_db": -60.2,
+ "worst_case": "sweep",
+ "commit": "2403b5c",
+ "dirty": false,
+ "note": "the first record: the start-up settings, the built VST3",
+ "recorded": "2026-11-18 21:14"
+}
