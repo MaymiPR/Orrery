@@ -1,0 +1,282 @@
+[
+ {
+  "name": "Input Gain",
+  "law": {
+   "law": "linear",
+   "a": -12.0,
+   "b": 24.0
+  },
+  "worst_error": 3.552713678800501e-15,
+  "resolution": 0.001,
+  "lo": -12.0,
+  "hi": 12.0,
+  "descending": false,
+  "step_seen": 0.5999999999999996,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.195207
+  },
+  "monotonic": true
+ },
+ {
+  "name": "Harm Amount",
+  "law": {
+   "law": "linear",
+   "a": 1.7496778698641387e-16,
+   "b": 1.0
+  },
+  "worst_error": 2.220446049250313e-16,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 1.0,
+  "descending": false,
+  "step_seen": 0.02499999999999991,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.008134
+  },
+  "monotonic": true
+ },
+ {
+  "name": "Comp Amount",
+  "law": {
+   "law": "linear",
+   "a": 1.7496778698641387e-16,
+   "b": 1.0
+  },
+  "worst_error": 2.220446049250313e-16,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 1.0,
+  "descending": false,
+  "step_seen": 0.02499999999999991,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.008134
+  },
+  "monotonic": true
+ },
+ {
+  "name": "Lift Amount",
+  "law": {
+   "law": "linear",
+   "a": 1.7496778698641387e-16,
+   "b": 1.0
+  },
+  "worst_error": 2.220446049250313e-16,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 1.0,
+  "descending": false,
+  "step_seen": 0.02499999999999991,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.008134
+  },
+  "monotonic": true
+ },
+ {
+  "name": "EQ 40Hz",
+  "law": {
+   "law": "linear",
+   "a": 1.0667105518420252e-15,
+   "b": 5.999999999999999
+  },
+  "worst_error": 1.1102230246251565e-15,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 6.0,
+  "descending": false,
+  "step_seen": 0.14999999999999947,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.048802
+  },
+  "monotonic": true
+ },
+ {
+  "name": "EQ 100Hz",
+  "law": {
+   "law": "linear",
+   "a": 1.0667105518420252e-15,
+   "b": 5.999999999999999
+  },
+  "worst_error": 1.1102230246251565e-15,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 6.0,
+  "descending": false,
+  "step_seen": 0.14999999999999947,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.048802
+  },
+  "monotonic": true
+ },
+ {
+  "name": "EQ 1kHz",
+  "law": {
+   "law": "linear",
+   "a": 1.0667105518420252e-15,
+   "b": 5.999999999999999
+  },
+  "worst_error": 1.1102230246251565e-15,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 6.0,
+  "descending": false,
+  "step_seen": 0.14999999999999947,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.048802
+  },
+  "monotonic": true
+ },
+ {
+  "name": "EQ 3kHz",
+  "law": {
+   "law": "linear",
+   "a": 1.0667105518420252e-15,
+   "b": 5.999999999999999
+  },
+  "worst_error": 1.1102230246251565e-15,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 6.0,
+  "descending": false,
+  "step_seen": 0.14999999999999947,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.048802
+  },
+  "monotonic": true
+ },
+ {
+  "name": "EQ 10kHz",
+  "law": {
+   "law": "linear",
+   "a": 1.0667105518420252e-15,
+   "b": 5.999999999999999
+  },
+  "worst_error": 1.1102230246251565e-15,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 6.0,
+  "descending": false,
+  "step_seen": 0.14999999999999947,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.048802
+  },
+  "monotonic": true
+ },
+ {
+  "name": "Par Sub Level",
+  "law": {
+   "law": "linear",
+   "a": 1.7496778698641387e-16,
+   "b": 1.0
+  },
+  "worst_error": 2.220446049250313e-16,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 1.0,
+  "descending": false,
+  "step_seen": 0.02499999999999991,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.008134
+  },
+  "monotonic": true
+ },
+ {
+  "name": "Par Low Level",
+  "law": {
+   "law": "linear",
+   "a": 1.7496778698641387e-16,
+   "b": 1.0
+  },
+  "worst_error": 2.220446049250313e-16,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 1.0,
+  "descending": false,
+  "step_seen": 0.02499999999999991,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.008134
+  },
+  "monotonic": true
+ },
+ {
+  "name": "Par Loud Level",
+  "law": {
+   "law": "linear",
+   "a": 1.7496778698641387e-16,
+   "b": 1.0
+  },
+  "worst_error": 2.220446049250313e-16,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 1.0,
+  "descending": false,
+  "step_seen": 0.02499999999999991,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.008134
+  },
+  "monotonic": true
+ },
+ {
+  "name": "Par Grit Level",
+  "law": {
+   "law": "linear",
+   "a": 1.7496778698641387e-16,
+   "b": 1.0
+  },
+  "worst_error": 2.220446049250313e-16,
+  "resolution": 0.001,
+  "lo": 0.0,
+  "hi": 1.0,
+  "descending": false,
+  "step_seen": 0.02499999999999991,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.008134
+  },
+  "monotonic": true
+ },
+ {
+  "name": "Output Gain",
+  "law": {
+   "law": "linear",
+   "a": -12.0,
+   "b": 24.0
+  },
+  "worst_error": 3.552713678800501e-15,
+  "resolution": 0.001,
+  "lo": -12.0,
+  "hi": 12.0,
+  "descending": false,
+  "step_seen": 0.5999999999999996,
+  "candidates": {
+   "linear": 0.0,
+   "power": 0.0,
+   "exp": 0.195207
+  },
+  "monotonic": true
+ }
+]

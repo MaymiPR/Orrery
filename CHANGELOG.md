@@ -21,6 +21,8 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 - **Null-test scripts:** the harnesses are `po_ref.py`, `sc_ref.py` and `wr_ref.py`, the helpers end in `_lib.py`, the
   scripts that write a plug-in's sources sit in `plugins/<Id>/scripts/`, and Scorpius's and Wraith's NULLTESTS.md are
   written by `nulltest.py --report` like Positron's.
+- **The standard's per-plug-in files:** each plug-in carries its parameter dump, parameter table, taper fits,
+  classification sheet and target file under `nulltest/`.
 - **Source layout:** every plug-in's DSP is plain C++: Wraith's reverb convolution and Scorpius's long filters run on
   the suite's own FFT (`shared/dsp/Fft.h`) in the order of operations they had, so the renders are unchanged to the
   last bit; Scorpius's editor analyses sit beside its processor; Positron's band gain computer for the fits is a null

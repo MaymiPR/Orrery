@@ -1,0 +1,21 @@
+{
+  "name": "Wraith",
+  "refrender": "{orrery}/build/RefRender_artefacts/Release/RefRender.exe",
+  "ref": {"vst3": "{wraith_ref_vst3}", "name": "{wraith_ref_name}"},
+  "ours": {"vst3": "{orrery}/build/Wraith_artefacts/Release/VST3/Wraith.vst3", "name": "Wraith"},
+  "model": "{orrery}/build/WrRender_artefacts/Release/WrRender.exe",
+  "fs": 48000,
+  "block": 512,
+  "settle_ms": 0,
+  "skip_s": 0.1,
+  "cache": "{orrery}/plugins/Wraith/nulltest/renders/targets_cache",
+  "bypass": "Bypass",
+  "isolation": {
+    "RIDER_ONLY": {"Gain Rider State": 1.0, "Character State": 0.0, "EQ State": 0.0, "Doubler State": 0.0, "Reverb State": 0.0},
+    "CHAR_ONLY": {"Gain Rider State": 0.0, "Character State": 1.0, "EQ State": 0.0, "Doubler State": 0.0, "Reverb State": 0.0},
+    "EQ_ONLY": {"Gain Rider State": 0.0, "Character State": 0.0, "EQ State": 1.0, "Doubler State": 0.0, "Reverb State": 0.0},
+    "DBL_ONLY": {"Gain Rider State": 0.0, "Character State": 0.0, "EQ State": 0.0, "Doubler State": 1.0, "Reverb State": 0.0},
+    "REV_ONLY": {"Gain Rider State": 0.0, "Character State": 0.0, "EQ State": 0.0, "Doubler State": 0.0, "Reverb State": 1.0},
+    "NONE": {"Gain Rider State": 0.0, "Character State": 0.0, "EQ State": 0.0, "Doubler State": 0.0, "Reverb State": 0.0}
+  }
+}

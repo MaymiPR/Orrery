@@ -1,0 +1,25 @@
+{
+  "name": "Scorpius",
+  "refrender": "{orrery}/build/RefRender_artefacts/Release/RefRender.exe",
+  "ref": {"vst3": "{scorpius_ref_vst3}", "name": "{scorpius_ref_name}"},
+  "ours": {"vst3": "{orrery}/build/Scorpius_artefacts/Release/VST3/Scorpius.vst3", "name": "Scorpius"},
+  "model": "{orrery}/build/ScRender_artefacts/Release/ScRender.exe",
+  "fs": 48000,
+  "block": 512,
+  "settle_ms": 400,
+  "skip_s": 0.1,
+  "cache": "{orrery}/plugins/Scorpius/nulltest/renders/targets_cache",
+  "bypass": "Bypass",
+  "isolation": {
+    "DRIVE_ONLY": {"Drive On/Off": 1, "Harm On/Off": 0, "Comp On/Off": 0, "Lift On/Off": 0, "EQ On/Off": 0, "Par Sub On/Off": 0, "Par Low On/Off": 0, "Par Loud On/Off": 0, "Par Grit On/Off": 0},
+    "HARM_ONLY": {"Drive On/Off": 0, "Harm On/Off": 1, "Comp On/Off": 0, "Lift On/Off": 0, "EQ On/Off": 0, "Par Sub On/Off": 0, "Par Low On/Off": 0, "Par Loud On/Off": 0, "Par Grit On/Off": 0},
+    "COMP_ONLY": {"Drive On/Off": 0, "Harm On/Off": 0, "Comp On/Off": 1, "Lift On/Off": 0, "EQ On/Off": 0, "Par Sub On/Off": 0, "Par Low On/Off": 0, "Par Loud On/Off": 0, "Par Grit On/Off": 0},
+    "LIFT_ONLY": {"Drive On/Off": 0, "Harm On/Off": 0, "Comp On/Off": 0, "Lift On/Off": 1, "EQ On/Off": 0, "Par Sub On/Off": 0, "Par Low On/Off": 0, "Par Loud On/Off": 0, "Par Grit On/Off": 0},
+    "EQ_ONLY": {"Drive On/Off": 0, "Harm On/Off": 0, "Comp On/Off": 0, "Lift On/Off": 0, "EQ On/Off": 1, "Par Sub On/Off": 0, "Par Low On/Off": 0, "Par Loud On/Off": 0, "Par Grit On/Off": 0},
+    "SUB_ONLY": {"Drive On/Off": 0, "Harm On/Off": 0, "Comp On/Off": 0, "Lift On/Off": 0, "EQ On/Off": 0, "Par Sub On/Off": 1, "Par Low On/Off": 0, "Par Loud On/Off": 0, "Par Grit On/Off": 0},
+    "LOW_ONLY": {"Drive On/Off": 0, "Harm On/Off": 0, "Comp On/Off": 0, "Lift On/Off": 0, "EQ On/Off": 0, "Par Sub On/Off": 0, "Par Low On/Off": 1, "Par Loud On/Off": 0, "Par Grit On/Off": 0},
+    "LOUD_ONLY": {"Drive On/Off": 0, "Harm On/Off": 0, "Comp On/Off": 0, "Lift On/Off": 0, "EQ On/Off": 0, "Par Sub On/Off": 0, "Par Low On/Off": 0, "Par Loud On/Off": 1, "Par Grit On/Off": 0},
+    "GRIT_ONLY": {"Drive On/Off": 0, "Harm On/Off": 0, "Comp On/Off": 0, "Lift On/Off": 0, "EQ On/Off": 0, "Par Sub On/Off": 0, "Par Low On/Off": 0, "Par Loud On/Off": 0, "Par Grit On/Off": 1},
+    "NONE": {"Drive On/Off": 0, "Harm On/Off": 0, "Comp On/Off": 0, "Lift On/Off": 0, "EQ On/Off": 0, "Par Sub On/Off": 0, "Par Low On/Off": 0, "Par Loud On/Off": 0, "Par Grit On/Off": 0}
+  }
+}
