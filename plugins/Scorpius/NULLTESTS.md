@@ -13,6 +13,10 @@ Reproduce: `python nulltest/nulltest.py` (our processor through tools/ScRender) 
 (the built VST3; the same numbers), then `python nulltest/nulltest.py --report`. The reference renders stay local
 (git-ignored).
 
+The words used for a residual: a null below -60 dB, close from -40 to -60 dB, a model from -20 to -40 dB, not a null
+above -20 dB. Of the 120 measured cases of the three tables read from the results (presets, quiet material, the EQ and
+compression rows), 30 are a null, 35 close, 54 a model and 1 not a null.
+
 ## The whole plug-in: the factory presets
 
 48 kHz (44.1 kHz within 0.3 dB of these, except "all off"):
@@ -54,11 +58,14 @@ DC on silence:
 | pink noise at -78 dBFS RMS | -29.4 | -29.5 |
 
 The preset "grit only" on the same quiet signals nulls at -62 … -65 dB (-36 dB on the track at -60), because its
-models leave no DC on silence (-45 … -58 with models that do).
+models leave no DC on silence (-45 … -58 with models that do). These figures were measured with an earlier build
+and are typed in: no published result file backs them yet.
 
 ## Module by module
 
-Each module alone (the others off with the reference's own power buttons), on the same four signals:
+Each module alone (the others off with the reference's own power buttons), on the same four signals. The EQ
+and compression rows are read from the published results; the other rows were measured with earlier builds
+and are typed in, with no published result file behind them yet:
 
 | Module | Residual (dB) |
 |---|---|
@@ -81,7 +88,7 @@ a fixed filter after it, against WaveNets at -29.7 (-21.8) / -28.3 (-20.5)), col
 (-25.5) (the same kind of network, with the filter for the hi-pass, against WaveNets at -32.1 (-23.6) / -33.6
 (-23.7)), colour c -34.6
 (-25.5) / -36.3 (-25.6). The plug-in runs the recurrent networks as trained: through the plug-in, colour a's capture
-pieces null at -31.9 dB on average (with exact activations the same), where a sigmoid clamped at 0.99995 left -30.3 and
+pieces leave -31.9 dB on average (with exact activations the same), where a sigmoid clamped at 0.99995 left -30.3 and
 the quieter pieces up to 4.5 dB worse (MEASUREMENTS.md 14). A second, finer training pass of colour a's network:
 -32.7 / -32.3 dB through the plug-in, hi-pass off / on, and a third: -33.1 / -32.7. Colour b's network,
 a second pass the same way: -35.4 (-26.1) held out, hi-pass off.
@@ -92,7 +99,8 @@ A parameter jumps at 1 s and back at 2 s on the drums at -12 dB, one module on (
 the null in the 0.15 s around each jump, at host blocks of 512 / 64 samples. Each cell reads without → with the
 reference's control rate (chunked amount smoothing, switches at the block start; MEASUREMENTS.md 12), modules switched
 on starting from silence with the expander closed (MEASUREMENTS.md 3, 12) and the expander reading the end of the group
-and its mid. For comparison the same setting held still nulls at the "steady" value.
+and its mid. For comparison the same setting held still leaves the "steady" value. The table was measured with an
+earlier build and is typed in: no published result file backs it yet.
 
 | Change | Around the jumps, block 512 (dB) | Block 64 (dB) | Steady |
 |---|---|---|---|
@@ -108,18 +116,18 @@ and its mid. For comparison the same setting held still nulls at the "steady" va
 
 ## What the numbers say
 
-- **The fixed parts are close to exact** (single EQ bands, sub, the rate converters: -51 to -110 dB; all five EQ
+- **The fixed parts are close or a null** (single EQ bands, sub, the rate converters: -51 to -110 dB; all five EQ
   bands together -46 to -48 dB): these are the reference's own filters, identified from its responses.
-- **Everything but the drive** nulls at -44 … -51 dB together (the default preset with the drive off): the
+- **Everything but the drive** is close: -44 … -51 dB together (the default preset with the drive off). The
   compressor applies its gain before its filters (as the reference), lift and harmonics are learned (harmonics at
   four amounts, interpolated).
 - **The whole plug-in is limited by the drive**, which the reference runs as a learned model of its own and which
-  Scorpius learns from the reference's input and output: on loud program material the default preset nulls at about
-  -22 to -30 dB, 10 … 12 dB lower at -33 to -37 dB. Loud, dense material is the hard part: a linear filter explains
+  Scorpius learns from the reference's input and output: on loud program material the default preset is a model, not a
+  null: about -22 to -30 dB, 10 … 12 dB lower -33 to -37 dB. Loud, dense material is the hard part: a linear filter explains
   only 3 dB of the drive's output there, and even a model trained on one loud piece alone reaches only -21 (8
   channels) to -26 dB (16) on it.
 - **Above 48 kHz** (88.2, 96, 176.4, 192 kHz) Scorpius runs the reference's own converters, identified from its
-  impulse responses (-73 … -110 dB with everything off); the presets null as at 48 kHz.
+  impulse responses (-73 … -110 dB with everything off); the presets leave what they leave at 48 kHz.
 - **Grit** is learned too (a transient shaper of the mids, each channel by itself), 5 … 9 dB better than a
   hand-made transient shaper; after the compressor on stereo material the reference's grit still differs a little.
 - **Low** matches on tones and chords; on music its octave keeps the right shape and level but its polarity drifts
@@ -130,4 +138,5 @@ and its mid. For comparison the same setting held still nulls at the "steady" va
 60 s of the drum loop, stereo, 48 kHz, one instance, offline, the two plug-ins in the same run: the default preset
 takes 10.6 … 10.8 s of CPU against the reference's 9.1 s (drive alone 4.6 s against 5.7, lift 3.3 against 2.3,
 compression 0.5 against 2.1, grit 2.8 against 4.1). The learned parts run in 8-wide vector registers where the
-processor has AVX.
+processor has AVX. These figures were measured with an earlier build and are typed in: no published result file
+backs them yet.

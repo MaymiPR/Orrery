@@ -34,6 +34,9 @@ Signal list: **pink -18**: pink noise, -18 dBFS RMS; **pink -6**: pink noise, -6
 
 ## What the numbers say
 
+The words used for a residual: a null below -60 dB, close from -40 to -60 dB, a model from -20 to -40 dB, not a
+null above -20 dB. Of the 16 cases above, 13 are a null, 3 close, 0 a model and 0 not a null.
+
 None of these is a perfect null. On program material the full chain lands at -57 to -75 dB, and the
 stress tests below (163 cases over settings, levels, signals, automation, rates and block sizes) have a median of
 -66 dB.
@@ -53,7 +56,7 @@ stress tests below (163 cases over settings, levels, signals, automation, rates 
   the floor set by the reference's own sensitivity: input noise at -80 dBFS moves its output by -57.5 dB
   (MEASUREMENTS.md 4.1).
 - **Parameter changes** follow the reference's control-rate smoothing (MEASUREMENTS.md 5.1): gain, EQ, amount,
-  limiter moves and switching stages on and off null at -53 to -69 dB.
+  limiter moves and switching stages on and off leave -53 to -69 dB.
 - **The built VST3 and the offline renderer give the same numbers**, so these hold for the plug-in itself.
 
 ## A mastered track
@@ -82,7 +85,7 @@ irregular host blocks as FL Studio does, with the same results). The worst secon
 Default settings with the reference switched to 2x / 4x / 8x through its own settings page (then back to 1x) and
 ours forced to the same ratio, at 48, 44.1 and 96 kHz (`python nulltest/null_oversampling.py`). The filters are
 designed per host rate like the reference's (MEASUREMENTS.md 7); with the 48 kHz design at every rate, 44.1 kHz
-drums null at -14 / -11 / -14 dB (2x / 4x / 8x) and 96 kHz at -19 / -37 / -38.
+drums are left at -14 / -11 / -14 dB (2x / 4x / 8x), not a null, and 96 kHz at -19 / -37 / -38.
 
 | Ratio, signal | Residual, ours (dB) |
 |---|---|

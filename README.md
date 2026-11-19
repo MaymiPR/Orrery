@@ -99,14 +99,16 @@ Each plug-in's page covers its controls in detail: [Positron](plugins/Positron#u
 ## How close
 
 The residual is the difference between the original's output and ours, in dB below the original's level. Lower is
-better: -60 dB is inaudible in practice.
+better: -60 dB is inaudible in practice. The pages use four words for a residual: a null below -60 dB, close from
+-40 to -60 dB, a model from -20 to -40 dB, not a null above -20 dB.
 
 | | Positron | Scorpius | Wraith |
 |---|---|---|---|
 | Mastered track, default settings | -49.6 dB | -25.8 dB | not tested (a vocal chain) |
 | Synthetic music / drums, default settings | -57 to -75 dB | -29.7 dB (drums) | -23.6 dB (music), -21.0 dB (drums) |
+| On that scale, default settings | close on the track; close or a null on synthetic material | a model | a model |
 | Best parts | EQ, crossover, signal path: -79 to -87 dB | single EQ bands, sub, rate converters: -51 to -110 dB | gains, EQ, gain rider, reverb: -63 to -143 dB |
-| Weakest part | the character section on loud, dense material (-43 to -48 dB) | the drive on loud, dense material (the reason for the default's -22 to -30 dB) | the character section (a fitted model, -15 to -29 dB) and the doubler fully wet (-11 to -27 dB) |
+| Weakest part | the character section on loud, dense material (-43 to -48 dB, close) | the drive on loud, dense material (the reason for the default's -22 to -30 dB, a model) | the character section (a fitted model, -15 to -29 dB) and the doubler fully wet (-11 to -27 dB): a model, and not a null at their worst |
 
 Every case is listed in each plug-in's NULLTESTS.md ([Positron](plugins/Positron/NULLTESTS.md),
 [Scorpius](plugins/Scorpius/NULLTESTS.md), [Wraith](plugins/Wraith/NULLTESTS.md)), and how the originals were measured in its MEASUREMENTS.md.

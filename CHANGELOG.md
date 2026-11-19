@@ -32,6 +32,9 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   results give (Positron's defaults on synthetic material -57 to -75 dB, Scorpius's default preset on loud material
   -22 to -30 dB, its single EQ bands, sub and rate converters -51 to -110 dB); file names that no longer exist are
   corrected.
+- **Wording of the results:** the pages name a residual by one scale: a null below -60 dB, close from -40 to
+  -60 dB, a model from -20 to -40 dB, not a null above -20 dB. Each NULLTESTS.md counts its cases by it, and the
+  figures that were typed in from earlier builds, with no published result file, are marked as such.
 - **Positron, a call without samples:** a host's call with a block of no samples (a parameter flush) no longer
   divides by zero.
 - **Scorpius, a longer block than announced:** at a sample rate other than 48 kHz a host block longer than the
