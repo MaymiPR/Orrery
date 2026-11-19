@@ -48,9 +48,9 @@ original's own filters and curves, identified from its responses.
 
 ## How close
 
-The fixed parts (single EQ bands, sub, rate converters) null at -51 to -110 dB (all five EQ bands together -46 to
--48 dB), everything but the drive at -44 … -51 dB together, and the whole default preset at -22 to -30 dB on loud
-program material (-33 to -37 dB 10 to 12 dB lower): the
+The fixed parts (single EQ bands, sub, rate converters) leave -51 to -110 dB, close or a null (all five EQ bands
+together -46 to -48 dB, close). Everything but the drive leaves -44 … -51 dB together (close). The whole default
+preset is a model, not a null: -22 to -30 dB on loud program material (-33 to -37 dB 10 to 12 dB lower). The
 drive, a neural capture in the original, is the hard part on loud, dense material. Automation follows the original's
 control rate (MEASUREMENTS.md 12). CPU use is a little above the original's (NULLTESTS.md, "CPU").
 Every case: [NULLTESTS.md](NULLTESTS.md).

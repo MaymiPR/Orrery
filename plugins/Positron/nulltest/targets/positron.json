@@ -1,0 +1,19 @@
+{
+  "name": "Positron",
+  "refrender": "{orrery}/build/RefRender_artefacts/Release/RefRender.exe",
+  "ref": {"vst3": "{positron_ref_vst3}", "name": "{positron_ref_name}"},
+  "ours": {"vst3": "{orrery}/build/Positron_artefacts/Release/VST3/Positron.vst3", "name": "Positron"},
+  "model": "{orrery}/build/PoRender_artefacts/Release/PoRender.exe",
+  "fs": 48000,
+  "block": 512,
+  "settle_ms": 0,
+  "skip_s": 2.0,
+  "cache": "{orrery}/plugins/Positron/nulltest/renders/targets_cache",
+  "bypass": "Bypass",
+  "isolation": {
+    "EQ_ONLY": {"Character Bypass": 1, "Limiter Bypass": 1},
+    "CHAR_ONLY": {"EQ Bypass": 1, "Limiter Bypass": 1},
+    "LIM_ONLY": {"EQ Bypass": 1, "Character Bypass": 1},
+    "NONE": {"EQ Bypass": 1, "Character Bypass": 1, "Limiter Bypass": 1}
+  }
+}

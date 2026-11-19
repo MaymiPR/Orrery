@@ -50,8 +50,9 @@ output gain. Zero latency, like the original.
 The gains, EQ, rider and reverb are the original's own laws and responses: they null at -63 to -143 dB. The
 character section is a fitted model of the original's expander, drive and compressor, its overshoot after a rise in
 level and its measured static curve included (about -16 to -29 dB on steady and program material, -15 to -25 dB on
-drums), and it sets the level of the whole chain's null: -24 dB on music and -21 dB on drums at the start-up preset.
-The doubler is a model too: -25 to -39 dB at Mix 0.1 and -11 to -27 dB fully wet, its level within 0.1 dB of the
+drums), and it sets the level of the whole chain's residual: -24 dB on music and -21 dB on drums at the start-up preset,
+a model on the scale of NULLTESTS.md and not a null.
+The doubler is a model too: -25 to -39 dB at Mix 0.1 and -11 to -27 dB fully wet (not a null at its worst), its level within 0.1 dB of the
 original's, its modulation at the original's measured rate (about 0.503 Hz).
 Every case: [NULLTESTS.md](NULLTESTS.md).
 

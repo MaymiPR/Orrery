@@ -314,7 +314,9 @@ void ScorpiusEditor::takeParameterChanges()
 {
     const bool in = inputGainChanged.exchange (false), out = outputGainChanged.exchange (false);
     const bool other = paramsChanged.exchange (false);
-    if (linkSource == nullptr) { if (in) mirror (true); if (out) mirror (false); }      // automation, presets: keep the link
+    // automation and presets: the output knob follows the input. A changed output never writes the input: the
+    // processor alone makes the output the input's opposite, so the render is the same with the editor closed
+    if (linkSource == nullptr && in) mirror (true);
     if (in || out || other) updateFromParams();
 }
 

@@ -8,6 +8,7 @@
 #include <random>
 #include <vector>
 #include "PluginProcessor.h"
+#include "PluginEditor.h"
 #include "dsp/Engine.h"
 
 static int failures = 0, checks = 0;
@@ -195,6 +196,32 @@ static void testLatency()
     t.forceOversampling = 1;
 }
 
+// host rates below the fitted ones: every oversampling ratio prepares and renders finite samples
+static void testLowRates()
+{
+    auto& t = tuning();
+    for (double fs : { 8000.0, 11025.0, 16000.0, 22050.0, 32000.0 })
+        for (int os : { 1, 2, 4, 8 })
+        {
+            t.forceOversampling = os;
+            std::unique_ptr<PositronProcessor> p (makeProcessor (fs, 256));
+            CHECK (p->getLatencySamples() > 0);
+            juce::AudioBuffer<float> b (2, 256);
+            juce::MidiBuffer midi;
+            juce::Random rnd (7);
+            bool finite = true;
+            for (int block = 0; block < 8; ++block)
+            {
+                for (int c = 0; c < 2; ++c) for (int i = 0; i < 256; ++i) b.setSample (c, i, rnd.nextFloat() - 0.5f);
+                p->processBlock (b, midi);
+                for (int c = 0; c < 2; ++c) for (int i = 0; i < 256; ++i) finite = finite && std::isfinite (b.getSample (c, i));
+            }
+            if (! finite) std::printf ("not finite at %g Hz, oversampling %d\n", fs, os);
+            CHECK (finite);
+        }
+    t.forceOversampling = 1;
+}
+
 static void testBypassIsDelayedInput()
 {
     std::unique_ptr<PositronProcessor> p (makeProcessor (48000.0, 256));
@@ -316,6 +343,37 @@ static void testStateScaleIsLimited()
 }
 
 // a host may call with no samples (a parameter flush): nothing happens, nothing divides by the block length
+// With I/O LINK on the processor alone makes the output the input's opposite: the host automating the output gain
+// never moves the input gain, with the editor open (its timer takes the change) or closed
+static void testLinkKeepsInputUnderOutputAutomation()
+{
+    PositronProcessor p;
+    p.setPlayConfigDetails (2, 2, 48000.0, 512);
+    p.prepareToPlay (48000.0, 512);
+    p.ioLink = true;
+    auto set = [&p] (const char* pid, float v)
+    {
+        auto* r = dynamic_cast<juce::RangedAudioParameter*> (p.apvts.getParameter (pid));
+        r->setValueNotifyingHost (r->convertTo0to1 (v));
+    };
+    auto input = [&p] { return (double) p.apvts.getRawParameterValue (po::id::inputGain)->load(); };
+    set (po::id::inputGain, 6.0f);
+    set (po::id::outputGain, 3.0f);
+    CHECK_NEAR (input(), 6.0, 1.0e-4);
+    std::unique_ptr<juce::AudioProcessorEditor> editor (p.createEditor());
+    // the editor's timer is a private base: the cast below is the one that may reach it
+    auto* typed = dynamic_cast<PositronEditor*> (editor.get());
+    auto* timer = typed != nullptr ? (juce::Timer*) typed : nullptr;
+    CHECK (timer != nullptr);
+    if (timer != nullptr)
+    {
+        timer->timerCallback();
+        set (po::id::outputGain, 2.0f);
+        timer->timerCallback();
+    }
+    CHECK_NEAR (input(), 6.0, 1.0e-4);
+}
+
 static void testEmptyBlock()
 {
     std::unique_ptr<PositronProcessor> p (makeProcessor (48000.0, 512));
@@ -490,6 +548,8 @@ int main (int argc, char** argv)
     testStateRoundTrip();
     testStateScaleIsLimited();
     testEmptyBlock();
+    testLowRates();
+    testLinkKeepsInputUnderOutputAutomation();
     testCompare();
     testSilenceAndExtremes();
     testShortTermLoudness();

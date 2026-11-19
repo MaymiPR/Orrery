@@ -187,7 +187,8 @@ inline double coreDelay (double fs, const Tuning& t)
 inline int limiterLookahead (double fs)
 {
     const double r[5] { 44100, 48000, 88200, 96000, 192000 }, l[5] { 40, 38, 50, 54, 96 };
-    if (fs <= r[0]) return (int) std::lround (l[0] * fs / r[0]);
+    // never shorter than the inter-sample interpolator needs (half its 28 taps and two samples): reached under 17.6 kHz
+    if (fs <= r[0]) return std::max (16, (int) std::lround (l[0] * fs / r[0]));
     for (int i = 0; i < 4; ++i)
         if (fs <= r[i + 1]) return (int) std::lround (l[i] + (l[i + 1] - l[i]) * (fs - r[i]) / (r[i + 1] - r[i]));
     return (int) std::lround (l[4] * fs / r[4]);

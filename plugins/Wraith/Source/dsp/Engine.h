@@ -60,6 +60,8 @@ private:
     ControlRate revMix;
     Ramp revFilterHz;
     double revFilterMade = -1;
+    bool reverbRan = false;
+    void dropReverbRing();
     Biquad revLp[2];
     float sendL[chunkSize] {}, sendR[chunkSize] {}, wetL[chunkSize] {}, wetR[chunkSize] {};
 };

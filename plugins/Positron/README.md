@@ -46,9 +46,10 @@ input: the main signal or the side-chain bus.
 ## How close
 
 The fixed path, the EQ and the crossover null at -79 to -87 dB; the character section nulls music at -70 to -75 dB
-from 12.5 to 187.5 %; the limiter -78 dB on music and drums and -55 dB under continuous heavy limiting of pink noise.
+from 12.5 to 187.5 %; the limiter leaves -78 dB on music and drums and -55 dB (close) under continuous heavy
+limiting of pink noise.
 On program material the full chain lands at -57 to -75 dB; the stress tests (163 cases over settings, levels,
-signals, automation, rates and block sizes) have a median of -66.0 dB and a worst case of -44.1 dB. The built VST3
+signals, automation, rates and block sizes) have a median of -66.0 dB and a worst case of -44.1 dB (close). The built VST3
 and the offline renderer give the same numbers. Every case: [NULLTESTS.md](NULLTESTS.md).
 
 ## Tests

@@ -90,7 +90,8 @@ private:
     juce::AudioBuffer<float> meterBuf;
     float inGainNow = 1.0f, outGainNow = 1.0f, gainCoef = 0.0f;
     std::vector<float> silence;            // the side-chain when EXT is chosen but the host leaves the bus off
-    int enginePiece = 1;                   // the longest run the engine was prepared for (48 kHz samples)
+    int enginePiece = 1;
+    bool wasBypassed = false;                   // the longest run the engine was prepared for (48 kHz samples)
     juce::ValueTree slots[2];
     bool slotUsed[2] { true, false };
     int slot = 0;

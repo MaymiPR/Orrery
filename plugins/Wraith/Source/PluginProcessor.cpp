@@ -153,6 +153,13 @@ void WraithProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     ++blocksProcessed;
 }
 
+// The host's bounce and its stopped clips keep the reverb's ring: the longer response's length while the reverb is on
+double WraithProcessor::getTailLengthSeconds() const
+{
+    static const double reverbSeconds = wr::dsp::Reverb::longestResponseSeconds();
+    return raw[wr::iReverbOn]->load() > 0.5f ? reverbSeconds : 0.0;
+}
+
 void WraithProcessor::getStateInformation (MemoryBlock& dest)
 {
     auto state = apvts.copyState();

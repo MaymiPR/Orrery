@@ -141,7 +141,10 @@ void ScorpiusProcessor::prepareToPlay (double sampleRate, int block)
             toInner[c].setOffset (inTrim); keyToInner[c].setOffset (inTrim); toOuter[c].setOffset (outTrim);
             outer[c].assign ((size_t) prefill, 0.0f);
         }
-        setLatencySamples (reported);
+        // under about 30 kHz the converters cannot be trimmed down to the reference's scaled delay: the real delay
+        // is then reported, so the host's compensation holds (at the measured rates the two agree)
+        const double real = full + prefill - inTrim - outTrim * r;
+        setLatencySamples (real > target + 0.5 ? (int) std::lround (real) : reported);
         }
     }
     else setLatencySamples (0);
@@ -164,6 +167,10 @@ void ScorpiusProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     const int n = main.getNumSamples();
     if (main.getNumChannels() < 2) return;
     const bool bypassed = bypassParam->getValue() >= 0.5f;
+    // coming out of bypass the modules start from silence, as the reference's do (MEASUREMENTS.md 12), instead of
+    // carrying on from where they stopped
+    if (wasBypassed && ! bypassed) engine.reset();
+    wasBypassed = bypassed;
     // EXT: the compressor listens to the side-chain bus (silence when the host leaves the bus off)
     const bool external = sidechainExternal.load();
     AudioBuffer<float> side;

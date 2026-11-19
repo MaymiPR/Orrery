@@ -21,6 +21,8 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 - **Null-test scripts:** the harnesses are `po_ref.py`, `sc_ref.py` and `wr_ref.py`, the helpers end in `_lib.py`, the
   scripts that write a plug-in's sources sit in `plugins/<Id>/scripts/`, and Scorpius's and Wraith's NULLTESTS.md are
   written by `nulltest.py --report` like Positron's.
+- **The standard's per-plug-in files:** each plug-in carries its parameter dump, parameter table, taper fits,
+  classification sheet and target file under `nulltest/`.
 - **Source layout:** every plug-in's DSP is plain C++: Wraith's reverb convolution and Scorpius's long filters run on
   the suite's own FFT (`shared/dsp/Fft.h`) in the order of operations they had, so the renders are unchanged to the
   last bit; Scorpius's editor analyses sit beside its processor; Positron's band gain computer for the fits is a null
@@ -32,6 +34,9 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   results give (Positron's defaults on synthetic material -57 to -75 dB, Scorpius's default preset on loud material
   -22 to -30 dB, its single EQ bands, sub and rate converters -51 to -110 dB); file names that no longer exist are
   corrected.
+- **Wording of the results:** the pages name a residual by one scale: a null below -60 dB, close from -40 to
+  -60 dB, a model from -20 to -40 dB, not a null above -20 dB. Each NULLTESTS.md counts its cases by it, and the
+  figures that were typed in from earlier builds, with no published result file, are marked as such.
 - **Positron, a call without samples:** a host's call with a block of no samples (a parameter flush) no longer
   divides by zero.
 - **Scorpius, a longer block than announced:** at a sample rate other than 48 kHz a host block longer than the
@@ -46,6 +51,28 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 - **Offline renderers:** PoRender, ScRender and WrRender end with a non-zero exit code and a message on a jobs
   file, an input or a side-chain file they cannot read, an output they cannot write, an unknown parameter and a
   malformed number, where they reported success before.
+- **I/O LINK under automation:** with the link on, automating the output gain no longer moved the input gain while
+  the editor was open, so a project renders the same with the editor open or closed (all three plug-ins). The
+  output is the input's opposite, as before.
+- **Wraith, the reverb's tail in the host:** Wraith reports the reverb's length (about 4 s) while the reverb is
+  on, so a bounce or a clip's end keeps the ring instead of cutting it.
+- **Wraith, the reverb switched off and on:** the ring is dropped when the reverb is switched off or the plug-in
+  bypassed, as the original drops it; an old tail no longer plays when it comes back (against the original after
+  the switch: a cleared start to -134 dB).
+- **Wraith, small host blocks:** at host blocks of 64 and 32 samples a gain or mix change is smoothed as the
+  original smooths it. Around a gain jump, against the original: -23.2 / -18.8 → -99.5 / -99.7 dB at 48 kHz. Blocks
+  of 128 samples and more are unchanged.
+- **Scorpius, leaving bypass:** the modules start from silence, as the original's do, instead of carrying on from
+  where they stopped. Against the original in the 10 to 40 ms after the switch: -16.8 → -43.9 dB.
+- **Low sample rates:** Positron no longer crashes when prepared at a host rate of 34 kHz or less with
+  oversampling on, and renders finite audio down to 8 kHz at every ratio; Scorpius reports its real delay under
+  about 30 kHz (22.05 kHz: 24 samples, where it reported 19). Nothing changes at 44.1 kHz and above.
+
+### Known issues
+
+- **Scorpius, bypass away from 48 kHz:** the bypassed signal runs through the rate converters, so it is the input
+  delayed by the reported latency to -47 dB at 44.1 kHz, not to the last bit. The original's bypass there is not
+  the delayed input at all (-4 dB against it).
 
 ## 1.2.1 (2026-11-04)
 
