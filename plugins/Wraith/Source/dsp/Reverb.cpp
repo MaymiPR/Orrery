@@ -48,6 +48,24 @@ Packed nearestPacked (double fs)
 }
 }
 
+double Reverb::longestResponseSeconds()
+{
+    const auto pk = nearestPacked (48000.0);
+    const auto* p = reinterpret_cast<const unsigned char*> (pk.data);
+    const auto* end = p + pk.size;
+    std::uint32_t longest = 0;
+    while (p + 4 <= end)
+    {
+        std::uint32_t n;
+        std::memcpy (&n, p, 4);
+        p += 4;
+        if (n == 0 || p + (size_t) n * 4 > end) break;
+        longest = std::max (longest, n);
+        p += (size_t) n * 4;
+    }
+    return (double) longest / pk.fs;
+}
+
 void Reverb::prepare (double fs, int block)
 {
     const auto pk = nearestPacked (fs);

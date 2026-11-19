@@ -16,6 +16,8 @@ public:
     void prepare (double fs, int block);
     void reset();
     bool hasResponse (int type) const { return conv[(size_t) type] != nullptr; }
+    // the length in seconds of the longer of the two responses at their own rate: how long the reverb rings
+    static double longestResponseSeconds();
 
     // wet signal of one reverb (0 room, 1 plate) into wl / wr, for n samples of in l / r
     void process (const float* l, const float* r, float* wl, float* wr, int n, int type);

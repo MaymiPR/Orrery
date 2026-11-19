@@ -99,7 +99,8 @@ void Engine::updateEq (const double* glide)
     for (int b = 0; b < 3; ++b) db[b] = d == 1 ? 20.0 * std::log10 (glide[b]) : d == 2 ? 40.0 * std::log10 (glide[b]) : glide[b];
     eq[0].design (Biquad::Type::lowShelf, t.eqLowHz, t.eqLowQ, db[0], osRate);
     eq[1].design (Biquad::Type::peak, t.eqMidHz, t.eqMidQ, db[1], osRate);
-    eq[2].design (Biquad::Type::highShelf, t.eqHighHz, t.eqHighQ, db[2], osRate);
+    // the high shelf stays under half the processing rate (reached under a rate of 22.3 kHz; unchanged above)
+    eq[2].design (Biquad::Type::highShelf, std::min (t.eqHighHz, 0.45 * osRate), t.eqHighQ, db[2], osRate);
 }
 
 void Engine::process (float* l, float* r, const float* scL, const float* scR, int n, const Params& p)

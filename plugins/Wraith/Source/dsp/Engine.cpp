@@ -34,14 +34,26 @@ void Engine::reset()
     revFilterMade = -1;
     for (auto* b : { eqLow, eqLow + 1, eqHigh, eqHigh + 1, revLp, revLp + 1 }) b->reset();
     reverb.reset();
+    reverbRan = false;
     character.reset();
     rider.reset();
     doubler.reset();
 }
 
+// The reverb switched off, or the plug-in bypassed: the ring is dropped, as the reference drops it (MEASUREMENTS.md
+// "Reverb"), so no old tail plays when it comes back
+void Engine::dropReverbRing()
+{
+    if (! reverbRan) return;
+    reverb.reset();
+    revLp[0].reset();
+    revLp[1].reset();
+    reverbRan = false;
+}
+
 void Engine::process (float* l, float* r, int n, const Params& p, const float* keyL, const float* keyR)
 {
-    if (p.bypass) return;
+    if (p.bypass) { dropReverbRing(); return; }
     if (! started)
     {
         eqLowDb.jump (p.eqLowDb);
@@ -64,10 +76,10 @@ void Engine::process (float* l, float* r, int n, const Params& p, const float* k
 
 void Engine::processChunk (float* l, float* r, int n, const Params& p, const float* keyL, const float* keyR)
 {
-    inGain.advance (dbToGain (p.inputGainDb));
-    outGain.advance (dbToGain (p.outputGainDb));
-    revMix.advance (p.reverbMix);
-    dblMix.advance (p.doublerMix);
+    inGain.advance (dbToGain (p.inputGainDb), n);
+    outGain.advance (dbToGain (p.outputGainDb), n);
+    revMix.advance (p.reverbMix, n);
+    dblMix.advance (p.doublerMix, n);
     for (int i = 0; i < n; ++i)
     {
         const double gi = inGain.at (i);
@@ -90,7 +102,8 @@ void Engine::processChunk (float* l, float* r, int n, const Params& p, const flo
         sendL[i] = (float) xl;
         sendR[i] = (float) xr;
     }
-    if (p.reverbOn) reverb.process (sendL, sendR, wetL, wetR, n, p.reverbType);
+    if (p.reverbOn) { reverb.process (sendL, sendR, wetL, wetR, n, p.reverbType); reverbRan = true; }
+    else dropReverbRing();
     for (int i = 0; i < n; ++i)
     {
         double xl = sendL[i], xr = sendR[i];

@@ -8,6 +8,7 @@
 #include <limits>
 #include <cstdio>
 #include "PluginProcessor.h"
+#include "PluginEditor.h"
 #include "dsp/Convolver.h"
 #include "dsp/LearnedModules.h"
 #include "shared/ui/MetalKnob.h"
@@ -132,6 +133,37 @@ static void modulesOff (ScorpiusProcessor& p)
 {
     for (auto* pid : { sc::id::driveOn, sc::id::harmOn, sc::id::compOn, sc::id::liftOn, sc::id::eqOn })
         setReal (p, pid, 0.0f);
+}
+
+// With I/O LINK on the processor alone makes the output the input's opposite: the host automating the output gain
+// never moves the input gain, with the editor open (its timer takes the change) or closed
+static void testLinkKeepsInputUnderOutputAutomation()
+{
+    ScorpiusProcessor p;
+    p.setPlayConfigDetails (2, 2, 48000.0, 512);
+    p.prepareToPlay (48000.0, 512);
+    p.ioLink = true;
+    auto set = [&p] (const char* pid, float v)
+    {
+        auto* r = dynamic_cast<RangedAudioParameter*> (p.apvts.getParameter (pid));
+        r->setValueNotifyingHost (r->convertTo0to1 (v));
+    };
+    auto input = [&p] { return (double) p.apvts.getRawParameterValue (sc::id::inputGain)->load(); };
+    set (sc::id::inputGain, 6.0f);
+    set (sc::id::outputGain, 3.0f);
+    CHECK_NEAR (input(), 6.0, 1.0e-4);
+    std::unique_ptr<AudioProcessorEditor> editor (p.createEditor());
+    // the editor's timer is a private base: the cast below is the one that may reach it
+    auto* typed = dynamic_cast<ScorpiusEditor*> (editor.get());
+    auto* timer = typed != nullptr ? (Timer*) typed : nullptr;
+    CHECK (timer != nullptr);
+    if (timer != nullptr)
+    {
+        timer->timerCallback();
+        set (sc::id::outputGain, 2.0f);
+        timer->timerCallback();
+    }
+    CHECK_NEAR (input(), 6.0, 1.0e-4);
 }
 
 // the I/O link: the output gain follows the input gain inverted, in the audio whatever the output parameter says
@@ -346,6 +378,73 @@ static void testConvolver()
         err += (y - d) * (y - d); ref += d * d;
     }
     CHECK (10 * std::log10 (err / ref) < -100.0);
+}
+
+// Coming out of bypass the modules start from silence, as the reference's do (MEASUREMENTS.md 12): after 10 ms the
+// output is that of a processor that heard silence until then, not one carrying on from where it stopped
+static void testModulesRestartAfterBypass()
+{
+    auto noise = [] (int seed, int n)
+    {
+        Random rnd (seed);
+        std::vector<float> v ((size_t) n);
+        for (auto& s : v) s = 0.5f * (rnd.nextFloat() * 2.0f - 1.0f);
+        return v;
+    };
+    auto feed = [] (ScorpiusProcessor& p, const std::vector<float>& x)
+    {
+        std::vector<float> y (x.size());
+        AudioBuffer<float> b (2, 512);
+        MidiBuffer midi;
+        for (size_t pos = 0; pos + 512 <= x.size(); pos += 512)
+        {
+            for (int i = 0; i < 512; ++i) { b.setSample (0, i, x[pos + (size_t) i]); b.setSample (1, i, x[pos + (size_t) i]); }
+            p.processBlock (b, midi);
+            for (int i = 0; i < 512; ++i) y[pos + (size_t) i] = b.getSample (0, i);
+        }
+        return y;
+    };
+    const auto before = noise (1, 48128), after = noise (2, 24064);
+    const std::vector<float> silence (24064, 0.0f);
+    ScorpiusProcessor p, q;
+    for (auto* r : { &p, &q }) { r->setPlayConfigDetails (2, 2, 48000.0, 512); r->prepareToPlay (48000.0, 512); }
+    feed (p, before);
+    setReal (p, sc::id::bypass, 1.0f);
+    feed (p, silence);
+    setReal (p, sc::id::bypass, 0.0f);
+    const auto y = feed (p, after);
+    feed (q, std::vector<float> (before.size(), 0.0f));
+    feed (q, silence);
+    const auto z = feed (q, after);
+    double num = 0, den = 0;
+    for (size_t i = 480; i < y.size(); ++i) { num += std::pow ((double) y[i] - z[i], 2.0); den += std::pow ((double) z[i], 2.0); }
+    CHECK (10.0 * std::log10 (num / den + 1.0e-30) < -60.0);
+}
+
+// below the lowest measured rate the converters' own delay exceeds the scaled reference delay: the reported latency
+// is then the real delay, so an impulse through the bypassed plug-in lands where the host is told
+static void testLatencyAtLowRates()
+{
+    for (double fs : { 22050.0, 24000.0, 32000.0, 44100.0 })
+    {
+        ScorpiusProcessor p;
+        p.setPlayConfigDetails (2, 2, fs, 512);
+        p.prepareToPlay (fs, 512);
+        modulesOff (p);
+        AudioBuffer<float> b (2, 512);
+        MidiBuffer midi;
+        std::vector<float> y;
+        for (int block = 0; block < 8; ++block)
+        {
+            b.clear();
+            if (block == 2) { b.setSample (0, 0, 1.0f); b.setSample (1, 0, 1.0f); }
+            p.processBlock (b, midi);
+            for (int i = 0; i < 512; ++i) y.push_back (b.getSample (0, i));
+        }
+        size_t peak = 0;
+        for (size_t i = 0; i < y.size(); ++i) if (std::fabs (y[i]) > std::fabs (y[peak])) peak = i;
+        CHECK_NEAR ((double) peak - 1024.0, (double) p.getLatencySamples(), 1.0);
+    }
 }
 
 // the DSP: every preset's processing stays finite and bounded on loud noise; the latency at 44.1 kHz is the reference's
@@ -726,6 +825,9 @@ int main (int argc, char** argv)
     testCompareAndState();
     testCompareFirstUse();
     testIoLink();
+    testLatencyAtLowRates();
+    testModulesRestartAfterBypass();
+    testLinkKeepsInputUnderOutputAutomation();
     testPassThrough();
     testSidechain();
     testLight();

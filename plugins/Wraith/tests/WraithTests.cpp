@@ -8,6 +8,7 @@
 #include <random>
 #include <vector>
 #include "PluginProcessor.h"
+#include "PluginEditor.h"
 #include "dsp/Engine.h"
 
 static int failures = 0, checks = 0;
@@ -262,6 +263,95 @@ static void testIoLink()
     CHECK (q.ioLink.load());
 }
 
+// With I/O LINK on the processor alone makes the output the input's opposite: the host automating the output gain
+// never moves the input gain, with the editor open (its timer takes the change) or closed
+static void testLinkKeepsInputUnderOutputAutomation()
+{
+    WraithProcessor p;
+    p.prepareToPlay (48000.0, 512);
+    p.ioLink = true;
+    auto set = [&p] (const char* pid, float v)
+    {
+        auto* r = dynamic_cast<RangedAudioParameter*> (p.apvts.getParameter (pid));
+        r->setValueNotifyingHost (r->convertTo0to1 (v));
+    };
+    auto input = [&p] { return (double) p.apvts.getRawParameterValue (wr::id::inputGain)->load(); };
+    set (wr::id::inputGain, 6.0f);
+    set (wr::id::outputGain, 3.0f);
+    CHECK_NEAR (input(), 6.0, 1.0e-4);
+    std::unique_ptr<AudioProcessorEditor> editor (p.createEditor());
+    // the editor's timer is a private base: the cast below is the one that may reach it
+    auto* typed = dynamic_cast<WraithEditor*> (editor.get());
+    auto* timer = typed != nullptr ? (Timer*) typed : nullptr;
+    CHECK (timer != nullptr);
+    if (timer != nullptr)
+    {
+        timer->timerCallback();
+        set (wr::id::outputGain, 2.0f);
+        timer->timerCallback();
+    }
+    CHECK_NEAR (input(), 6.0, 1.0e-4);
+}
+
+// the host learns how long the reverb rings, so a bounce or a stopped clip keeps its tail; nothing with the reverb off
+static void testTailLength()
+{
+    WraithProcessor p;
+    p.prepareToPlay (48000.0, 512);
+    setReal (p, wr::id::reverbOn, 0.0f);
+    CHECK_NEAR (p.getTailLengthSeconds(), 0.0, 1.0e-9);
+    setReal (p, wr::id::reverbOn, 1.0f);
+    CHECK (p.getTailLengthSeconds() > 2.0 && p.getTailLengthSeconds() < 10.0);
+}
+
+// The reverb switched off, or the plug-in bypassed, drops its ring as the reference does: nothing of an old tail plays
+// when it comes back (MEASUREMENTS.md "Reverb")
+static void testReverbRingIsDropped()
+{
+    for (auto* switchId : { wr::id::reverbOn, wr::id::bypass })
+    {
+        WraithProcessor p;
+        p.prepareToPlay (48000.0, 512);
+        allStagesOff (p);
+        setReal (p, wr::id::reverbOn, 1.0f);
+        setReal (p, wr::id::reverbMix, 1.0f);
+        const bool isBypass = switchId == wr::id::bypass;
+        Random rnd (3);
+        std::vector<float> burst (24000);
+        for (auto& v : burst) v = 0.25f * (rnd.nextFloat() * 2.0f - 1.0f);
+        run (p, burst);
+        const std::vector<float> silence (24064, 0.0f);
+        setReal (p, switchId, isBypass ? 1.0f : 0.0f);
+        run (p, silence);
+        setReal (p, switchId, isBypass ? 0.0f : 1.0f);
+        const auto y = run (p, silence);
+        double peak = 0;
+        for (auto v : y) peak = std::max (peak, (double) std::fabs (v));
+        CHECK (peak < 1.0e-6);
+    }
+}
+
+// A host block shorter than the 128-sample control chunk smooths a gain change over the same time as a longer one
+// (MEASUREMENTS.md "Smoothing": the reference at blocks of 64 and 32 is within -38 dB of itself at 512)
+static void testSmoothingAtShortBlocks()
+{
+    const auto x = sine (1000.0, 48000.0, 48000, 0.25f);
+    std::vector<float> out[2];
+    int k = 0;
+    for (int block : { 512, 32 })
+    {
+        WraithProcessor p;
+        p.prepareToPlay (48000.0, block);
+        allStagesOff (p);
+        run (p, std::vector<float> (x.begin(), x.begin() + 24064), block);
+        setReal (p, wr::id::inputGain, 6.0f);
+        out[k++] = run (p, std::vector<float> (x.begin() + 24064, x.end()), block);
+    }
+    double num = 0, den = 0;
+    for (size_t i = 0; i < 2400; ++i) { num += std::pow ((double) out[1][i] - out[0][i], 2.0); den += std::pow ((double) out[0][i], 2.0); }
+    CHECK (10.0 * std::log10 (num / den) < -34.0);
+}
+
 static void testSidechainWithoutBus()
 {
     // EXT with the side-chain bus not connected keeps listening to the input: the same output as INT
@@ -296,6 +386,10 @@ int main()
     testExtremeInput();
     testCompare();
     testIoLink();
+    testTailLength();
+    testReverbRingIsDropped();
+    testSmoothingAtShortBlocks();
+    testLinkKeepsInputUnderOutputAutomation();
     testSidechainWithoutBus();
     std::printf ("%d checks, %d failures\n", checks, failures);
     return failures == 0 ? 0 : 1;

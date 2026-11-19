@@ -21,7 +21,10 @@ inline constexpr double kOsEdgeHz = 17000.0, kOsDepthDb = 100.0;
 inline std::vector<double> designOsStage (int k, double fs)
 {
     const double rate = fs * (double) (2 << k);
-    const double width = (rate - 4.0 * kOsEdgeHz) / (2.0 * rate);           // (stop - pass) / rate, stop = rate/2 - pass
+    // below 44.1 kHz the passband edge falls with the rate (the fitted edge would leave no transition band under a
+    // host rate of 34 kHz); at 44.1 kHz and above it is the fitted edge, unchanged
+    const double edge = std::min (kOsEdgeHz, kOsEdgeHz * fs / 44100.0);
+    const double width = (rate - 4.0 * edge) / (2.0 * rate);                // (stop - pass) / rate, stop = rate/2 - pass
     int order = (int) std::ceil ((kOsDepthDb - 7.95) / (2.285 * width * 2.0 * 3.14159265358979323846));
     order += order % 2;
     const double beta = 0.1102 * (kOsDepthDb - 8.7);

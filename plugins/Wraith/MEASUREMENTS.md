@@ -71,6 +71,7 @@ different in-band level from the same full-band noise; its small-signal response
 | Gains (input, output, the Mix controls) | the engine runs in 128-sample chunks; at each chunk's start the target moves a share k of the way to the new value, k = (128 / fs) / 9.98 ms (0.2672 at 48 kHz, 0.1335 at 96 kHz: an Euler one-pole of 10 ms), and the gain ramps linearly across the chunk in linear amplitude | `probe_smoothing.py`, the gain read sample by sample | automation jumps of ±6 dB null at -102 to -107 dB |
 | EQ gains | a 5 ms linear ramp in dB, coefficients per sample | `fit_eq_motion.py` | knob-sized jumps (about 1 dB) -52 to -61 dB over the first 5 ms, -78 to -136 dB after |
 | Large low-shelf jumps (12 to 16 dB) | the original shows a broadband bump of up to +4.6 dB for about 200 samples that no tried filter structure reproduces (Declined changes) | `fit_eq_motion.py` | -10 to -21 dB over the first 5 ms, exact afterwards |
+| Host blocks under a chunk | a host block of 64 or 32 samples makes a chunk of that length: the share moved is the chunk's own time over the time constant (k × n / 128) and the ramp runs over the n samples. The original at blocks of 64 / 32 against itself at 512, in the 50 ms after a gain jump: -41.4 / -37.9 dB at 48 kHz, -47.6 / -44.1 dB at 96 kHz; at 128 and 256 it is identical | `probe_block_smoothing.py` | ours against the original at 64 / 32: -99.5 / -99.7 dB at 48 kHz, -78.5 dB at 96 kHz, as at 512 (-23.2 / -18.8 dB with chunks restarted at a quarter of the ramp) |
 
 ## 3. Rider (`nulltest/probe_rider.py`, `fit_rider.py`)
 
@@ -176,6 +177,8 @@ Scripts: `nulltest/probe_reverb.py`, `render_plate.py`, `pack_reverb.py`, `null_
 | Responses | linear and time-invariant, left and right independent (no cross-feed); room: T60 about 1.5 s, 2.27 s long; plate: T60 about 4.7 s; the same length in seconds at every rate | impulses | |
 | Capture | both responses recorded with the editor open (`tools/RefCapture record=1`, 5 s of silence first, repeated until two runs agree below -100 dB; the room recorded this way equals the offline render to -132 to -137 dB); the 20 kHz low-pass taken out by regularised deconvolution; each response cut where its decay energy has fallen 80 dB (room 2.07 s, plate 6.07 s), faded over 30 ms and stored as float16 (-73.5 to -73.8 dB re the response): 9 MB for four rates (`ir/`) | `render_plate.py`, `pack_reverb.py` | |
 | Nulls | room at the start-up preset -97 dB, fully wet -79 dB (the float16 floor); plate at Mix 0.1 and Filter 8 kHz -95 dB, fully wet -52 dB | `null_plate.py` | NULLTESTS.md "reverb:" cases |
+| Switched off and on, bypass | the ring is dropped: with the stage's power or the plug-in's bypass switched off 50 ms after a noise burst and on again 0.5 s later, the output afterwards equals a render that heard silence until then (-133.7 dB at 48 kHz, -132.0 dB at 44.1 kHz, bypass -133.7 dB) and not one that kept ringing (-23.3 dB) | `probe_reverb_toggle.py` | exact; Wraith clears the convolution and the wet filter at the switch (-300 dB against its own cleared render) |
+| Tail reported to the host | Wraith reports the longer response's length while the reverb is on, so a bounce or a stopped clip keeps the ring; the original reports none | | ours |
 
 ### 6.1 The reverb comes before the doubler (`probe_plate_presets.py`)
 
