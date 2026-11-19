@@ -96,6 +96,8 @@ private:
     juce::AudioProcessorParameter* bypassParam = nullptr;
     std::atomic<float>* raw[po::numParams] {};   // every parameter's current value, in po::allIds order
     po::dsp::Engine engine;
+    // the hand-over of a re-prepare from the message thread: set there, read at the top of every block
+    std::atomic<bool> preparing { false }, inBlock { false };
     juce::AudioBuffer<float> meterBuf;    // the input meters' copy (after the input gain)
     double preparedRate = 0.0;
     int preparedBlock = 0;

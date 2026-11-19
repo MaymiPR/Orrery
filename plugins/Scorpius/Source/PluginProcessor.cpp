@@ -1,4 +1,5 @@
 #include "PluginProcessor.h"
+#include "shared/dsp/Math.h"
 #include "PluginEditor.h"
 
 using namespace juce;
@@ -64,6 +65,7 @@ ScorpiusProcessor::ScorpiusProcessor()
       apvts (*this, nullptr, "Scorpius", sc::createLayout())
 {
     bypassParam = apvts.getParameter (sc::id::bypass);
+    for (int i = 0; i < sc::numParams; ++i) rawValues[(size_t) i] = apvts.getRawParameterValue (sc::allIds[i]);
     inGainRaw = apvts.getRawParameterValue (sc::id::inputGain);
     outGainRaw = apvts.getRawParameterValue (sc::id::outputGain);
     compAmountRaw = apvts.getRawParameterValue (sc::id::compAmount);
@@ -166,6 +168,7 @@ void ScorpiusProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     auto main = getBusBuffer (buffer, true, 0);
     const int n = main.getNumSamples();
     if (main.getNumChannels() < 2) return;
+    for (int c = 0; c < buffer.getNumChannels(); ++c) orrery::math::zeroNonFinite (buffer.getWritePointer (c), buffer.getNumSamples());
     const bool bypassed = bypassParam->getValue() >= 0.5f;
     // coming out of bypass the modules start from silence, as the reference's do (MEASUREMENTS.md 12), instead of
     // carrying on from where they stopped

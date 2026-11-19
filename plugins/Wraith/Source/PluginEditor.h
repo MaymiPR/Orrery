@@ -45,7 +45,7 @@ private:
     class RiderPanel : public juce::Component
     {
     public:
-        explicit RiderPanel (WraithEditor& e) : ed (e) {}
+        explicit RiderPanel (WraithEditor& e) : ed (e) { orrery::noFocus (*this); }
         void paint (juce::Graphics&) override;
         bool hitTest (int x, int y) override;
         void mouseDown (const juce::MouseEvent&) override;

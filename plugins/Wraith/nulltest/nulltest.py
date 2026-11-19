@@ -243,6 +243,15 @@ NOTES = """\
 """
 
 
+def results_for_report():
+    """The results the page is written from: the local file of the last run, unless it is missing or the published
+    copy (measurements/Wraith/nulltest/results.json) is newer, so an old local run never rewrites the page."""
+    published = os.path.join(h.ROOT, 'measurements', 'Wraith', 'nulltest', 'results.json')
+    if os.path.exists(published) and (not os.path.exists(RESULTS) or os.path.getmtime(published) > os.path.getmtime(RESULTS)):
+        return published
+    return RESULTS
+
+
 def report(results):
     sig_desc = '; '.join(f'**{k}**: {d}' for k, (_, d) in SIGNALS.items())
     rows = ['# Null tests', '',
@@ -305,7 +314,9 @@ if __name__ == '__main__':
         raise SystemExit(check_vst3(a.only, a.fs, a.threshold))
     vst3 = a.ours == 'vst3'
     if a.report:
-        report(json.load(open(RESULTS)))
+        source = results_for_report()
+        print('from', source)
+        report(json.load(open(source)))
     else:
         res = run(vst3, a.only, not a.no_cache, a.no_plate, json.load(open(a.tune)) if a.tune else None)
         out = os.path.join(HERE, a.out) if a.out else RESULTS if not vst3 else RESULTS.replace('.json', '_vst3.json')

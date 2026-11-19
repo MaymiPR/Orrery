@@ -1,4 +1,5 @@
 #include "PluginProcessor.h"
+#include "shared/dsp/Math.h"
 #include "PluginEditor.h"
 
 using namespace juce;
@@ -117,6 +118,7 @@ void WraithProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     auto main = getBusBuffer (buffer, true, 0);
     const int n = main.getNumSamples();
     if (main.getNumChannels() < 2) return;
+    for (int c = 0; c < buffer.getNumChannels(); ++c) orrery::math::zeroNonFinite (buffer.getWritePointer (c), buffer.getNumSamples());
 
     auto v = [this] (wr::Index i) { return raw[i]->load(); };
     auto on = [&] (wr::Index i) { return v (i) >= 0.5f; };

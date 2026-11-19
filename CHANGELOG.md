@@ -64,6 +64,12 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   of 128 samples and more are unchanged.
 - **Scorpius, leaving bypass:** the modules start from silence, as the original's do, instead of carrying on from
   where they stopped. Against the original in the 10 to 40 ms after the switch: -16.8 → -43.9 dB.
+- **A sample that is not a number:** a NaN or an infinite input sample is dropped at the input instead of staying in
+  the filters, detectors and meters until the next prepare (all three plug-ins, bypassed too).
+- **Positron, oversampling changed while playing:** no block runs while the engine is prepared again, in CLAP
+  hosts too; a block longer than announced no longer allocates for the input meters.
+- **Scorpius:** the wide vector code runs only where the operating system saves its registers; the parameter
+  values are no longer looked up by name in every block.
 - **Low sample rates:** Positron no longer crashes when prepared at a host rate of 34 kHz or less with
   oversampling on, and renders finite audio down to 8 kHz at every ratio; Scorpius reports its real delay under
   about 30 kHz (22.05 kHz: 24 samples, where it reported 19). Nothing changes at 44.1 kHz and above.

@@ -1,4 +1,5 @@
 #include "PluginProcessor.h"
+#include "shared/dsp/Math.h"
 #include "PluginEditor.h"
 
 using namespace juce;
@@ -59,9 +60,15 @@ void PositronProcessor::changeListenerCallback (juce::ChangeBroadcaster*)
     // a new oversampling ratio: prepare again (and tell the host the new latency)
     if (preparedRate > 0.0 && po::dsp::tuning().forceOversampling <= 0 && po::Settings::get().oversampling() != engine.oversamplingFactor())
     {
+        // No block may run while the engine is prepared again. A wrapper that reads the suspended flag without the
+        // callback lock (CLAP) could be inside a block: `preparing` turns the next blocks into silence, and this
+        // thread waits for the one that is running
+        preparing.store (true);
+        while (inBlock.load()) Thread::yield();
         suspendProcessing (true);
         prepareToPlay (preparedRate, preparedBlock);
         suspendProcessing (false);
+        preparing.store (false);
     }
 }
 
@@ -82,7 +89,7 @@ void PositronProcessor::prepareToPlay (double sampleRate, int block)
 {
     preparedRate = sampleRate;
     preparedBlock = block;
-    meterBuf.setSize (2, jmax (1, block));
+    meterBuf.setSize (2, jmax (1024, block));
     const auto& t = po::dsp::tuning();
     engine.prepare (sampleRate, block, t.forceOversampling > 0 ? (int) t.forceOversampling : po::Settings::get().oversampling(), t);
     // the RMS readout's mean square (MEASUREMENTS.md 6): in silence the readout falls 48.7 dB/s
@@ -124,6 +131,9 @@ void PositronProcessor::measure (const AudioBuffer<float>& b, po::LevelTap& l, p
 void PositronProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
     ScopedNoDenormals noDenormals;
+    inBlock.store (true);
+    struct Leave { std::atomic<bool>& flag; ~Leave() { flag.store (false); } } leave { inBlock };
+    if (preparing.load()) { buffer.clear(); return; }      // the engine is being prepared again (changeListenerCallback)
     if (auto* head = getPlayHead())
         if (const auto position = head->getPosition())
         {
@@ -133,6 +143,7 @@ void PositronProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     auto main = getBusBuffer (buffer, true, 0);
     const int n = main.getNumSamples();
     if (main.getNumChannels() < 2) return;
+    for (int c = 0; c < buffer.getNumChannels(); ++c) orrery::math::zeroNonFinite (buffer.getWritePointer (c), buffer.getNumSamples());
 
     po::dsp::Params p;
     p.inputGainDb = raw[0]->load(); p.outputGainDb = raw[1]->load();
@@ -156,10 +167,16 @@ void PositronProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     // input meters read the signal after the input gain
     {
         const float g = Decibels::decibelsToGain (p.inputGainDb);
-        meterBuf.setSize (2, n, false, false, true);
-        for (int c = 0; c < 2; ++c) FloatVectorOperations::copyWithMultiply (meterBuf.getWritePointer (c), main.getReadPointer (c), p.bypass ? 1.0f : g, n);
-        measure (meterBuf, inL, inR, &meterState[0][0]);
-        inLoudness.process (meterBuf.getReadPointer (0), meterBuf.getReadPointer (1), n);
+        // in pieces of the copy's size, so a block longer than announced never allocates here
+        const int room = meterBuf.getNumSamples();
+        for (int pos = 0; pos < n; pos += room)
+        {
+            const int len = jmin (room, n - pos);
+            for (int c = 0; c < 2; ++c) FloatVectorOperations::copyWithMultiply (meterBuf.getWritePointer (c), main.getReadPointer (c) + pos, p.bypass ? 1.0f : g, len);
+            AudioBuffer<float> piece (meterBuf.getArrayOfWritePointers(), 2, len);
+            measure (piece, inL, inR, &meterState[0][0]);
+            inLoudness.process (piece.getReadPointer (0), piece.getReadPointer (1), len);
+        }
         inL.loudness.store ((float) inLoudness.meanSquare()); inR.loudness.store ((float) inLoudness.meanSquare());
     }
     engine.process (main.getWritePointer (0), main.getWritePointer (1), sc[0], sc[1], n, p);

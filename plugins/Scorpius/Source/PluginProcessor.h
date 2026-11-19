@@ -86,7 +86,13 @@ private:
     sc::dsp::Resampler toInner[2], keyToInner[2], toOuter[2];
     const sc::dsp::fits::Converters* ownConverters = nullptr;   // above 48 kHz: the reference's own (ConverterFits.h)
     std::vector<float> inner[2], keyInner[2], outer[2];
-    std::atomic<float>* raw (const char* pid) const { return apvts.getRawParameterValue (pid); }
+    // every parameter's value, found once in the constructor (in the order of sc::allIds): no lookup by name in a block
+    std::array<std::atomic<float>*, sc::numParams> rawValues {};
+    std::atomic<float>* raw (const char* pid) const
+    {
+        for (int i = 0; i < sc::numParams; ++i) if (sc::allIds[i] == pid) return rawValues[(size_t) i];
+        return apvts.getRawParameterValue (pid);
+    }
     juce::AudioBuffer<float> meterBuf;
     float inGainNow = 1.0f, outGainNow = 1.0f, gainCoef = 0.0f;
     std::vector<float> silence;            // the side-chain when EXT is chosen but the host leaves the bus off

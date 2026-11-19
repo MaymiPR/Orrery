@@ -304,6 +304,7 @@ void GrReadout::paint (Graphics& g)
 //==============================================================================
 Blob::Blob (uint32 seed, Law l) : law (l)
 {
+    orrery::noFocus (*this);
     setInterceptsMouseClicks (false, false);
     // the outline's deformation: lobes 2 ... 12 in the reference's proportions (its outlines' angular spectrum), each
     // swelling in place at its own speed (the reference's shapes morph without turning), scaled to an rms of 1

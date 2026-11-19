@@ -222,6 +222,15 @@ processor has AVX. These figures were measured with an earlier build and are typ
 backs them yet."""
 
 
+def results_for_report():
+    """The results the page is written from: the local file of the last run, unless it is missing or the published
+    copy (measurements/Scorpius/nulltest/results.json) is newer, so an old local run never rewrites the page."""
+    published = os.path.join(o.ROOT, 'measurements', 'Scorpius', 'nulltest', 'results.json')
+    if os.path.exists(published) and (not os.path.exists(RESULTS) or os.path.getmtime(published) > os.path.getmtime(RESULTS)):
+        return published
+    return RESULTS
+
+
 def scale_line(res):
     """the cases of the published tables by the scale's four words"""
     vals = [v for group in ('presets', 'quiet', 'modules') for row in res[group].values() for v in row.values()]
@@ -271,7 +280,9 @@ def main():
         v = ap.parse_args(a)
         sys.exit(check_vst3(v.only, v.fs, v.threshold))
     if a[:1] == ['--report']:
-        report(json.load(open(RESULTS)))
+        source = results_for_report()
+        print('from', source)
+        report(json.load(open(source)))
         return
     plugin = a[0] if a else 'model'
     if plugin not in ('model', 'ours'):
