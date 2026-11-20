@@ -45,7 +45,7 @@ private:
     class RiderPanel : public juce::Component
     {
     public:
-        explicit RiderPanel (WraithEditor& e) : ed (e) {}
+        explicit RiderPanel (WraithEditor& e) : ed (e) { orrery::noFocus (*this); }
         void paint (juce::Graphics&) override;
         bool hitTest (int x, int y) override;
         void mouseDown (const juce::MouseEvent&) override;
@@ -110,6 +110,8 @@ private:
     // by the timer on the message thread
     std::atomic<bool> paramsChanged { false }, inputGainChanged { false }, outputGainChanged { false };
     void takeParameterChanges();
+    void takeStateLoad();
+    int shownStateLoads = 0;
 
     // sections
     wr::ui::PowerPill power[4];                 // character, eq, doubler, reverb

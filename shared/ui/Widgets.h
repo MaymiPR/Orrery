@@ -140,7 +140,7 @@ private:
 class Toast : public juce::Component, private juce::Timer
 {
 public:
-    Toast() { setInterceptsMouseClicks (false, false); setVisible (false); }
+    Toast() { noFocus (*this); setInterceptsMouseClicks (false, false); setVisible (false); }
     void paint (juce::Graphics&) override;
     void show (const juce::String&);
     static constexpr double holdMs = 550.0, fadeMs = 1050.0;

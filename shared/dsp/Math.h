@@ -9,10 +9,24 @@
 // for every value that feeds a decision; <cmath> stays fine for a value that is only ever added or multiplied on.
 // Plain C++ without JUCE, like the rest of Source/dsp.
 #include <cmath>
+#include <cstdint>
+#include <cstring>
 #include <limits>
 
 namespace orrery::math
 {
+// A sample that is not a number or not finite becomes silence before anything reads it: one such sample would
+// otherwise stay in every filter, detector and meter until the next prepare. Read by its bits, so no floating-point
+// mode can fold the test away.
+inline void zeroNonFinite (float* samples, int n)
+{
+    for (int i = 0; i < n; ++i)
+    {
+        std::uint32_t bits;
+        std::memcpy (&bits, samples + i, sizeof (bits));
+        if ((bits & 0x7f800000u) == 0x7f800000u) samples[i] = 0.0f;
+    }
+}
 inline constexpr double ln2Hi = 6.93147180369123816490e-01;   // ln 2 split so that k * ln2Hi is exact for |k| < 2^20
 inline constexpr double ln2Lo = 1.90821492927058770002e-10;
 inline constexpr double invLn2 = 1.44269504088896338700e+00;

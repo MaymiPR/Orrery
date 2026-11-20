@@ -1,0 +1,77 @@
+{
+ "start-up settings": {
+  "residual_dB": -16.59,
+  "worst_second_dB": -7.4,
+  "worst_at_s": 67
+ },
+ "every stage on": {
+  "residual_dB": -16.25,
+  "worst_second_dB": -7.82,
+  "worst_at_s": 67
+ },
+ "every stage off": {
+  "residual_dB": -356.01,
+  "worst_second_dB": -257.43,
+  "worst_at_s": 68
+ },
+ "rider off, the others on": {
+  "residual_dB": -15.3,
+  "worst_second_dB": -7.82,
+  "worst_at_s": 67
+ },
+ "character off, the others on": {
+  "residual_dB": -25.33,
+  "worst_second_dB": -19.67,
+  "worst_at_s": 11
+ },
+ "eq off, the others on": {
+  "residual_dB": -16.85,
+  "worst_second_dB": -7.82,
+  "worst_at_s": 67
+ },
+ "doubler off, the others on": {
+  "residual_dB": -17.86,
+  "worst_second_dB": -7.4,
+  "worst_at_s": 67
+ },
+ "reverb off, the others on": {
+  "residual_dB": -16.27,
+  "worst_second_dB": -7.8,
+  "worst_at_s": 67
+ },
+ "rider alone": {
+  "residual_dB": -110.73,
+  "worst_second_dB": -103.6,
+  "worst_at_s": 63
+ },
+ "character alone": {
+  "residual_dB": -17.33,
+  "worst_second_dB": -7.4,
+  "worst_at_s": 67
+ },
+ "eq alone": {
+  "residual_dB": -136.88,
+  "worst_second_dB": -132.35,
+  "worst_at_s": 67
+ },
+ "doubler alone": {
+  "residual_dB": -25.56,
+  "worst_second_dB": -19.67,
+  "worst_at_s": 10
+ },
+ "reverb alone": {
+  "residual_dB": -89.58,
+  "worst_second_dB": -62.13,
+  "worst_at_s": 63
+ },
+ "reverb switched off at 23 s, on at 46 s": {
+  "residual_dB": -16.61,
+  "worst_second_dB": -7.4,
+  "worst_at_s": 67
+ },
+ "character switched off at 23 s, on at 46 s": {
+  "residual_dB": -26.64,
+  "worst_second_dB": -7.4,
+  "worst_at_s": 67
+ }
+}

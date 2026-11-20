@@ -174,3 +174,199 @@ above -20 dB. Of the 97 cases, 32 are a null, 0 close, 37 a model and 28 not a n
   (-4.4 dB), where the two together do not null.
 - **Our VST3 equals our renderer:** `nulltest.py --ours vst3` gives the same numbers to the printed digit, and
   `first_null.py` finds the two equal at -333 dB at the start-up preset.
+
+## A mastered track
+
+A demo track (a loud, dense future-house mix; local only, not in the repository) through the reference and the built VST3 at the track's own rate, block 512 (`python nulltest/null_track.py`). The track is a full mix, not a vocal: a stress case for a vocal chain.
+
+| Setting | Residual (dB) | Worst second (dB) |
+|---|---|---|
+| start-up settings | -16.59 | -7.4 |
+| every stage on | -16.25 | -7.82 |
+| every stage off | -356.01 | -257.43 |
+| rider off, the others on | -15.3 | -7.82 |
+| character off, the others on | -25.33 | -19.67 |
+| eq off, the others on | -16.85 | -7.82 |
+| doubler off, the others on | -17.86 | -7.4 |
+| reverb off, the others on | -16.27 | -7.8 |
+| rider alone | -110.73 | -103.6 |
+| character alone | -17.33 | -7.4 |
+| eq alone | -136.88 | -132.35 |
+| doubler alone | -25.56 | -19.67 |
+| reverb alone | -89.58 | -62.13 |
+| reverb switched off at 23 s, on at 46 s | -16.61 | -7.4 |
+| character switched off at 23 s, on at 46 s | -26.64 | -7.4 |
+
+By the scale: 4 a null, 0 close, 3 a model, 8 not a null.
+
+## Stress tests
+
+`python nulltest/null_stress.py`: 260 cases over the settings, levels, signals, parameter automation, sample
+rates and block sizes. Median -19.3 dB, worst -5.1 dB; by the scale: 53 a null, 5 close, 69 a model, 133 not a null.
+
+| Run | Group | Cases | Median (dB) | Worst (dB), case |
+|---|---|---|---|---|
+| 48 kHz, block 512 | alone rider | 6 | -111.8 | -53.8, rider alone: amount 0.85, floor -23.5, speed 0.007 / dynamic -4 |
+| 48 kHz, block 512 | alone character | 6 | -18.0 | -11.3, character alone: compression 38, focus 41 / voice -8 |
+| 48 kHz, block 512 | alone eq | 6 | -130.1 | -126.3, eq alone: low -10.5, high 7.9 / music -10 |
+| 48 kHz, block 512 | alone doubler | 6 | -20.1 | -7.5, doubler alone: mix 0.85, stereo 1 / voice -8 |
+| 48 kHz, block 512 | alone reverb | 6 | -76.0 | -73.5, reverb alone: mix 0.9, filter 2700 / music -10 |
+| 48 kHz, block 512 | pairs | 20 | -18.3 | -11.2, character + doubler / voice -8 |
+| 48 kHz, block 512 | io gain | 4 | -145.7 | -141.1, gains only: in -4.5, out 7.5 / music -10 |
+| 48 kHz, block 512 | presets | 14 | -14.6 | -7.7, preset: doubler alone / voice -8 |
+| 48 kHz, block 512 | levels | 16 | -22.2 | -12.4, full chain: start-up / voice -1 |
+| 48 kHz, block 512 | random | 48 | -13.0 | -5.1, random 16 (EQ+DBL+REV) / drums -6 |
+| 48 kHz, block 512 | automation | 8 | -64.8 | -13.1, gain and eq moves, full chain: start-up / voice -8 |
+| 44.1 kHz | pairs | 20 | -17.4 | -11.2, character + doubler / voice -8 |
+| 44.1 kHz | levels | 16 | -22.1 | -11.9, full chain: start-up / voice -1 |
+| 96 kHz | pairs | 20 | -18.4 | -11.3, character + doubler / voice -8 |
+| 96 kHz | levels | 16 | -19.3 | -13.0, full chain: start-up / voice -1 |
+| block 64 | levels | 16 | -22.2 | -12.4, full chain: start-up / voice -1 |
+| block 64 | automation | 8 | -65.1 | -13.1, gain and eq moves, full chain: start-up / voice -8 |
+| block 2048 | levels | 16 | -22.2 | -12.4, full chain: start-up / voice -1 |
+| block 2048 | automation | 8 | -65.8 | -13.1, gain and eq moves, full chain: start-up / voice -8 |
+
+Every case of the run "48 kHz, block 512":
+
+| Group | Case | Residual (dB) |
+|---|---|---|
+| alone rider | rider alone: amount 0.35, floor -41.5, speed 0.002 / voice -8 | -115.64 |
+| alone rider | rider alone: amount 0.35, floor -41.5, speed 0.002 / dynamic -4 | -121.30 |
+| alone rider | rider alone: amount 0.85, floor -23.5, speed 0.007 / voice -8 | -57.56 |
+| alone rider | rider alone: amount 0.85, floor -23.5, speed 0.007 / dynamic -4 | -53.78 |
+| alone rider | rider alone: amount 0.55, floor -33.5, speed 0.005 / voice -8 | -107.99 |
+| alone rider | rider alone: amount 0.55, floor -33.5, speed 0.005 / dynamic -4 | -117.40 |
+| alone character | character alone: compression 17, focus -13 / voice -8 | -13.47 |
+| alone character | character alone: compression 17, focus -13 / music -10 | -22.44 |
+| alone character | character alone: compression -33, focus 27 / voice -8 | -13.04 |
+| alone character | character alone: compression -33, focus 27 / music -10 | -24.82 |
+| alone character | character alone: compression 38, focus 41 / voice -8 | -11.30 |
+| alone character | character alone: compression 38, focus 41 / music -10 | -22.69 |
+| alone eq | eq alone: low 3.3, high -4.7 / voice -8 | -134.04 |
+| alone eq | eq alone: low 3.3, high -4.7 / music -10 | -137.56 |
+| alone eq | eq alone: low -10.5, high 7.9 / voice -8 | -130.32 |
+| alone eq | eq alone: low -10.5, high 7.9 / music -10 | -126.31 |
+| alone eq | eq alone: low 11.1, high 11.7 / voice -8 | -128.84 |
+| alone eq | eq alone: low 11.1, high 11.7 / music -10 | -129.97 |
+| alone doubler | doubler alone: mix 0.25, stereo 0.8 / voice -8 | -15.64 |
+| alone doubler | doubler alone: mix 0.25, stereo 0.8 / music -10 | -33.38 |
+| alone doubler | doubler alone: mix 0.55, stereo 0.15 / voice -8 | -13.41 |
+| alone doubler | doubler alone: mix 0.55, stereo 0.15 / music -10 | -30.35 |
+| alone doubler | doubler alone: mix 0.85, stereo 1 / voice -8 | -7.50 |
+| alone doubler | doubler alone: mix 0.85, stereo 1 / music -10 | -24.51 |
+| alone reverb | reverb alone: mix 0.25, filter 12500 / voice -8 | -81.87 |
+| alone reverb | reverb alone: mix 0.25, filter 12500 / music -10 | -81.12 |
+| alone reverb | reverb alone: mix 0.6, filter 5200 / voice -8 | -76.36 |
+| alone reverb | reverb alone: mix 0.6, filter 5200 / music -10 | -74.25 |
+| alone reverb | reverb alone: mix 0.9, filter 2700 / voice -8 | -75.74 |
+| alone reverb | reverb alone: mix 0.9, filter 2700 / music -10 | -73.46 |
+| pairs | rider + character / voice -8 | -13.78 |
+| pairs | rider + character / drums -6 | -18.33 |
+| pairs | rider + eq / voice -8 | -115.49 |
+| pairs | rider + eq / drums -6 | -110.63 |
+| pairs | rider + doubler / voice -8 | -15.65 |
+| pairs | rider + doubler / drums -6 | -19.06 |
+| pairs | rider + reverb / voice -8 | -81.91 |
+| pairs | rider + reverb / drums -6 | -80.57 |
+| pairs | character + eq / voice -8 | -13.33 |
+| pairs | character + eq / drums -6 | -18.24 |
+| pairs | character + doubler / voice -8 | -11.16 |
+| pairs | character + doubler / drums -6 | -17.60 |
+| pairs | character + reverb / voice -8 | -13.42 |
+| pairs | character + reverb / drums -6 | -18.37 |
+| pairs | eq + doubler / voice -8 | -15.53 |
+| pairs | eq + doubler / drums -6 | -23.65 |
+| pairs | eq + reverb / voice -8 | -81.84 |
+| pairs | eq + reverb / drums -6 | -80.27 |
+| pairs | doubler + reverb / voice -8 | -14.76 |
+| pairs | doubler + reverb / drums -6 | -16.88 |
+| io gain | gains only: in -12, out 0 / music -10 | -145.92 |
+| io gain | gains only: in -4.5, out 7.5 / music -10 | -141.11 |
+| io gain | gains only: in 9.3, out -9.3 / music -10 | -150.06 |
+| io gain | gains only: in 12, out -12 / music -10 | -145.44 |
+| presets | preset: lead / voice -8 | -13.34 |
+| presets | preset: lead / music -10 | -23.63 |
+| presets | preset: up front / voice -8 | -13.55 |
+| presets | preset: up front / music -10 | -23.43 |
+| presets | preset: wide image / voice -8 | -8.08 |
+| presets | preset: wide image / music -10 | -19.49 |
+| presets | preset: short phase / voice -8 | -7.79 |
+| presets | preset: short phase / music -10 | -15.71 |
+| presets | preset: doubler alone / voice -8 | -7.66 |
+| presets | preset: doubler alone / music -10 | -25.63 |
+| presets | preset: soft room / voice -8 | -13.48 |
+| presets | preset: soft room / music -10 | -23.41 |
+| presets | preset: hard squeeze / voice -8 | -11.61 |
+| presets | preset: hard squeeze / music -10 | -21.21 |
+| levels | full chain: start-up / music -30 | -17.19 |
+| levels | full chain: start-up / music -20 | -31.36 |
+| levels | full chain: start-up / music -10 | -23.63 |
+| levels | full chain: start-up / music -6 | -22.14 |
+| levels | full chain: start-up / music -1 | -22.21 |
+| levels | full chain: start-up / voice -30 | -33.71 |
+| levels | full chain: start-up / voice -18 | -15.79 |
+| levels | full chain: start-up / voice -8 | -13.34 |
+| levels | full chain: start-up / voice -1 | -12.36 |
+| levels | full chain: start-up / drums -18 | -28.70 |
+| levels | full chain: start-up / drums -1 | -17.46 |
+| levels | full chain: start-up / bass -6 | -24.23 |
+| levels | full chain: start-up / bright -8 | -23.63 |
+| levels | full chain: start-up / wide -10 | -27.73 |
+| levels | full chain: start-up / dynamic -4 | -21.43 |
+| levels | full chain: start-up / sweep -12 | -16.79 |
+| random | random 00 (RIDER+CHAR+EQ+DBL+REV) / voice -8 | -5.53 |
+| random | random 00 (RIDER+CHAR+EQ+DBL+REV) / drums -6 | -8.32 |
+| random | random 01 (RIDER+CHAR+EQ+DBL+REV) / voice -8 | -9.79 |
+| random | random 01 (RIDER+CHAR+EQ+DBL+REV) / drums -6 | -11.55 |
+| random | random 02 (RIDER+EQ+DBL) / voice -8 | -18.31 |
+| random | random 02 (RIDER+EQ+DBL) / drums -6 | -20.66 |
+| random | random 03 (RIDER+CHAR+EQ+DBL+REV) / voice -8 | -6.07 |
+| random | random 03 (RIDER+CHAR+EQ+DBL+REV) / drums -6 | -11.66 |
+| random | random 04 (CHAR+EQ+DBL) / voice -8 | -7.92 |
+| random | random 04 (CHAR+EQ+DBL) / drums -6 | -12.59 |
+| random | random 05 (RIDER+CHAR+EQ+DBL) / voice -8 | -14.51 |
+| random | random 05 (RIDER+CHAR+EQ+DBL) / drums -6 | -20.87 |
+| random | random 06 (RIDER+CHAR+DBL+REV) / voice -8 | -13.74 |
+| random | random 06 (RIDER+CHAR+DBL+REV) / drums -6 | -16.94 |
+| random | random 07 (RIDER+CHAR+DBL+REV) / voice -8 | -6.15 |
+| random | random 07 (RIDER+CHAR+DBL+REV) / drums -6 | -9.57 |
+| random | random 08 (EQ+DBL+REV) / voice -8 | -13.01 |
+| random | random 08 (EQ+DBL+REV) / drums -6 | -13.31 |
+| random | random 09 (RIDER+CHAR+EQ+REV) / voice -8 | -13.46 |
+| random | random 09 (RIDER+CHAR+EQ+REV) / drums -6 | -21.32 |
+| random | random 10 (RIDER+CHAR+EQ) / voice -8 | -13.08 |
+| random | random 10 (RIDER+CHAR+EQ) / drums -6 | -22.05 |
+| random | random 11 (RIDER+CHAR+EQ+DBL+REV) / voice -8 | -6.98 |
+| random | random 11 (RIDER+CHAR+EQ+DBL+REV) / drums -6 | -10.76 |
+| random | random 12 (EQ+DBL) / voice -8 | -8.72 |
+| random | random 12 (EQ+DBL) / drums -6 | -13.48 |
+| random | random 13 (RIDER+CHAR+EQ+DBL+REV) / voice -8 | -11.87 |
+| random | random 13 (RIDER+CHAR+EQ+DBL+REV) / drums -6 | -17.59 |
+| random | random 14 (RIDER+CHAR) / voice -8 | -13.09 |
+| random | random 14 (RIDER+CHAR) / drums -6 | -16.27 |
+| random | random 15 (CHAR+REV) / voice -8 | -10.99 |
+| random | random 15 (CHAR+REV) / drums -6 | -14.25 |
+| random | random 16 (EQ+DBL+REV) / voice -8 | -5.27 |
+| random | random 16 (EQ+DBL+REV) / drums -6 | -5.14 |
+| random | random 17 (CHAR+EQ+REV) / voice -8 | -12.97 |
+| random | random 17 (CHAR+EQ+REV) / drums -6 | -17.51 |
+| random | random 18 (RIDER+CHAR+EQ+DBL+REV) / voice -8 | -18.41 |
+| random | random 18 (RIDER+CHAR+EQ+DBL+REV) / drums -6 | -18.85 |
+| random | random 19 (CHAR+DBL+REV) / voice -8 | -5.31 |
+| random | random 19 (CHAR+DBL+REV) / drums -6 | -8.24 |
+| random | random 20 (EQ+DBL) / voice -8 | -15.65 |
+| random | random 20 (EQ+DBL) / drums -6 | -29.32 |
+| random | random 21 (RIDER+CHAR+EQ+DBL+REV) / voice -8 | -9.12 |
+| random | random 21 (RIDER+CHAR+EQ+DBL+REV) / drums -6 | -11.74 |
+| random | random 22 (CHAR+DBL+REV) / voice -8 | -6.49 |
+| random | random 22 (CHAR+DBL+REV) / drums -6 | -11.89 |
+| random | random 23 (RIDER+CHAR+EQ+DBL+REV) / voice -8 | -13.19 |
+| random | random 23 (RIDER+CHAR+EQ+DBL+REV) / drums -6 | -17.30 |
+| automation | input gain jumps +6/-6/0, gains only / music -10 | -109.12 |
+| automation | output gain jumps -6/+9, gains only / drums -6 | -100.12 |
+| automation | input gain ramp -12 to +12 in 41 steps, gains only / pink -18 | -123.77 |
+| automation | eq high jumps +12/-12/0, eq only / music -10 | -63.09 |
+| automation | eq low jumps -12/+12/0, eq only / pink -18 | -33.15 |
+| automation | eq low up and high down in 41 steps, eq only / music -10 | -57.84 |
+| automation | gain and eq moves, eq + reverb / voice -8 | -66.59 |
+| automation | gain and eq moves, full chain: start-up / voice -8 | -13.06 |

@@ -87,6 +87,11 @@ public:
     // Sidechain INT / EXT (ours; the reference has no side-chain): EXT takes the character section's detector (its
     // expander and compressor) from the side-chain bus; with the bus not connected it keeps listening to the input
     std::atomic<bool> sidechainExternal { false };
+    // counted up by every state the host loads: an open editor compares it with the count it last showed
+    std::atomic<int> stateLoads { 0 };
+    // the editor changed a part of the state that is no parameter (the scale, the link, INT / EXT, a compare copy):
+    // the host marks its project changed
+    void stateEdited() { updateHostDisplay (ChangeDetails().withNonParameterStateChanged (true)); }
     std::atomic<float> hostBpm { 0.0f };     // the project's tempo, as the host last gave it (0: it gives none)
 
     // meters: input and output L R

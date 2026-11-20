@@ -23,6 +23,11 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   written by `nulltest.py --report` like Positron's.
 - **The standard's per-plug-in files:** each plug-in carries its parameter dump, parameter table, taper fits,
   classification sheet and target file under `nulltest/`.
+- **Scorpius, measured figures:** the module-by-module rows, the quiet "grit only" figure and the automation table
+  of its NULLTESTS.md are cases of `nulltest.py` now, published in `measurements/Scorpius/nulltest/results.json`
+  (they were typed in from earlier builds; the measured values agree with them).
+- **Scorpius and Wraith, stress and track nulls:** each has a stress grid (`null_stress.py`) and a demo-track null
+  (`null_track.py`) like Positron's; their results are published and each NULLTESTS.md lists them.
 - **Source layout:** every plug-in's DSP is plain C++: Wraith's reverb convolution and Scorpius's long filters run on
   the suite's own FFT (`shared/dsp/Fft.h`) in the order of operations they had, so the renders are unchanged to the
   last bit; Scorpius's editor analyses sit beside its processor; Positron's band gain computer for the fits is a null
@@ -48,6 +53,8 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 - **Automation with the editor open:** an automated parameter no longer posts a message from the audio thread per
   change; the editor picks the change up at its next frame (all three plug-ins). Scorpius's rate conversion no
   longer allocates in the first blocks at a sample rate other than 48 kHz.
+- **Snapshot tools:** ScorpiusSnapshot and WraithSnapshot end with a non-zero exit code when the picture cannot
+  be written.
 - **Offline renderers:** PoRender, ScRender and WrRender end with a non-zero exit code and a message on a jobs
   file, an input or a side-chain file they cannot read, an output they cannot write, an unknown parameter and a
   malformed number, where they reported success before.
@@ -64,6 +71,17 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   of 128 samples and more are unchanged.
 - **Scorpius, leaving bypass:** the modules start from silence, as the original's do, instead of carrying on from
   where they stopped. Against the original in the 10 to 40 ms after the switch: -16.8 → -43.9 dB.
+- **A sample that is not a number:** a NaN or an infinite input sample is dropped at the input instead of staying in
+  the filters, detectors and meters until the next prepare (all three plug-ins, bypassed too).
+- **Positron, oversampling changed while playing:** no block runs while the engine is prepared again, in CLAP
+  hosts too; a block longer than announced no longer allocates for the input meters.
+- **Scorpius:** the wide vector code runs only where the operating system saves its registers; the parameter
+  values are no longer looked up by name in every block.
+- **An open editor after a preset recall or an undo in the host:** the A / B slot, the preset name, INT / EXT,
+  I/O LINK and the scale now follow the loaded state at once (they kept their old values until the editor was
+  reopened). Changing INT / EXT or I/O LINK, or copying A to B, marks the host's project as changed.
+- **A preset saved under a name with a character a file cannot hold:** the menu shows the name the file got, so
+  previous and next step from it.
 - **Low sample rates:** Positron no longer crashes when prepared at a host rate of 34 kHz or less with
   oversampling on, and renders finite audio down to 8 kHz at every ratio; Scorpius reports its real delay under
   about 30 kHz (22.05 kHz: 24 samples, where it reported 19). Nothing changes at 44.1 kHz and above.

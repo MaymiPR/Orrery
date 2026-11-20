@@ -170,6 +170,7 @@ PositronEditor::PositronEditor (PositronProcessor& p) : AudioProcessorEditor (p)
     ioLinkButton.onClick = [this]
     {
         proc.ioLink = ! proc.ioLink.load();
+        proc.stateEdited();
         ioLinkButton.active = proc.ioLink.load();
         ioLinkButton.repaint();
         if (proc.ioLink.load())                    // linking snaps the output to the input's opposite
@@ -197,7 +198,7 @@ PositronEditor::PositronEditor (PositronProcessor& p) : AudioProcessorEditor (p)
         s.addParameterListener (pid, this);
 
     sidechain.external = proc.sidechainExternal.load();
-    sidechain.onChange = [this] (bool ext) { proc.sidechainExternal = ext; };
+    sidechain.onChange = [this] (bool ext) { proc.sidechainExternal = ext; proc.stateEdited(); };
     presetBox.onClick = [this] { if (dropList != nullptr) closePopups(); else showPresetList(); };
     scaleBox.onClick = [this] { if (dropList != nullptr) closePopups(); else showScaleList(); };
     prevButton.onClick = [this] { proc.presets.step (-1); presetBox.text = proc.presets.currentName(); presetBox.repaint(); };
@@ -218,6 +219,7 @@ PositronEditor::PositronEditor (PositronProcessor& p) : AudioProcessorEditor (p)
     compare.onCopy = [this]
     {
         proc.copyCompareSlot();
+        proc.stateEdited();
         toast.show (proc.compareSlot() == 0 ? "A copied to B." : "B copied to A.");
     };
 
@@ -232,6 +234,7 @@ PositronEditor::PositronEditor (PositronProcessor& p) : AudioProcessorEditor (p)
     orrery::noFocus (*grip);
     addAndMakeVisible (*grip);
     grip->setAlwaysOnTop (true);
+    shownStateLoads = proc.stateLoads.load();
     setUiScale (proc.uiScale.load());
     hostFocus = std::make_unique<orrery::HostFocus> (*this);
     startTimerHz (30);
@@ -314,6 +317,22 @@ void PositronEditor::parameterChanged (const String& id, float)
     if (id == po::id::inputGain) inputGainChanged.store (true);
     else if (id == po::id::outputGain) outputGainChanged.store (true);
     else paramsChanged.store (true);
+}
+
+// A state the host loaded while the editor is open (a preset recall, an undo): everything the constructor read once
+// is read again, on the message thread
+void PositronEditor::takeStateLoad()
+{
+    const int loads = proc.stateLoads.load();
+    if (loads == shownStateLoads) return;
+    shownStateLoads = loads;
+    ioLinkButton.active = proc.ioLink.load();
+    sidechain.external = proc.sidechainExternal.load();
+    compare.slot = proc.compareSlot();
+    presetBox.text = proc.presets.currentName();
+    if (std::abs (proc.uiScale.load() - scale) > 1.0e-4f) setUiScale (proc.uiScale.load());
+    updateFromParams();
+    repaint();
 }
 
 void PositronEditor::takeParameterChanges()
@@ -456,6 +475,7 @@ void PositronEditor::timerCallback()
 {
     // a resize has settled (no new size for 150 ms): render the per-scale images sharp at the final size
     if (getProperties().getWithDefault ("liveResize", false) && Time::getMillisecondCounter() - lastResizeMs > 150) endLiveResize();
+    takeStateLoad();
     takeParameterChanges();
     if (frozen) return;
     updateMeter (inMeter[0], proc.inL);

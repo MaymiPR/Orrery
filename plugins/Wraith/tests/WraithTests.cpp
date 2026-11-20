@@ -352,6 +352,84 @@ static void testSmoothingAtShortBlocks()
     CHECK (10.0 * std::log10 (num / den) < -34.0);
 }
 
+// A NaN or an infinite input sample is dropped at the door: it never latches in a filter, a detector or a meter, with
+// the plug-in active or bypassed
+static void testNonFiniteInputDoesNotLatch()
+{
+    for (bool bypassed : { false, true })
+    {
+        WraithProcessor p;
+        p.prepareToPlay (48000.0, 256);
+        if (auto* bp = p.getBypassParameter()) bp->setValueNotifyingHost (bypassed ? 1.0f : 0.0f);
+        AudioBuffer<float> b (2, 256);
+        MidiBuffer midi;
+        Random rnd (11);
+        bool finite = true;
+        for (int block = 0; block < 24; ++block)
+        {
+            for (int c = 0; c < 2; ++c) for (int i = 0; i < 256; ++i) b.setSample (c, i, 0.25f * (rnd.nextFloat() * 2.0f - 1.0f));
+            if (block == 2) { b.setSample (0, 10, std::numeric_limits<float>::quiet_NaN()); b.setSample (1, 20, std::numeric_limits<float>::infinity()); }
+            p.processBlock (b, midi);
+            if (block >= 3) for (int c = 0; c < 2; ++c) for (int i = 0; i < 256; ++i) finite = finite && std::isfinite (b.getSample (c, i));
+        }
+        CHECK (finite);
+    }
+}
+
+// A state that is cut short, empty or not ours changes nothing; the state round trip keeps I/O LINK and the scale
+static void testDamagedStateIsRefused()
+{
+    WraithProcessor p, q;
+    p.ioLink = true;
+    p.uiScale = 1.5f;
+    MemoryBlock good;
+    p.getStateInformation (good);
+    q.setStateInformation (good.getData(), (int) good.getSize());
+    CHECK (q.ioLink.load());
+    CHECK_NEAR (q.uiScale, 1.5, 1.0e-6);
+    MemoryBlock before;
+    q.getStateInformation (before);
+    const char junk[] = "not a state of this plug-in at all, only some bytes";
+    q.setStateInformation (junk, (int) sizeof (junk));
+    q.setStateInformation (good.getData(), 0);
+    q.setStateInformation (good.getData(), (int) good.getSize() / 2);
+    q.setStateInformation (good.getData(), 7);
+    MemoryBlock after;
+    q.getStateInformation (after);
+    CHECK (before == after);
+}
+
+// An open editor follows a state the host loads (a preset recall, an undo): its size and its top bar, which shows the
+// compare slot, the preset, INT / EXT, I/O LINK and the scale, are those of an editor opened after the load
+static void testEditorFollowsStateLoad()
+{
+    WraithProcessor source;
+    source.ioLink = true;
+    source.sidechainExternal = true;
+    source.uiScale = 1.25f;
+    MemoryBlock state;
+    source.getStateInformation (state);
+    WraithProcessor p;
+    auto tick = [] (AudioProcessorEditor* e)
+    {
+        if (auto* typed = dynamic_cast<WraithEditor*> (e)) ((Timer*) typed)->timerCallback();      // the timer is a private base
+    };
+    std::unique_ptr<AudioProcessorEditor> open (p.createEditor());
+    tick (open.get());
+    p.setStateInformation (state.getData(), (int) state.getSize());
+    tick (open.get());
+    std::unique_ptr<AudioProcessorEditor> fresh (p.createEditor());
+    tick (fresh.get());
+    CHECK (open->getWidth() == fresh->getWidth() && open->getHeight() == fresh->getHeight());
+    const Rectangle<int> bar (0, 0, jmin (open->getWidth(), fresh->getWidth()), 30);
+    const auto a = open->createComponentSnapshot (bar), b = fresh->createComponentSnapshot (bar);
+    bool same = a.getWidth() == b.getWidth() && a.getHeight() == b.getHeight();
+    for (int y = 0; same && y < a.getHeight(); ++y)
+        for (int x = 0; same && x < a.getWidth(); ++x)
+            same = a.getPixelAt (x, y) == b.getPixelAt (x, y);
+    CHECK (same);
+}
+
 static void testSidechainWithoutBus()
 {
     // EXT with the side-chain bus not connected keeps listening to the input: the same output as INT
@@ -387,6 +465,9 @@ int main()
     testCompare();
     testIoLink();
     testTailLength();
+    testEditorFollowsStateLoad();
+    testNonFiniteInputDoesNotLatch();
+    testDamagedStateIsRefused();
     testReverbRingIsDropped();
     testSmoothingAtShortBlocks();
     testLinkKeepsInputUnderOutputAutomation();

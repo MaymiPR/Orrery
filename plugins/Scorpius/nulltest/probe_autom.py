@@ -33,17 +33,39 @@ def win(r, y, t, a=-0.03, b=0.12):
     return 10 * np.log10(np.sum((r[:, s:e] - y[:, s:e]) ** 2) / np.sum(r[:, s:e] ** 2) + 1e-30)
 
 
-if __name__ == '__main__':
-    x = drums()[:, :PRE + 3 * o.FS] * 10 ** (-12 / 20) if drums().ndim == 2 else drums()[:PRE + 3 * o.FS] * 10 ** (-12 / 20)
-    sel = sys.argv[1:] or list(cases())
-    for block in (512, 64):
-        for name in sel:
-            params, p, v0, v1 = cases()[name]
+def title(name):
+    """a case as the report names it: the host parameter and the two values it jumps between"""
+    _, p, v0, v1 = cases()[name]
+    if p.endswith('On/Off'):
+        return f'{p[:-7]} switched off and on'
+    return f'{p} {v0:g} to {v1:g} and back' + (' (normalised)' if p.startswith('EQ') else '')
+
+
+def table(names=None, plugin='model', tune=None):
+    """{case: {'title': ..., block: {'jump1', 'jump2', 'steady', 'whole', 'static'}}} for host blocks of 512 and 64"""
+    d = drums()
+    x = (d[:, :PRE + 3 * o.FS] if d.ndim == 2 else d[:PRE + 3 * o.FS]) * 10 ** (-12 / 20)
+    out = {}
+    for name in names or list(cases()):
+        params, p, v0, v1 = cases()[name]
+        out[name] = {}
+        for block in (512, 64):
             job = dict(x=x, params=params, auto=[(p, PRE + T1, v1), (p, PRE + T2, v0)])
-            tune = json.loads(os.environ.get('TUNE', '{}'))          # tuning overrides for ours (probes)
+            extra = dict(tune=tune) if tune else {}
             r = o.render_many([job], 'ref', block=block, cache=True)[0]
-            y = o.render_many([dict(job, tune=tune)], 'model', block=block)[0]
-            st = o.render_many([dict(x=x, params=params, tune=tune)], 'model', block=block)[0]
+            y = o.render_many([dict(job, **extra)], plugin, block=block)[0]
+            st = o.render_many([dict(x=x, params=params, **extra)], plugin, block=block)[0]
             rs = o.render_many([dict(x=x, params=params)], 'ref', block=block, cache=True)[0]
-            print(f'block {block:3d} {name:12s}: whole {o.null_db(r, y):6.1f}  static {o.null_db(rs, st):6.1f}  '
-                  f'jump1 {win(r, y, T1):6.1f}  jump2 {win(r, y, T2):6.1f}  steady {win(r, y, T1 + 24000):6.1f}', flush=True)
+            out[name][str(block)] = {'whole': round(float(o.null_db(r, y)), 2), 'static': round(float(o.null_db(rs, st)), 2),
+                                     'jump1': round(float(win(r, y, T1)), 2), 'jump2': round(float(win(r, y, T2)), 2),
+                                     'steady': round(float(win(r, y, T1 + 24000)), 2)}
+    return out
+
+
+if __name__ == '__main__':
+    res = table(sys.argv[1:] or None, tune=json.loads(os.environ.get('TUNE', '{}')) or None)      # TUNE: overrides for ours
+    for name, row in res.items():
+        for block in ('512', '64'):
+            v = row[block]
+            print(f"block {block:>3s} {name:12s}: whole {v['whole']:6.1f}  static {v['static']:6.1f}  "
+                  f"jump1 {v['jump1']:6.1f}  jump2 {v['jump2']:6.1f}  steady {v['steady']:6.1f}", flush=True)

@@ -57,7 +57,7 @@ bool PresetManager::save (const String& name)
             xml.setAttribute (pid, (double) p->convertFrom0to1 (p->getValue()));
     const auto f = fileFor (name.trim());
     if (! f.getParentDirectory().createDirectory() || ! xml.writeTo (f)) return false;
-    current = name.trim();
+    current = f.getFileNameWithoutExtension();      // the name the file got (a typed character a file name cannot hold is replaced)
     return true;
 }
 }

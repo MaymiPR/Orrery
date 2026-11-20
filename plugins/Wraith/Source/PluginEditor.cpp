@@ -151,6 +151,7 @@ WraithEditor::WraithEditor (WraithProcessor& p) : AudioProcessorEditor (p), proc
     ioLinkButton.onClick = [this]
     {
         proc.ioLink = ! proc.ioLink.load();
+        proc.stateEdited();
         ioLinkButton.active = proc.ioLink.load();
         ioLinkButton.repaint();
         if (proc.ioLink.load())                    // linking snaps the output to the input's opposite
@@ -162,7 +163,7 @@ WraithEditor::WraithEditor (WraithProcessor& p) : AudioProcessorEditor (p), proc
             }
     };
     sidechain.external = proc.sidechainExternal.load();
-    sidechain.onChange = [this] (bool ext) { proc.sidechainExternal = ext; };
+    sidechain.onChange = [this] (bool ext) { proc.sidechainExternal = ext; proc.stateEdited(); };
     compare.slot = proc.compareSlot();
     compare.onSelect = [this] (int slot)
     {
@@ -174,6 +175,7 @@ WraithEditor::WraithEditor (WraithProcessor& p) : AudioProcessorEditor (p), proc
     compare.onCopy = [this]
     {
         proc.copyCompareSlot();
+        proc.stateEdited();
         toast.show (proc.compareSlot() == 0 ? "A copied to B." : "B copied to A.");
     };
     presetBox.onClick = [this] { if (dropList != nullptr) closePopups(); else showPresetList(); };
@@ -194,6 +196,7 @@ WraithEditor::WraithEditor (WraithProcessor& p) : AudioProcessorEditor (p), proc
     orrery::noFocus (*grip);
     addAndMakeVisible (*grip);
     grip->setAlwaysOnTop (true);
+    shownStateLoads = proc.stateLoads.load();
     setUiScale (proc.uiScale.load());
     animate = true;
     lastTick = Time::getMillisecondCounterHiRes() * 0.001;
@@ -297,6 +300,22 @@ void WraithEditor::parameterChanged (const String& pid, float)
     if (pid == wr::id::inputGain) inputGainChanged.store (true);
     else if (pid == wr::id::outputGain) outputGainChanged.store (true);
     else paramsChanged.store (true);
+}
+
+// A state the host loaded while the editor is open (a preset recall, an undo): everything the constructor read once
+// is read again, on the message thread
+void WraithEditor::takeStateLoad()
+{
+    const int loads = proc.stateLoads.load();
+    if (loads == shownStateLoads) return;
+    shownStateLoads = loads;
+    ioLinkButton.active = proc.ioLink.load();
+    sidechain.external = proc.sidechainExternal.load();
+    compare.slot = proc.compareSlot();
+    presetBox.text = proc.presets.currentName();
+    if (std::abs (proc.uiScale.load() - scale) > 1.0e-4f) setUiScale (proc.uiScale.load());
+    updateFromParams();
+    repaint();
 }
 
 void WraithEditor::takeParameterChanges()
@@ -428,6 +447,7 @@ void WraithEditor::setTestLevels (float inDb, float outDb, float inBarDb, float 
 void WraithEditor::timerCallback()
 {
     if (getProperties().getWithDefault ("liveResize", false) && Time::getMillisecondCounter() - lastResizeMs > 150) endLiveResize();
+    takeStateLoad();
     takeParameterChanges();
     if (frozen) return;
     const double now = Time::getMillisecondCounterHiRes() * 0.001;
