@@ -12,6 +12,7 @@
 #include "dsp/Convolver.h"
 #include "dsp/LearnedModules.h"
 #include "shared/ui/MetalKnob.h"
+#include "shared/ui/SaveDialog.h"
 
 static int failures = 0, checks = 0;
 #define CHECK(cond) do { ++checks; if (! (cond)) { ++failures; std::printf ("FAIL %s:%d  %s\n", __FILE__, __LINE__, #cond); } } while (0)
@@ -711,6 +712,32 @@ static void bench()
     }
 }
 
+// The save dialog asks before it replaces a preset: Return on a name that exists only arms it, the second saves; a
+// name that is free saves at once
+static void testSaveDialogAsksBeforeReplacing()
+{
+    for (bool taken : { true, false })
+    {
+        int saves = 0;
+        bool closed = false;
+        orrery::SaveDialog d ("mine", [&saves] (const String&) { ++saves; return true; }, [] {});
+        d.exists = [] (const String& n) { return n == "taken"; };
+        d.onClose = [&closed] { closed = true; };
+        TextEditor* field = nullptr;
+        for (auto* c : d.getChildren()) if (auto* t = dynamic_cast<TextEditor*> (c)) field = t;
+        CHECK (field != nullptr);
+        if (field == nullptr) return;
+        field->setText (taken ? "taken" : "free", false);
+        field->onReturnKey();
+        CHECK (saves == (taken ? 0 : 1) && closed == ! taken);
+        if (taken)
+        {
+            field->onReturnKey();
+            CHECK (saves == 1 && closed);
+        }
+    }
+}
+
 // double-clicking a knob opens a field over it: a typed value (in the parameter's own text) is set as one gesture,
 // clamped to the range; Escape leaves the value alone
 static void testValueEntry()
@@ -904,6 +931,7 @@ int main (int argc, char** argv)
     testCompareAndState();
     testCompareFirstUse();
     testIoLink();
+    testSaveDialogAsksBeforeReplacing();
     testLatencyAtLowRates();
     testEditorFollowsStateLoad();
     testNonFiniteInputDoesNotLatch();

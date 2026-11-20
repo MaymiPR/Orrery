@@ -11,7 +11,7 @@ per band: the one most of the band's usable nodes were fitted with; nodes fitted
                                                          --shaper: the band's k and dry share at every row as read
                                                          with anti-phase tones (probe_shape_side.py, shaper_<band>.txt);
                                                          band:row applies it from that row up only
-The plug-in's table: python make_character_table.py --min-db 0 --law bandlaw_final_v11.json --shaper high
+The plug-in's table: python make_character_table.py --min-db 0 --law bandlaw_final_v13.json --shaper high
 (low and mid: the refits of MEASUREMENTS.md 3.14 / 3.15; high: fit_music.py --shaper --loud --track --set fallRate=47
 at every node, --relative from 100 % up (3.16), each node's law put in by hand; its shaper k, dry share and mid gain as
 measured, probe_shape_side.py / probe_shape_mid.py)."""

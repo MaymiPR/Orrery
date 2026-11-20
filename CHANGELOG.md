@@ -9,6 +9,8 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 
 ### Improved
 
+- **Saving over a preset:** the save dialog asks first: when the typed name is already a preset, the save button
+  reads "replace" and a second click or Return saves (all three plug-ins; it replaced the file silently).
 - **Keys in VST3 hosts:** the VST3 editors take the keys the host offers them, so a focused editor
   receives its keys in FL Studio; every key the editor does not use still goes to the host (the space bar, Ctrl+Z).
 - **Keys after a click:** each editor hands the keyboard focus back to the host's window after a click, so the space
@@ -28,6 +30,9 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   (they were typed in from earlier builds; the measured values agree with them).
 - **Scorpius and Wraith, stress and track nulls:** each has a stress grid (`null_stress.py`) and a demo-track null
   (`null_track.py`) like Positron's; their results are published and each NULLTESTS.md lists them.
+- **Parameter texts against the originals:** `nulltest/check_tapers.py` compares each built plug-in's parameter
+  values with the original's at 41 positions: Positron's 11 and Scorpius's 26 parameters agree; Wraith's 19 agree but
+  for a rounding tie of Compression and Focus exactly half-way between two steps.
 - **Source layout:** every plug-in's DSP is plain C++: Wraith's reverb convolution and Scorpius's long filters run on
   the suite's own FFT (`shared/dsp/Fft.h`) in the order of operations they had, so the renders are unchanged to the
   last bit; Scorpius's editor analyses sit beside its processor; Positron's band gain computer for the fits is a null

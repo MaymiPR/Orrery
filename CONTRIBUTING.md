@@ -164,4 +164,6 @@ suite's first name, Orrery Suite, which the suite carried until it took the repo
 
 ## Deviations from the standard
 
-None.
+`Source/Tapers.h` is not generated: each plug-in's `Source/Params.h` keeps the ranges and tapers it shipped with, which
+are frozen identity (saved projects and automation depend on them). `nulltest/check_tapers.py` compares the built
+plug-in's parameter texts with the original's at 41 positions instead.

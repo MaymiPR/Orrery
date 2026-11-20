@@ -973,6 +973,7 @@ void ScorpiusEditor::showSavePreset()
 {
     auto d = std::make_unique<orrery::SaveDialog> (proc.presets.currentName(), [this] (const String& n) { return proc.presets.save (n); },
                                                    [this] { presetBox.text = proc.presets.currentName(); presetBox.repaint(); });
+    d->exists = [this] (const String& n) { return proc.presets.exists (n.trim()); };
     d->moveBy ((designH - 359.5f) * 0.5f);         // centred in this taller window
     auto* raw = d.get();
     showDialog (std::move (d));

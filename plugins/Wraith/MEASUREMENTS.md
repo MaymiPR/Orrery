@@ -322,6 +322,9 @@ unexplained on white noise (most below 200 Hz and above 12 kHz); it sets the ful
 - The expander's own frequency weighting and its dependence on the Compression setting (4.3): below the null suite's
   levels.
 - The broadband bump after large EQ low-shelf jumps (2).
+- Compression and Focus at a normalised value exactly half-way between two of their 101 steps: the original rounds
+  away from zero (0.025 reads -48), Wraith toward zero (-47). 11 of the 41 positions of `check_tapers.py` are such
+  ties; every other position and every other parameter reads the same.
 - The rider at 0.97 into full compression on drums ("preset: hard squeeze"): the preset's rider alone nulls at
   -99 dB there; the loss is the compressor's gain on transients.
 
