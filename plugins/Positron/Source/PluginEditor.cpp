@@ -992,6 +992,7 @@ public:
         name.setText (pm.currentName(), false);
         name.onReturnKey = [this] { commit(); };
         name.onEscapeKey = [this] { if (onClose) onClose(); };
+        name.onTextChange = [this] { repaint(); };
     }
     void focusName() { name.grabKeyboardFocus(); name.selectAll(); }
     void paint (Graphics& g) override
@@ -1002,7 +1003,7 @@ public:
         g.setColour (theme::letteringDim);
         g.setFont (theme::font (12.5f));
         theme::textAt (g, "preset name", 267.5f, 164.5f);
-        button (g, saveArea, "save");
+        button (g, saveArea, armed.isNotEmpty() && armed == name.getText() ? "replace" : "save");
         button (g, cancelArea, "cancel");
     }
     void mouseDown (const MouseEvent& e) override
@@ -1012,9 +1013,12 @@ public:
         Dialog::mouseDown (e);
     }
 private:
+    // a name that is already a preset is asked about first: the save button reads "replace", a second click saves
     void commit()
     {
-        if (presets.save (name.getText())) { if (onSaved) onSaved(); }
+        const auto typed = name.getText();
+        if (presets.exists (typed.trim()) && armed != typed) { armed = typed; repaint(); return; }
+        if (presets.save (typed)) { if (onSaved) onSaved(); }
         if (onClose) onClose();
     }
     static void button (Graphics& g, Rectangle<float> r, const String& t)
@@ -1030,6 +1034,7 @@ private:
     po::PresetManager& presets;
     std::function<void()> onSaved;
     TextEditor name;
+    String armed;      // the name the dialog has asked about
 };
 }
 

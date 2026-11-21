@@ -7,7 +7,10 @@ namespace orrery
 class SaveDialog : public Dialog
 {
 public:
-    // save: stores the preset under the name, false if that failed; saved: called after a successful save
+    // save: stores the preset under the name, false if that failed; saved: called after a successful save.
+    // exists (optional): whether a preset of that name is already there; the dialog then asks before it replaces it:
+    // the save button reads "replace" and a second click or Return saves
+    std::function<bool (const juce::String&)> exists;
     SaveDialog (juce::String currentName, std::function<bool (const juce::String&)> saveFn, std::function<void()> saved)
         : Dialog ("save preset", { 240.0f, 74.0f, 408.0f, 209.0f }, true), save (std::move (saveFn)), onSaved (std::move (saved))
     {
@@ -23,6 +26,7 @@ public:
         name.setText (currentName, false);
         name.onReturnKey = [this] { commit(); };
         name.onEscapeKey = [this] { if (onClose) onClose(); };
+        name.onTextChange = [this] { repaint(); };
     }
     // centred on a box placed for an editor of another height (the reference centres it in its own window)
     void moveBy (float dy) { box = box.translated (0.0f, dy); name.setBounds (name.getBounds().translated (0, juce::roundToInt (dy))); saveArea = saveArea.translated (0.0f, dy); cancelArea = cancelArea.translated (0.0f, dy); fieldTop += dy; }
@@ -35,7 +39,7 @@ public:
         g.setColour (orrery::theme::letteringDim);
         g.setFont (theme::font (12.5f));
         theme::textAt (g, "preset name", 267.5f, fieldTop + 18.0f);
-        button (g, saveArea, "save");
+        button (g, saveArea, armed.isNotEmpty() && armed == name.getText() ? "replace" : "save");
         button (g, cancelArea, "cancel");
     }
     void mouseDown (const juce::MouseEvent& e) override
@@ -47,7 +51,9 @@ public:
 private:
     void commit()
     {
-        if (save && save (name.getText())) { if (onSaved) onSaved(); }
+        const auto typed = name.getText();
+        if (exists && exists (typed) && armed != typed) { armed = typed; repaint(); return; }      // asks first
+        if (save && save (typed)) { if (onSaved) onSaved(); }
         if (onClose) onClose();
     }
     static void button (juce::Graphics& g, juce::Rectangle<float> r, const juce::String& t)
@@ -64,5 +70,6 @@ private:
     std::function<bool (const juce::String&)> save;
     std::function<void()> onSaved;
     juce::TextEditor name;
+    juce::String armed;      // the name the dialog has asked about
 };
 }

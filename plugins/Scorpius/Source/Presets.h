@@ -17,6 +17,7 @@ public:
     void load (const Entry&);
     void step (int delta);
     bool save (const juce::String& name);
+    bool exists (const juce::String& name) const { return fileFor (name).existsAsFile(); }
     const juce::String& currentName() const { return current; }
     void setCurrentName (const juce::String& n) { current = n; }
 
