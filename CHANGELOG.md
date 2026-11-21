@@ -31,8 +31,7 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 - **Scorpius and Wraith, stress and track nulls:** each has a stress grid (`null_stress.py`) and a demo-track null
   (`null_track.py`) like Positron's; their results are published and each NULLTESTS.md lists them.
 - **Parameter texts against the originals:** `nulltest/check_tapers.py` compares each built plug-in's parameter
-  values with the original's at 41 positions: Positron's 11 and Scorpius's 26 parameters agree; Wraith's 19 agree but
-  for a rounding tie of Compression and Focus exactly half-way between two steps.
+  values with the original's at 41 positions: Positron's 11, Scorpius's 26 and Wraith's 19 parameters agree.
 - **Source layout:** every plug-in's DSP is plain C++: Wraith's reverb convolution and Scorpius's long filters run on
   the suite's own FFT (`shared/dsp/Fft.h`) in the order of operations they had, so the renders are unchanged to the
   last bit; Scorpius's editor analyses sit beside its processor; Positron's band gain computer for the fits is a null
@@ -44,6 +43,9 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
   results give (Positron's defaults on synthetic material -57 to -75 dB, Scorpius's default preset on loud material
   -22 to -30 dB, its single EQ bands, sub and rate converters -51 to -110 dB); file names that no longer exist are
   corrected.
+- **Wraith, Compression and Focus half-way between two steps:** a value exactly half-way between two of the 101
+  steps lands on the step further from zero, as the original's does (a host value of 0.025 gave -47 and gives -48;
+  0.525 gave 2 and gives 3). Every whole step, and so every saved setting, is where it was.
 - **Wording of the results:** the pages name a residual by one scale: a null below -60 dB, close from -40 to
   -60 dB, a model from -20 to -40 dB, not a null above -20 dB. Each NULLTESTS.md counts its cases by it, and the
   figures that were typed in from earlier builds, with no published result file, are marked as such.
