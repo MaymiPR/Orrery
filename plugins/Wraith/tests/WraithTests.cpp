@@ -448,6 +448,27 @@ static void testSidechainWithoutBus()
     CHECK (a.getBusCount (true) == 2);                         // the side-chain input exists, off by default
 }
 
+// Compression and Focus, exactly half-way between two of their 101 steps, land on the step further from zero, as the
+// reference's do (nulltest/paramdump.txt); every other position lands where it did
+static void testStepsRoundAwayFromZero()
+{
+    WraithProcessor p;
+    for (auto* pid : { wr::id::compression, wr::id::focus })
+    {
+        auto* q = p.apvts.getParameter (pid);
+        CHECK (q != nullptr);
+        if (q == nullptr) return;
+        const std::pair<float, float> expected[] = { { 0.025f, -48.0f }, { 0.475f, -3.0f }, { 0.525f, 3.0f }, { 0.975f, 48.0f },
+                                                     { 0.0f, -50.0f }, { 0.03f, -47.0f }, { 0.5f, 0.0f }, { 0.52f, 2.0f },
+                                                     { 0.529f, 3.0f }, { 0.521f, 2.0f }, { 1.0f, 50.0f } };
+        for (const auto& e : expected)
+            CHECK (exactlyEqual ((double) q->convertFrom0to1 (e.first), (double) e.second));
+        for (int v = -50; v <= 50; ++v)                      // a step is where it was, and survives the round trip
+            CHECK (exactlyEqual ((double) q->convertFrom0to1 (q->convertTo0to1 ((float) v)), (double) v));
+        CHECK (exactlyEqual ((double) q->convertFrom0to1 (q->getDefaultValue()), 0.0));
+    }
+}
+
 int main()
 {
     ScopedJuceInitialiser_GUI init;
@@ -472,6 +493,7 @@ int main()
     testSmoothingAtShortBlocks();
     testLinkKeepsInputUnderOutputAutomation();
     testSidechainWithoutBus();
+    testStepsRoundAwayFromZero();
     std::printf ("%d checks, %d failures\n", checks, failures);
     return failures == 0 ? 0 : 1;
 }

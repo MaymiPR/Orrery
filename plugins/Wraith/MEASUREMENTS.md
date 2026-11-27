@@ -95,6 +95,10 @@ The stage is the Focus EQ, then a downward expander, the Compression drive and a
 a fixed ceiling. Its detectors hear the mid signal only (a quiet 1 kHz probe is ducked 10 to 22 dB by a loud tone
 anywhere from 60 Hz to 12 kHz), and its one gain is applied to both channels.
 
+Compression and Focus move in 101 whole steps from -50 to +50. A normalised value exactly half-way between two steps
+lands on the step further from zero in the original (0.025 reads -48, 0.525 reads 3), and in Wraith
+(`nulltest/check_tapers.py`: both parameters read the original's value at each of the 41 positions).
+
 **The side channel.** With L = d + p and R = d - p the drive d sets the gain, and the side output (L - R) / 2 is that
 gain times the stage's linear filters applied to p alone. A probe on the side does not reach the detectors: a 4 or
 12 kHz tone at -46, -76 and -100 dBFS gives the same gain trajectory to the printed digit (0.1 dB). Most probes below
@@ -322,9 +326,6 @@ unexplained on white noise (most below 200 Hz and above 12 kHz); it sets the ful
 - The expander's own frequency weighting and its dependence on the Compression setting (4.3): below the null suite's
   levels.
 - The broadband bump after large EQ low-shelf jumps (2).
-- Compression and Focus at a normalised value exactly half-way between two of their 101 steps: the original rounds
-  away from zero (0.025 reads -48), Wraith toward zero (-47). 11 of the 41 positions of `check_tapers.py` are such
-  ties; every other position and every other parameter reads the same.
 - The rider at 0.97 into full compression on drums ("preset: hard squeeze"): the preset's rider alone nulls at
   -99 dB there; the loss is the compressor's gain on transients.
 

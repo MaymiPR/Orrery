@@ -33,6 +33,17 @@ AudioProcessorValueTreeState::ParameterLayout createLayout()
     {
         layout.add (std::make_unique<AudioParameterFloat> (ParameterID { pid, 1 }, name, NormalisableRange<float> (lo, hi, step), def, text));
     };
+    // whole steps like `stepped`, but a value half-way between two steps lands on the one further from zero, as the
+    // reference's does (nulltest/check_tapers.py); the nudge covers the float error of a half-way value (0.525 of the
+    // range is 2.499998), far under anything a host can set apart
+    auto whole = [&] (const char* pid, const char* name, float lo, float hi, float def)
+    {
+        NormalisableRange<float> r (lo, hi, [] (float s, float e, float n) { return s + (e - s) * n; },
+                                    [] (float s, float e, float v) { return (v - s) / (e - s); },
+                                    [] (float s, float e, float v) { return jlimit (s, e, std::round (v + std::copysign (1.0e-4f, v))); });
+        r.interval = 1.0f;
+        layout.add (std::make_unique<AudioParameterFloat> (ParameterID { pid, 1 }, name, r, def, text));
+    };
     auto mix = [&] (const char* pid, const char* name, float def)
     {
         NormalisableRange<float> r (0.0f, 1.0f, [] (float, float, float n) { return mixFromNorm (n); },
@@ -44,8 +55,8 @@ AudioProcessorValueTreeState::ParameterLayout createLayout()
     linear (id::riderAmount, "Gain Rider Amount", 0.0f, 1.0f, 0.7f);
     linear (id::riderFloor, "Gain Rider Floor", -50.0f, -18.0f, -30.0f);
     stepped (id::riderOn, "Gain Rider State", 0.0f, 1.0f, 1.0f, 0.0f);
-    stepped (id::compression, "Compression", -50.0f, 50.0f, 1.0f, 0.0f);
-    stepped (id::focus, "Focus", -50.0f, 50.0f, 1.0f, 0.0f);
+    whole (id::compression, "Compression", -50.0f, 50.0f, 0.0f);
+    whole (id::focus, "Focus", -50.0f, 50.0f, 0.0f);
     stepped (id::characterOn, "Character State", 0.0f, 1.0f, 1.0f, 0.0f);
     linear (id::eqLow, "EQ Low Gain", -12.0f, 12.0f, 0.0f);
     linear (id::eqHigh, "EQ High Gain", -12.0f, 12.0f, 0.0f);
