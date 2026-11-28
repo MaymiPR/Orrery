@@ -46,6 +46,9 @@ each only when it has content, with bullets `- **Topic:** what, with the before 
 - **Wraith, Compression and Focus half-way between two steps:** a value exactly half-way between two of the 101
   steps lands on the step further from zero, as the original's does (a host value of 0.025 gave -47 and gives -48;
   0.525 gave 2 and gives 3). Every whole step, and so every saved setting, is where it was.
+- **Wraith, Compression and Focus as steps in VST3 hosts:** the VST3 tells the host that the two knobs have 101
+  steps, as the original's does (it reported them as continuous). The values, the automation range and the CLAP and
+  AU are unchanged.
 - **Wording of the results:** the pages name a residual by one scale: a null below -60 dB, close from -40 to
   -60 dB, a model from -20 to -40 dB, not a null above -20 dB. Each NULLTESTS.md counts its cases by it, and the
   figures that were typed in from earlier builds, with no published result file, are marked as such.

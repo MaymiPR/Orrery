@@ -97,7 +97,10 @@ anywhere from 60 Hz to 12 kHz), and its one gain is applied to both channels.
 
 Compression and Focus move in 101 whole steps from -50 to +50. A normalised value exactly half-way between two steps
 lands on the step further from zero in the original (0.025 reads -48, 0.525 reads 3), and in Wraith
-(`nulltest/check_tapers.py`: both parameters read the original's value at each of the 41 positions).
+(`nulltest/check_tapers.py`: both parameters read the original's value at each of the 41 positions). The original's
+VST3 tells the host that the two have 101 steps, and Wraith's VST3 does; its CLAP and AU report them as continuous,
+as before (an AU scales a parameter with steps by its step count, which would move a saved project's automation).
+The five on / off switches report 2 steps in the original and none in Wraith (listed by `check_tapers.py`).
 
 **The side channel.** With L = d + p and R = d - p the drive d sets the gain, and the side output (L - R) / 2 is that
 gain times the stage's linear filters applied to p alone. A probe on the side does not reach the detectors: a 4 or

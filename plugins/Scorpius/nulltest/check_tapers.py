@@ -3,7 +3,8 @@ paramdump.txt (the reference's parameters at 41 positions, in this folder) must 
 name, and at each position our value must be the reference's to within one unit of the last decimal the reference
 shows, or ten parts in a million of the value where that is more (a table taper keeps fewer decimals). A stepped
 parameter that lands one step apart exactly half-way between two steps is a tie, listed and not counted: the two
-sides round a tie differently. Texts that are no numbers (a switch that reads Off / On on one side) are compared by their order instead:
+sides round a tie differently. A step count the two sides report differently to the host is listed and not counted:
+the values decide. Texts that are no numbers (a switch that reads Off / On on one side) are compared by their order instead:
 the positions where the text changes must be the same. Needs the tools and the VST3 built; the reference is not
 loaded.
 
@@ -71,7 +72,7 @@ def main():
             return 2
     ref, steps = parse(open(dump, encoding='utf-8').read())
     r = subprocess.run([TOOL, VST3, ID, 'points=41'], capture_output=True, text=True)
-    ours, _ = parse(r.stdout)
+    ours, our_steps = parse(r.stdout)
     if r.returncode != 0 or not ours:
         print(f'ParamDump failed on {os.path.relpath(VST3, ROOT)} (exit code {r.returncode}): nothing compared')
         return 2
@@ -82,6 +83,9 @@ def main():
             bad += 1
             continue
         mine = dict(ours[name])
+        if steps.get(name) != our_steps.get(name):
+            said = lambda k: f'{k} steps' if k < 100000 else 'no steps'
+            print(f'steps    {name}: the reference reports {said(steps[name])} to the host, ours {said(our_steps[name])}')
         worst, where, kind, ties = 0.0, None, 'values', 0
         n = steps.get(name, 0)
         step = (number(points[-1][1])[0] - number(points[0][1])[0]) / (n - 1) if 2 <= n <= 100000 and number(points[0][1]) and number(points[-1][1]) else 0.0

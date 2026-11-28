@@ -466,6 +466,7 @@ static void testStepsRoundAwayFromZero()
         for (int v = -50; v <= 50; ++v)                      // a step is where it was, and survives the round trip
             CHECK (exactlyEqual ((double) q->convertFrom0to1 (q->convertTo0to1 ((float) v)), (double) v));
         CHECK (exactlyEqual ((double) q->convertFrom0to1 (q->getDefaultValue()), 0.0));
+        CHECK (! q->isDiscrete());                           // a VST3 host alone is told the steps; no wrapper here
     }
 }
 
