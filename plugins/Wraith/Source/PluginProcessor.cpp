@@ -21,6 +21,16 @@ float filterToNorm (float hz)
     return jlimit (0.0f, 1.0f, ((float) i + (b > a ? (hz - a) / (b - a) : 0.0f)) / 40.0f);
 }
 
+// A float parameter of whole steps that tells a VST3 host its step count, as the reference's VST3 does
+// (nulltest/paramdump.txt: 101 steps). Only there: an AU scales a discrete parameter by its steps and not from 0 to
+// 1, which would move the automation a saved project holds, and the reference was measured as a VST3 only.
+struct WholeSteps final : AudioParameterFloat
+{
+    using AudioParameterFloat::AudioParameterFloat;
+    bool isDiscrete() const override { return PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3; }
+    int getNumSteps() const override { return isDiscrete() ? RangedAudioParameter::getNumSteps() : AudioProcessor::getDefaultNumParameterSteps(); }
+};
+
 AudioProcessorValueTreeState::ParameterLayout createLayout()
 {
     AudioProcessorValueTreeState::ParameterLayout layout;
@@ -42,7 +52,7 @@ AudioProcessorValueTreeState::ParameterLayout createLayout()
                                     [] (float s, float e, float v) { return (v - s) / (e - s); },
                                     [] (float s, float e, float v) { return jlimit (s, e, std::round (v + std::copysign (1.0e-4f, v))); });
         r.interval = 1.0f;
-        layout.add (std::make_unique<AudioParameterFloat> (ParameterID { pid, 1 }, name, r, def, text));
+        layout.add (std::make_unique<WholeSteps> (ParameterID { pid, 1 }, name, r, def, text));
     };
     auto mix = [&] (const char* pid, const char* name, float def)
     {
