@@ -1,4 +1,5 @@
 #include "PluginProcessor.h"
+#include "shared/dsp/HostSteps.h"
 #include "shared/dsp/Math.h"
 #include "PluginEditor.h"
 
@@ -16,8 +17,8 @@ AudioProcessorValueTreeState::ParameterLayout createLayout()
     };
     auto toggle = [&] (const char* pid, const char* name)
     {
-        layout.add (std::make_unique<AudioParameterFloat> (ParameterID { pid, 1 }, name, NormalisableRange<float> (0.0f, 1.0f, 1.0f), 0.0f,
-                                                           AudioParameterFloatAttributes().withStringFromValueFunction (threeDecimals)));
+        layout.add (std::make_unique<orrery::HostSteps> (ParameterID { pid, 1 }, name, NormalisableRange<float> (0.0f, 1.0f, 1.0f), 0.0f,
+                                                         AudioParameterFloatAttributes().withStringFromValueFunction (threeDecimals)));
     };
     gain (id::inputGain, "Input Gain", 12.0f);
     gain (id::outputGain, "Output Gain", 12.0f);
