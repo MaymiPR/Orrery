@@ -1,4 +1,5 @@
 #include "PluginProcessor.h"
+#include "shared/dsp/HostSteps.h"
 #include "shared/dsp/Math.h"
 #include "PluginEditor.h"
 
@@ -22,7 +23,7 @@ AudioProcessorValueTreeState::ParameterLayout createLayout()
     };
     auto onOff = [&] (const char* pid, const char* name, bool on)
     {
-        layout.add (std::make_unique<AudioParameterFloat> (ParameterID { pid, 1 }, name, NormalisableRange<float> (0.0f, 1.0f, 1.0f), on ? 1.0f : 0.0f, attrs));
+        layout.add (std::make_unique<orrery::HostSteps> (ParameterID { pid, 1 }, name, NormalisableRange<float> (0.0f, 1.0f, 1.0f), on ? 1.0f : 0.0f, attrs));
     };
     auto amount = [&] (const char* pid, const char* name, float def)
     {
@@ -32,7 +33,7 @@ AudioProcessorValueTreeState::ParameterLayout createLayout()
     onOff (id::driveOn, "Drive On/Off", true);
     onOff (id::driveHiPass, "Drive Hi-Pass", true);
     onOff (id::harmOn, "Harm On/Off", true);
-    layout.add (std::make_unique<AudioParameterFloat> (ParameterID { id::harmFreq, 1 }, "Harm Freq", NormalisableRange<float> (50.0f, 80.0f, 30.0f), 80.0f, attrs));
+    layout.add (std::make_unique<orrery::HostSteps> (ParameterID { id::harmFreq, 1 }, "Harm Freq", NormalisableRange<float> (50.0f, 80.0f, 30.0f), 80.0f, attrs));
     amount (id::harmAmount, "Harm Amount", 0.8f);
     onOff (id::compOn, "Comp On/Off", true);
     amount (id::compAmount, "Comp Amount", 0.9f);
